@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %msg %logger{36}%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console">
+            <PatternLayout pattern="${pattern}"/>
+        </Console>
+        <RollingFile name="file"
+                     fileName="logs/timetable.log"
+                     filePattern="logs/timetable-%i.log">
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="/logs/" maxDepth="1">
+                    <IfFileName glob="*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="file"/>
+        </Root>
+    </Loggers>
+</Configuration>
