@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-public class MainController {
+public class TeacherController {
     @Autowired
     private TeacherService teacherService;
 
@@ -43,7 +43,7 @@ public class MainController {
      * описанный аннотацией @PostConstruct.
      * Который вызовется спрингом, после того,
      * как им будут произведены все оставшиеся инъекции.
-     * {@link MainController#init()}
+     * {@link TeacherController#init()}
      */
     @FXML
     public void initialize() {
@@ -59,7 +59,7 @@ public class MainController {
 
         // Добавляем столбцы к таблице
         TableColumn<Teacher, String> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("teacherId"));
 
         TableColumn<Teacher, String> nameColumn = new TableColumn<>("Имя");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));

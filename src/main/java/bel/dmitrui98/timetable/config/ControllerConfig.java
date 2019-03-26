@@ -1,6 +1,6 @@
 package bel.dmitrui98.timetable.config;
 
-import bel.dmitrui98.timetable.controller.MainController;
+import bel.dmitrui98.timetable.controller.TeacherController;
 import bel.dmitrui98.timetable.util.view.ViewName;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,8 +22,8 @@ public class ControllerConfig {
      * и заставили его произвести все необходимые инъекции.
      */
     @Bean
-    public MainController getMainController() throws IOException {
-        return (MainController) mainView().getController();
+    public TeacherController getMainController() throws IOException {
+        return (TeacherController) mainView().getController();
     }
 
     /**
