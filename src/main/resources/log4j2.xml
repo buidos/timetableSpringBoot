@@ -23,6 +23,10 @@
         </RollingFile>
     </Appenders>
     <Loggers>
+        <Logger name="org.hibernate.SQL" level="debug">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="file"/>
+        </Logger>
         <Root level="info">
             <AppenderRef ref="console"/>
             <AppenderRef ref="file"/>

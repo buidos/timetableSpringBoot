@@ -15,15 +15,16 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long teacherId;
 
-    @Column
+    @Column(nullable = false)
+    private String surname;
+
     private String name;
-    @Column
+    private String patronymic;
     private String phone;
-    @Column
     private String email;
 
     public Teacher(String name, String phone, String email) {
-        this.name = name;
+        this.surname = name;
         this.phone = phone;
         this.email = email;
     }
