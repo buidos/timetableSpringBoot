@@ -1,6 +1,6 @@
 package bel.dmitrui98.timetable.entity;
 
-import bel.dmitrui98.timetable.entity.dictionary.SubjectType;
+import bel.dmitrui98.timetable.enums.SubjectTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class Subject {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "subjectTypeId", nullable = false)
-    private SubjectType subjectType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SubjectTypeEnum subjectType;
 }

@@ -1,9 +1,9 @@
 package bel.dmitrui98.timetable.entity;
 
 import bel.dmitrui98.timetable.entity.dictionary.Specialty;
-import bel.dmitrui98.timetable.entity.dictionary.StudyForm;
 import bel.dmitrui98.timetable.entity.dictionary.StudyShift;
-import bel.dmitrui98.timetable.entity.dictionary.StudyType;
+import bel.dmitrui98.timetable.enums.StudyFormEnum;
+import bel.dmitrui98.timetable.enums.StudyTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,13 +38,13 @@ public class StudyGroup {
     @JoinColumn(nullable = false, name = "specialtyId")
     private Specialty specialty;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "studyTypeId")
-    private StudyType studyType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StudyTypeEnum studyType;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "studyFormId")
-    private StudyForm studyForm;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StudyFormEnum studyForm;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "studyGroup_teachersBranch", joinColumns = {
