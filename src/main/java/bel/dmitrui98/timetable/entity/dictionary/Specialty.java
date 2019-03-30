@@ -13,6 +13,9 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name"}, name = "spec_name_constr")
+})
 public class Specialty {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

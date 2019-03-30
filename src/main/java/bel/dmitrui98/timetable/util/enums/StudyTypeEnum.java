@@ -1,4 +1,4 @@
-package bel.dmitrui98.timetable.enums;
+package bel.dmitrui98.timetable.util.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

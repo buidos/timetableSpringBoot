@@ -1,6 +1,6 @@
 package bel.dmitrui98.timetable.entity;
 
-import bel.dmitrui98.timetable.enums.SubjectTypeEnum;
+import bel.dmitrui98.timetable.util.enums.SubjectTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
