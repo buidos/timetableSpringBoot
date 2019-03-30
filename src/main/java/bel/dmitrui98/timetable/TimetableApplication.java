@@ -1,9 +1,9 @@
 package bel.dmitrui98.timetable;
 
-import bel.dmitrui98.timetable.config.ControllerConfig;
-import javafx.scene.Scene;
+import bel.dmitrui98.timetable.util.view.AppsView;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Lazy;
 
@@ -14,14 +14,21 @@ public class TimetableApplication extends AbstractJavaFxApplicationSupport {
     private String windowTitle = "Помощник составления расписания";
 
     @Autowired
-    private ControllerConfig.View view;
+    @Qualifier("mainView")
+    private AppsView mainView;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         stage.setTitle(windowTitle);
-        stage.setScene(new Scene(view.getView()));
+        stage.setScene(mainView.getScene());
+        stage.getIcons().add(mainView.getIcon());
         stage.setResizable(true);
-        stage.centerOnScreen();
+
+        // на полный экран
+//        stage.setMaximized(true);
+
+
+
         stage.show();
     }
 

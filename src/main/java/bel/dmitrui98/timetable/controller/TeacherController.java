@@ -72,6 +72,7 @@ public class TeacherController {
 
         table.getColumns().setAll(idColumn, nameColumn, phoneColumn, emailColumn);
 
+
         // Добавляем данные в таблицу
         table.setItems(data);
     }
