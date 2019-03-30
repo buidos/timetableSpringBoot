@@ -23,3 +23,4 @@ Spring boot application
 - https://docs.oracle.com/javase/8/javafx/collections-tutorial/collections.htm - javafx collections
 - https://docs.oracle.com/javase/8/javafx/layout-tutorial/builtin_layouts.htm - Working with Layouts in JavaFX  
 - https://www.youtube.com/watch?v=db2wxZ1yDl8&list=PLwwk4BHih4fi1rkT7XAHrwya3Qjuo63AK - видеоуроки javafx
+- https://code.makery.ch/blog/javafx-8-event-handling-examples/ - обработка событий
