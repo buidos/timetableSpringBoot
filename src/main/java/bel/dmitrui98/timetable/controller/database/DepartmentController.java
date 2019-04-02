@@ -1,4 +1,4 @@
-package bel.dmitrui98.timetable.controller;
+package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.entity.dictionary.Department;
 import bel.dmitrui98.timetable.service.BaseService;
@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EditDBController {
+public class DepartmentController {
 
     private static final String EDIT_LABEL_NAME = "Номер для редактирования: ";
     private static final String EDIT_LABEL_INIT = "не установлен";

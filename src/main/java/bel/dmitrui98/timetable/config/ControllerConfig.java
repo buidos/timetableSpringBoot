@@ -1,7 +1,8 @@
 package bel.dmitrui98.timetable.config;
 
-import bel.dmitrui98.timetable.controller.EditDBController;
 import bel.dmitrui98.timetable.controller.MainController;
+import bel.dmitrui98.timetable.controller.database.DepartmentController;
+import bel.dmitrui98.timetable.controller.database.EditDBController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewName;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +34,7 @@ public class ControllerConfig {
     //*******BEGIN EDIT DATABASE VIEW*******
     @Bean
     public AppsView editDatabaseView() throws IOException {
-        return loadView(ViewName.getName("editDatabase"));
+        return loadView(ViewName.getName("database/editDatabase"));
     }
 
     @Bean
@@ -41,6 +42,18 @@ public class ControllerConfig {
         return (EditDBController) editDatabaseView().getController();
     }
     //*******END EDIT DATABASE VIEW*******
+
+    //*******BEGIN DEPARTMENT VIEW*******
+    @Bean
+    public AppsView departmentView() throws IOException {
+        return loadView(ViewName.getName("database/department"));
+    }
+
+    @Bean
+    public DepartmentController departmentController() throws IOException {
+        return (DepartmentController) departmentView().getController();
+    }
+    //*******END DEPARTMENT VIEW*******
 
     private AppsView loadView(String url) throws IOException {
         if (icon == null) {
