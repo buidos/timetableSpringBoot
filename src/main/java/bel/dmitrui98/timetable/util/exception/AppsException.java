@@ -24,8 +24,9 @@ public class AppsException extends Exception {
         this.exceptionType = exceptionType;
     }
 
-    public AppsException(String message) {
+    public AppsException(ExceptionType exceptionType, String message) {
         super(message);
         this.message = message;
+        this.exceptionType = exceptionType;
     }
 }

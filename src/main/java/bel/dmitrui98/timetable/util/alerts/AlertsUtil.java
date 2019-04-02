@@ -45,4 +45,13 @@ public class AlertsUtil {
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
     }
+
+    public static void showInfoAlert(String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Информация");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.initStyle(StageStyle.UTILITY);
+        alert.showAndWait();
+    }
 }

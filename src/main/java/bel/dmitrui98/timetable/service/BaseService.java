@@ -5,7 +5,8 @@ import bel.dmitrui98.timetable.util.exception.AppsException;
 import java.util.List;
 
 public interface BaseService<T, T_ID> {
-    boolean save(T entity) throws AppsException;
-    boolean delete(T_ID id) throws AppsException;
+    void save(T entity) throws AppsException;
+    void delete(T_ID id) throws AppsException;
+    T findByIdThrow(T_ID id) throws AppsException;
     List<T> findAll();
 }

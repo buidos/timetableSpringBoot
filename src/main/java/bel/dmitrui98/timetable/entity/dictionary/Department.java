@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -13,11 +14,12 @@ import javax.persistence.*;
  */
 @NoArgsConstructor
 @Entity
-@Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name"}, name = "dep_name_constr")
-})
+@Table(indexes =
+        {@Index(columnList = "name", unique = true, name = "dep_name_ind_unique")})
+@ToString
 public class Department {
 
+    @ToString.Exclude
     private IntegerProperty departmentId = new SimpleIntegerProperty();
     private StringProperty name = new SimpleStringProperty();
 
