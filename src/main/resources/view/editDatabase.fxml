@@ -31,7 +31,7 @@
                            <content>
                               <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="814.0" spacing="10.0">
+                                    <HBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="678.0" spacing="10.0">
                                        <children>
                                           <Label text="Название:">
                                              <HBox.margin>
@@ -39,13 +39,23 @@
                                              </HBox.margin>
                                           </Label>
                                           <TextField fx:id="depNameTextField" />
-                                          <Button mnemonicParsing="false" onAction="#addDepartment" text="Добавить" />
+                                          <Button defaultButton="true" mnemonicParsing="false" onAction="#addDepartment" text="Добавить" />
                                           <Button mnemonicParsing="false" onAction="#editDepartment" text="Редактировать" />
                                           <Button mnemonicParsing="false" onAction="#deleteDepartment" text="Удалить" />
                                        </children>
                                        <opaqueInsets>
                                           <Insets right="10.0" />
                                        </opaqueInsets>
+                                    </HBox>
+                                    <HBox maxWidth="-Infinity" prefWidth="678.0">
+                                       <children>
+                                          <Label fx:id="editIndexLabel" text="Номер для редактирования:" />
+                                       </children>
+                                    </HBox>
+                                    <HBox layoutX="139.0" layoutY="51.0" maxWidth="-Infinity" prefWidth="678.0">
+                                       <children>
+                                          <Label fx:id="deleteIndexesLabel" text="Номера для удаления:" />
+                                       </children>
                                     </HBox>
                                     <TableView fx:id="departmentTableView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="325.0" prefWidth="834.0">
                                       <columns>

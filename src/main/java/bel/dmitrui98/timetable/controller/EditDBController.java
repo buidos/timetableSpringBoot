@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
 
 public class EditDBController {
 
+    private static final String EDIT_LABEL_NAME = "Номер для редактирования: ";
+    private static final String EDIT_LABEL_INIT = "не установлен";
+    private static final String DELETE_LABEL_NAME = "Номера для удаления: ";
+    private static final String DELETE_LABEL_INIT = "не установлены";
+
     @Autowired
     private BaseService<Department, Integer> departmentService;
     private ObservableList<Department> departments;
@@ -36,6 +41,11 @@ public class EditDBController {
     private TextField depNameTextField;
 
     @FXML
+    private Label editIndexLabel;
+    @FXML
+    private Label deleteIndexesLabel;
+
+    @FXML
     private void addDepartment() throws AppsException {
         String name = depNameTextField.getText().toLowerCase();
 
@@ -48,12 +58,11 @@ public class EditDBController {
 
     @FXML
     private void editDepartment() throws AppsException {
-        ObservableList<Department> selectedItems = departmentTableView.getSelectionModel().getSelectedItems();
-        if (selectedItems.isEmpty()) {
+        Department departmentForEdit  = departmentTableView.getSelectionModel().getSelectedItem();
+        if (departmentForEdit == null) {
             AlertsUtil.showInfoAlert("Не выбрано отделение", "Выберите хотя бы одно отделение для редактирования");
             return;
         }
-        Department departmentForEdit = selectedItems.stream().findFirst().get();
         String name = depNameTextField.getText().toLowerCase();
         if (isValid(name)) {
             departmentForEdit.setName(name);
@@ -62,8 +71,18 @@ public class EditDBController {
     }
 
     @FXML
-    private void deleteDepartment() {
-        System.out.println("delete");
+    private void deleteDepartment() throws AppsException {
+        ObservableList<Department> selectedItems = departmentTableView.getSelectionModel().getSelectedItems();
+        if (selectedItems.isEmpty()) {
+            AlertsUtil.showInfoAlert("Не выбрано отделение", "Выберите хотя бы одно отделение для удаления");
+            return;
+        }
+        departmentService.deleteAll(selectedItems);
+
+        departments.clear();
+        departments.setAll(departmentService.findAll());
+
+        refreshLabels();
     }
 
     private boolean isValid(String name) {
@@ -89,6 +108,7 @@ public class EditDBController {
 
     @PostConstruct
     public void init() {
+
         departmentIndexCol.setCellFactory(col -> {
             TableCell<Department, Void> cell = new TableCell<>();
             cell.textProperty().bind(Bindings.createStringBinding(() -> {
@@ -110,8 +130,24 @@ public class EditDBController {
         departmentTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 depNameTextField.setText(newValue.getName());
+                refreshLabels();
             }
         });
         VBox.setVgrow(departmentTableView, Priority.ALWAYS);
+
+        refreshLabels();
+    }
+
+    private void refreshLabels() {
+        List<Integer> selectedNumbers = departmentTableView.getSelectionModel().getSelectedIndices().stream()
+                .map(index -> index + 1)
+                .collect(Collectors.toList());
+        if (!selectedNumbers.isEmpty()) {
+            editIndexLabel.setText(EDIT_LABEL_NAME + (departmentTableView.getSelectionModel().getSelectedIndex() + 1));
+            deleteIndexesLabel.setText(DELETE_LABEL_NAME + selectedNumbers);
+        } else {
+            deleteIndexesLabel.setText(DELETE_LABEL_NAME + DELETE_LABEL_INIT);
+            editIndexLabel.setText(EDIT_LABEL_NAME + EDIT_LABEL_INIT);
+        }
     }
 }
