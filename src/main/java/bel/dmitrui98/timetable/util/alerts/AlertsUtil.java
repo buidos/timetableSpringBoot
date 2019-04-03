@@ -1,6 +1,7 @@
 package bel.dmitrui98.timetable.util.alerts;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
@@ -9,6 +10,7 @@ import javafx.stage.StageStyle;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Optional;
 
 public class AlertsUtil {
 
@@ -53,5 +55,17 @@ public class AlertsUtil {
         alert.setContentText(contentText);
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
+    }
+
+    public static boolean showConfirmAlert(String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Подтверждение действия");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.initStyle(StageStyle.UTILITY);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 }

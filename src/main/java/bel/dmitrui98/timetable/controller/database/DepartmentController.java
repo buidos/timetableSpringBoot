@@ -77,12 +77,19 @@ public class DepartmentController {
             AlertsUtil.showInfoAlert("Не выбрано отделение", "Выберите хотя бы одно отделение для удаления");
             return;
         }
-        departmentService.deleteAll(selectedItems);
+        List<Integer> selectedNumbers = departmentTableView.getSelectionModel().getSelectedIndices().stream()
+                .map(index -> index + 1)
+                .collect(Collectors.toList());
+        boolean isConfirmed = AlertsUtil.showConfirmAlert("Вы точно хотите удалить выделенные отделения?",
+                "Отделения с номерами " + selectedNumbers + " будут удалены");
 
-        departments.clear();
-        departments.setAll(departmentService.findAll());
+        if (isConfirmed) {
+            departmentService.deleteAll(selectedItems);
 
-        refreshLabels();
+            departments.clear();
+            departments.setAll(departmentService.findAll());
+            refreshLabels();
+        }
     }
 
     private boolean isValid(String name) {

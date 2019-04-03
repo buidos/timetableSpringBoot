@@ -58,4 +58,14 @@ public class DepartmentService implements BaseService<Department, Integer> {
             throw new AppsException(REC_NOT_DELETED, ex);
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteAllByIds(List<Integer> ids) throws AppsException {
+        try {
+            departmentRepository.deleteAllByIds(ids);
+        } catch (Exception ex) {
+            throw new AppsException(REC_NOT_DELETED, ex);
+        }
+    }
 }
