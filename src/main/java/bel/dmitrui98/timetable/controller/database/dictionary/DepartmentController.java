@@ -1,10 +1,9 @@
-package bel.dmitrui98.timetable.controller.database;
+package bel.dmitrui98.timetable.controller.database.dictionary;
 
 import bel.dmitrui98.timetable.entity.dictionary.Department;
 import bel.dmitrui98.timetable.service.BaseService;
 import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.exception.AppsException;
-import bel.dmitrui98.timetable.util.exception.ExceptionType;
 import bel.dmitrui98.timetable.util.validation.AppsValidation;
 import bel.dmitrui98.timetable.util.validation.ValidConditions;
 import javafx.beans.binding.Bindings;
@@ -20,12 +19,17 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static bel.dmitrui98.timetable.util.exception.ExceptionType.*;
+
 public class DepartmentController {
 
     private static final String EDIT_LABEL_NAME = "Номер для редактирования: ";
     private static final String EDIT_LABEL_INIT = "не установлен";
     private static final String DELETE_LABEL_NAME = "Номера для удаления: ";
     private static final String DELETE_LABEL_INIT = "не установлены";
+
+    @FXML
+    private Button defaultButton;
 
     @Autowired
     private BaseService<Department, Integer> departmentService;
@@ -84,7 +88,17 @@ public class DepartmentController {
                 "Отделения с номерами " + selectedNumbers + " будут удалены");
 
         if (isConfirmed) {
-            departmentService.deleteAll(selectedItems);
+            try {
+                departmentService.deleteAll(selectedItems);
+            } catch (AppsException ex) {
+                // не удалено, так как на отделение ссылается специальность
+                if (ex.getExceptionType().equals(REC_NOT_DELETED_RELATION)) {
+                    AlertsUtil.showErrorAlert("Ошибка удаления", ex.getMessage());
+                    return;
+                } else {
+                    throw ex;
+                }
+            }
 
             departments.clear();
             departments.setAll(departmentService.findAll());
@@ -100,11 +114,11 @@ public class DepartmentController {
             AppsValidation.validate(name, new ValidConditions(false, false), depNames);
         } catch (AppsException ex) {
             String contentText = "";
-            if (ex.getExceptionType().equals(ExceptionType.VALID_EMPTY_VALUE)) {
+            if (ex.getExceptionType().equals(VALID_EMPTY_VALUE)) {
                 contentText = "Имя отделения не должно быть пустым";
-            } else if (ex.getExceptionType().equals(ExceptionType.VALID_LONG_VALUE)) {
+            } else if (ex.getExceptionType().equals(VALID_LONG_VALUE)) {
                 contentText = "Имя отделения не дожно превышать длину в " + ValidConditions.MAX_STRING_LENGTH + " символов";
-            } else if (ex.getExceptionType().equals(ExceptionType.VALID_DUPLICATE_VALUE)) {
+            } else if (ex.getExceptionType().equals(VALID_DUPLICATE_VALUE)) {
                 contentText = "Отделение с именем \"" + name + "\" уже существует";
             }
             AlertsUtil.showErrorAlert(AppsException.VALIDATION_ERROR, contentText);
@@ -156,5 +170,9 @@ public class DepartmentController {
             deleteIndexesLabel.setText(DELETE_LABEL_NAME + DELETE_LABEL_INIT);
             editIndexLabel.setText(EDIT_LABEL_NAME + EDIT_LABEL_INIT);
         }
+    }
+
+    public Button getDefaultButton() {
+        return defaultButton;
     }
 }

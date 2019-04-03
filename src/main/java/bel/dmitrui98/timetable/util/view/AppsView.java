@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- *
+ * fxml отображение(сцена, контроллер, иконка)
  */
 @Getter
 @Setter
@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AppsView {
     /**
-     * главная панель fxml
+     * Сцена fxml файла
      */
     private Scene scene;
     /**

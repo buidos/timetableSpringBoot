@@ -1,13 +1,17 @@
-package bel.dmitrui98.timetable.service;
+package bel.dmitrui98.timetable.service.database.dictionary;
 
 import bel.dmitrui98.timetable.entity.dictionary.Department;
+import bel.dmitrui98.timetable.entity.dictionary.Specialty;
 import bel.dmitrui98.timetable.repository.DepartmentRepository;
+import bel.dmitrui98.timetable.repository.SpecialtyRepository;
+import bel.dmitrui98.timetable.service.BaseService;
 import bel.dmitrui98.timetable.util.exception.AppsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,9 @@ public class DepartmentService implements BaseService<Department, Integer> {
 
     @Autowired
     private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private SpecialtyRepository specialtyRepository;
 
     public void save(Department entity) throws AppsException {
         try {
@@ -52,6 +59,20 @@ public class DepartmentService implements BaseService<Department, Integer> {
         List<Integer> ids = entities.stream()
                 .map(Department::getDepartmentId)
                 .collect(Collectors.toList());
+
+        List<Specialty> specialties = specialtyRepository.findByDepartmentDepartmentIdIn(ids);
+        List<String> specialityNames = new ArrayList<>();
+
+        for (Specialty specialty : specialties) {
+            if (ids.contains(specialty.getDepartment().getDepartmentId())) {
+                specialityNames.add(specialty.getName());
+            }
+        }
+        if (!specialityNames.isEmpty()) {
+            throw new AppsException(REC_NOT_DELETED_RELATION, "Невозможно удалить отделение," +
+                    " так как на него ссылаются специальности " + specialityNames);
+        }
+
         try {
             departmentRepository.deleteAllByIds(ids);
         } catch (Exception ex) {

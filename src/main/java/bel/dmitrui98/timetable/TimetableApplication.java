@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable;
 
 import bel.dmitrui98.timetable.util.exception.AppsExceptionHandler;
 import bel.dmitrui98.timetable.util.view.AppsView;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Lazy;
 public class TimetableApplication extends AbstractJavaFxApplicationSupport {
 
     private String windowTitle = "Помощник составления расписания";
+    public static final Image APPLICATION_ICON = new Image("images/icon.png");
 
     private Stage rootStage;
 
