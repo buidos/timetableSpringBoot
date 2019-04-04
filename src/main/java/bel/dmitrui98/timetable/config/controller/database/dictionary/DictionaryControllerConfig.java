@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable.config.controller.database.dictionary;
 
 import bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController;
 import bel.dmitrui98.timetable.controller.database.dictionary.SpecialtyController;
+import bel.dmitrui98.timetable.controller.database.dictionary.SubjectTypeController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewUtil;
 import org.springframework.context.annotation.Bean;
@@ -36,5 +37,16 @@ public class DictionaryControllerConfig {
     @Bean
     public SpecialtyController specialtyController() throws IOException {
         return (SpecialtyController) specialtyView().getController();
+    }
+
+    // SUBJECT_TYPE
+    @Bean
+    public AppsView subjectTypeView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "supject_type_enum"));
+    }
+
+    @Bean
+    public SubjectTypeController subjectTypeController() throws IOException {
+        return (SubjectTypeController) subjectTypeView().getController();
     }
 }

@@ -67,13 +67,10 @@ public class DepartmentService implements BaseService<Department, Integer> {
             if (ids.contains(specialty.getDepartment().getDepartmentId())) {
                 specialityNames.add(specialty.getName());
             }
-            if (!specialityNames.isEmpty()) {
-                break;
-            }
         }
         if (!specialityNames.isEmpty()) {
-            throw new AppsException(REC_NOT_DELETED_RELATION, "Невозможно удалить отделение," +
-                    " так как на него ссылаются специальности " + specialityNames);
+            throw new AppsException(REC_NOT_DELETED_RELATION, "Невозможно удалить выделенные отделения, так как на них ссылаются специальности." +
+                    " Зависимые специальности: " + specialityNames);
         }
 
         try {

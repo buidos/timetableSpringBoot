@@ -39,6 +39,11 @@ public class MainController {
     @Qualifier("specialtyView")
     private AppsView specialtyView;
 
+    @Autowired
+    @Qualifier("subjectTypeView")
+    private AppsView subjectTypeView;
+
+
     @FXML
     private void showEditDatabase() {
         Stage stage = new Stage();
@@ -89,7 +94,7 @@ public class MainController {
                     tab.setContent(specialtyView.getScene().getRoot());
                     break;
                 case SUBJECT_TYPE:
-                    System.out.println(SUBJECT_TYPE);
+                    tab.setContent(subjectTypeView.getScene().getRoot());
                     break;
                 case SUBJECT:
                     System.out.println(SUBJECT);
