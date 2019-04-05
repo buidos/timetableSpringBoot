@@ -20,7 +20,8 @@ public class Specialty {
     private ObjectProperty<Department> department = new SimpleObjectProperty<>();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "specialty_gen")
+    @SequenceGenerator(name="specialty_gen", sequenceName = "specialty_seq", allocationSize=1)
     public int getSpecialtyId() {
         return specialtyId.get();
     }

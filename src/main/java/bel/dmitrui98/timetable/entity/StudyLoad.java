@@ -15,7 +15,8 @@ import javax.persistence.*;
 @Entity
 public class StudyLoad {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "load_gen")
+    @SequenceGenerator(name="load_gen", sequenceName = "load_seq", allocationSize=1)
     private Long studyLoadId;
 
     /**

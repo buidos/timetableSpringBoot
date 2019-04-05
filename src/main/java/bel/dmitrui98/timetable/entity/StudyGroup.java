@@ -21,7 +21,8 @@ import java.util.Set;
 @Entity
 public class StudyGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_gen")
+    @SequenceGenerator(name="group_gen", sequenceName = "group_seq", allocationSize=1)
     private Long studyGroupId;
 
     @Column(nullable = false)

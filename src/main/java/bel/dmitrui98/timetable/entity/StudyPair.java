@@ -17,7 +17,8 @@ import java.time.LocalTime;
 @Entity
 public class StudyPair {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pair_gen")
+    @SequenceGenerator(name="pair_gen", sequenceName = "pair_seq", allocationSize=1)
     private Long studyPairId;
 
     /**

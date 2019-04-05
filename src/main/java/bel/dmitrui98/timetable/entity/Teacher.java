@@ -12,7 +12,8 @@ import javax.persistence.*;
 @Entity
 public class Teacher {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacher_gen")
+    @SequenceGenerator(name="teacher_gen", sequenceName = "teacher_seq", allocationSize=1)
     private Long teacherId;
 
     @Column(nullable = false)

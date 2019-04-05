@@ -47,6 +47,18 @@ public class MainController {
     @Qualifier("subjectView")
     private AppsView subjectView;
 
+    @Autowired
+    @Qualifier("studyTypeView")
+    private AppsView studyTypeView;
+
+    @Autowired
+    @Qualifier("studyFormView")
+    private AppsView studyFormView;
+
+    @Autowired
+    @Qualifier("studyShiftView")
+    private AppsView studyShiftView;
+
 
     @FXML
     private void showEditDatabase() {
@@ -104,13 +116,13 @@ public class MainController {
                     tab.setContent(subjectView.getScene().getRoot());
                     break;
                 case STUDY_FORM:
-                    System.out.println(STUDY_FORM);
+                    tab.setContent(studyFormView.getScene().getRoot());
                     break;
                 case STUDY_TYPE:
-                    System.out.println(STUDY_TYPE);
+                    tab.setContent(studyTypeView.getScene().getRoot());
                     break;
                 case STUDY_SHIFT:
-                    System.out.println(STUDY_SHIFT);
+                    tab.setContent(studyShiftView.getScene().getRoot());
                     break;
             }
         }

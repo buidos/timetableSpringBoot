@@ -1,9 +1,6 @@
 package bel.dmitrui98.timetable.config.controller.database.dictionary;
 
-import bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController;
-import bel.dmitrui98.timetable.controller.database.dictionary.SpecialtyController;
-import bel.dmitrui98.timetable.controller.database.dictionary.SubjectController;
-import bel.dmitrui98.timetable.controller.database.dictionary.SubjectTypeController;
+import bel.dmitrui98.timetable.controller.database.dictionary.*;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewUtil;
 import org.springframework.context.annotation.Bean;
@@ -60,6 +57,39 @@ public class DictionaryControllerConfig {
     @Bean
     public SubjectController subjectController() throws IOException {
         return (SubjectController) subjectView().getController();
+    }
+
+    // STUDY FORM
+    @Bean
+    public AppsView studyFormView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "study_form_enum"));
+    }
+
+    @Bean
+    public StudyFormController studyFormController() throws IOException {
+        return (StudyFormController) studyFormView().getController();
+    }
+
+    // STUDY TYPE
+    @Bean
+    public AppsView studyTypeView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "study_type_enum"));
+    }
+
+    @Bean
+    public StudyTypeController studyTypeController() throws IOException {
+        return (StudyTypeController) studyTypeView().getController();
+    }
+
+    // STUDY SHIFT
+    @Bean
+    public AppsView studyShiftView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "study_shift"));
+    }
+
+    @Bean
+    public StudyShiftController studyShiftController() throws IOException {
+        return (StudyShiftController) studyShiftView().getController();
     }
 
 }

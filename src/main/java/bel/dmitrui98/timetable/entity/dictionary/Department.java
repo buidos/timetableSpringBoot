@@ -24,7 +24,8 @@ public class Department {
     private StringProperty name = new SimpleStringProperty();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dep_gen")
+    @SequenceGenerator(name="dep_gen", sequenceName = "dep_seq", allocationSize=1)
     public int getDepartmentId() {
         return departmentId.get();
     }

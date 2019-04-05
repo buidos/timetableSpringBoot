@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController;
 import bel.dmitrui98.timetable.controller.database.dictionary.SpecialtyController;
+import bel.dmitrui98.timetable.controller.database.dictionary.StudyShiftController;
 import bel.dmitrui98.timetable.controller.database.dictionary.SubjectController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import javafx.event.Event;
@@ -23,6 +24,10 @@ public class EditDBController {
     @Autowired
     @Qualifier("subjectView")
     private AppsView subjectView;
+
+    @Autowired
+    @Qualifier("studyShiftView")
+    private AppsView studyShiftView;
 
     /**
      * Обновляет вкладку отделений
@@ -69,6 +74,23 @@ public class EditDBController {
         }
         Tab tab = (Tab) event.getSource();
         SubjectController controller = (SubjectController) subjectView.getController();
+        if (tab.isSelected()) {
+            controller.getDefaultButton().setDefaultButton(true);
+        } else {
+            controller.getDefaultButton().setDefaultButton(false);
+        }
+    }
+
+    /**
+     * Обновляет вкладку учебных смен
+     */
+    @FXML
+    private void studyShiftTabSelectionChange(Event event) {
+        if (studyShiftView == null) {
+            return;
+        }
+        Tab tab = (Tab) event.getSource();
+        StudyShiftController controller = (StudyShiftController) studyShiftView.getController();
         if (tab.isSelected()) {
             controller.getDefaultButton().setDefaultButton(true);
         } else {

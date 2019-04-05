@@ -20,7 +20,8 @@ import java.util.Set;
 })
 public class TeachersBranch {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacher_br_gen")
+    @SequenceGenerator(name="teacher_br_gen", sequenceName = "teacher_br_seq", allocationSize=1)
     private Long teacherBranchId;
 
     @ManyToOne

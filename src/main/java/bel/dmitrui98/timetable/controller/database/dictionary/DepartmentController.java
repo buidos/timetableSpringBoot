@@ -68,6 +68,14 @@ public class DepartmentController {
             return;
         }
         String name = depNameTextField.getText().toLowerCase();
+
+        // если изменений не было
+        if (departmentForEdit.getName().equals(name)) {
+            AlertsUtil.showInfoAlert("Изменений не зафиксировано",
+                    "Измените название");
+            return;
+        }
+
         if (isValid(name)) {
             departmentForEdit.setName(name);
             departmentService.save(departmentForEdit);

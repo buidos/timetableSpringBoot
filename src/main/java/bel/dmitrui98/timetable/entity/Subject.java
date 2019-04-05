@@ -26,7 +26,8 @@ public class Subject {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subject_gen")
+    @SequenceGenerator(name="subject_gen", sequenceName = "subject_seq", allocationSize=1)
     public long getSubjectId() {
         return subjectId.get();
     }
