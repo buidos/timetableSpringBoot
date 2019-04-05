@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController;
 import bel.dmitrui98.timetable.controller.database.dictionary.SpecialtyController;
+import bel.dmitrui98.timetable.controller.database.dictionary.SubjectController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -18,6 +19,10 @@ public class EditDBController {
     @Autowired
     @Qualifier("departmentView")
     private AppsView departmentView;
+
+    @Autowired
+    @Qualifier("subjectView")
+    private AppsView subjectView;
 
     /**
      * Обновляет вкладку отделений
@@ -49,6 +54,23 @@ public class EditDBController {
         if (tab.isSelected()) {
             controller.getDefaultButton().setDefaultButton(true);
             controller.refresh();
+        } else {
+            controller.getDefaultButton().setDefaultButton(false);
+        }
+    }
+
+    /**
+     * Обновляет вкладку дисциплин
+     */
+    @FXML
+    private void subjectTabSelectionChange(Event event) {
+        if (subjectView == null) {
+            return;
+        }
+        Tab tab = (Tab) event.getSource();
+        SubjectController controller = (SubjectController) subjectView.getController();
+        if (tab.isSelected()) {
+            controller.getDefaultButton().setDefaultButton(true);
         } else {
             controller.getDefaultButton().setDefaultButton(false);
         }

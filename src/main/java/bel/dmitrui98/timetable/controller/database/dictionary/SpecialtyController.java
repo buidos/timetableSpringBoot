@@ -90,15 +90,16 @@ public class SpecialtyController {
             return;
         }
 
-        boolean isValid;
-        if (specialtyForEdit.getDepartment().getDepartmentId() == department.getDepartmentId()) {
-            isValid = isValid(name);
-        } else {
-            // разрешаем дубликаты имен
-            isValid = isValid(name, false, true);
+        // если изменений не было
+        if (specialtyForEdit.getDepartment().getDepartmentId() == department.getDepartmentId() && specialtyForEdit.getName().equals(name)) {
+            AlertsUtil.showInfoAlert("Изменений не зафиксировано",
+                    "Измените название или отделение");
+            return;
         }
 
-        if (isValid) {
+        int ignoreIndex = specialtyTableView.getSelectionModel().getSelectedIndex();
+
+        if (isValid(name, ignoreIndex)) {
             specialtyForEdit.setName(name);
             specialtyForEdit.setDepartment(department);
             specialtyService.save(specialtyForEdit);
@@ -128,12 +129,16 @@ public class SpecialtyController {
         }
     }
 
-    private boolean isValid(String name, boolean allowEmpty, boolean allowDuplicate) {
+    private boolean isValid(String name) {
+        return isValid(name, -1);
+    }
+
+    private boolean isValid(String name, int ignoreIndex) {
         try {
             List<String> names = specialtyTableView.getItems().stream()
                     .map(Specialty::getName)
                     .collect(Collectors.toList());
-            AppsValidation.validate(name, new ValidConditions(allowEmpty, allowDuplicate), names);
+            AppsValidation.validate(name, new ValidConditions(false, false), names, ignoreIndex);
         } catch (AppsException ex) {
             String contentText = "";
             if (ex.getExceptionType().equals(ExceptionType.VALID_EMPTY_VALUE)) {
@@ -147,10 +152,6 @@ public class SpecialtyController {
             return false;
         }
         return true;
-    }
-
-    public boolean isValid(String name) {
-        return isValid(name, false, false);
     }
 
     @PostConstruct

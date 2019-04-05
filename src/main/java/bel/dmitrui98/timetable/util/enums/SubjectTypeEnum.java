@@ -9,8 +9,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum SubjectTypeEnum {
-    HUMANE("гуманитарный"),
-    TECHNICAL("технический"),
+    HUMANE("гуманитарная"),
+    TECHNICAL("техническая"),
     ;
     private String name;
 }

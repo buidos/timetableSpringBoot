@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable.config.controller.database.dictionary;
 
 import bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController;
 import bel.dmitrui98.timetable.controller.database.dictionary.SpecialtyController;
+import bel.dmitrui98.timetable.controller.database.dictionary.SubjectController;
 import bel.dmitrui98.timetable.controller.database.dictionary.SubjectTypeController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewUtil;
@@ -49,4 +50,16 @@ public class DictionaryControllerConfig {
     public SubjectTypeController subjectTypeController() throws IOException {
         return (SubjectTypeController) subjectTypeView().getController();
     }
+
+    // SUBJECT
+    @Bean
+    public AppsView subjectView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "subject"));
+    }
+
+    @Bean
+    public SubjectController subjectController() throws IOException {
+        return (SubjectController) subjectView().getController();
+    }
+
 }

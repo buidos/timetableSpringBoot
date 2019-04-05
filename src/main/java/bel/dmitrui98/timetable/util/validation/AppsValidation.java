@@ -19,6 +19,10 @@ public class AppsValidation {
      * @throws AppsException тип ошибки валидации
      */
     public static void validate(String s, ValidConditions conds, List<String> strings) throws AppsException {
+        validate(s, conds, strings, -1);
+    }
+
+    public static void validate(String s, ValidConditions conds, List<String> strings, int ignoreIntex) throws AppsException {
         if (s == null || (!conds.isAllowEmpty() && s.isEmpty())) {
             throw new AppsException(ExceptionType.VALID_EMPTY_VALUE);
         }
@@ -26,12 +30,22 @@ public class AppsValidation {
             throw new AppsException(ExceptionType.VALID_LONG_VALUE);
         }
         if (!conds.isAllowDuplicate()) {
-            if (strings != null) {
-                // переводим имена в нижний регистр
-                List<String> lowerCaseList = strings.stream()
-                        .map(String::toLowerCase)
-                        .collect(Collectors.toList());
-                if (lowerCaseList.contains(s.toLowerCase())) {
+            validateDuplicatesThrow(s, strings, ignoreIntex);
+        }
+    }
+
+    private static void validateDuplicatesThrow(String s, List<String> strings, int ignoreIndex) throws AppsException {
+        if (strings != null) {
+            // переводим имена в нижний регистр
+            List<String> lowerCaseList = strings.stream()
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toList());
+            String lower = s.toLowerCase();
+            for (int i = 0; i < lowerCaseList.size(); i++) {
+                if (i == ignoreIndex) {
+                    continue;
+                }
+                if (lower.equals(lowerCaseList.get(i))) {
                     throw new AppsException(ExceptionType.VALID_DUPLICATE_VALUE);
                 }
             }

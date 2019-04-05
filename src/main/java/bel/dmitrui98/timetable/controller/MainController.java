@@ -43,6 +43,10 @@ public class MainController {
     @Qualifier("subjectTypeView")
     private AppsView subjectTypeView;
 
+    @Autowired
+    @Qualifier("subjectView")
+    private AppsView subjectView;
+
 
     @FXML
     private void showEditDatabase() {
@@ -97,7 +101,7 @@ public class MainController {
                     tab.setContent(subjectTypeView.getScene().getRoot());
                     break;
                 case SUBJECT:
-                    System.out.println(SUBJECT);
+                    tab.setContent(subjectView.getScene().getRoot());
                     break;
                 case STUDY_FORM:
                     System.out.println(STUDY_FORM);
