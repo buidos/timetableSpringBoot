@@ -1,8 +1,8 @@
 package bel.dmitrui98.timetable.entity;
 
 import bel.dmitrui98.timetable.entity.dictionary.Specialty;
-import bel.dmitrui98.timetable.entity.dictionary.StudyShift;
 import bel.dmitrui98.timetable.util.enums.StudyFormEnum;
+import bel.dmitrui98.timetable.util.enums.StudyShiftEnum;
 import bel.dmitrui98.timetable.util.enums.StudyTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,9 +31,9 @@ public class StudyGroup {
     @Column(nullable = false)
     private Integer course;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "studyShiftId")
-    private StudyShift studyShift;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StudyShiftEnum studyShift;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "specialtyId")

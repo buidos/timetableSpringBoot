@@ -13,7 +13,7 @@
                </HBox.margin>
             </Label>
             <TextField fx:id="depNameTextField" />
-            <Button fx:id="defaultButton" defaultButton="true" mnemonicParsing="false" onAction="#addDepartment" text="Добавить" />
+            <Button fx:id="defaultButton" mnemonicParsing="false" onAction="#addDepartment" text="Добавить" />
             <Button mnemonicParsing="false" onAction="#editDepartment" text="Редактировать" />
             <Button mnemonicParsing="false" onAction="#deleteDepartment" text="Удалить" />
          </children>

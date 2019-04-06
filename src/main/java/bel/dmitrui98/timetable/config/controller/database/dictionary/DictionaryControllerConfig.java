@@ -84,7 +84,7 @@ public class DictionaryControllerConfig {
     // STUDY SHIFT
     @Bean
     public AppsView studyShiftView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "study_shift"));
+        return loadView(ViewUtil.getModifyName(PREFIX + "study_shift_enum"));
     }
 
     @Bean

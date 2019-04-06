@@ -22,7 +22,7 @@
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                </content>
             </Tab>
-          <Tab text="Словари">
+          <Tab onSelectionChanged="#dictionaryTabSelectionChange" text="Словари">
                <content>
                   <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" scaleY="1.03" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
@@ -52,7 +52,7 @@
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                            </content>
                         </Tab>
-                        <Tab onSelectionChanged="#studyShiftTabSelectionChange" text="Смена">
+                        <Tab text="Смена">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                            </content>
