@@ -59,6 +59,10 @@ public class MainController {
     @Qualifier("studyShiftView")
     private AppsView studyShiftView;
 
+    @Autowired
+    @Qualifier("settingView")
+    private AppsView settingView;
+
 
     @FXML
     private void showEditDatabase() {
@@ -74,7 +78,7 @@ public class MainController {
         for (Tab tab : rootTabPane.getTabs()) {
             switch (tab.getText()) {
                 case SETTINGS:
-                    System.out.println(SETTINGS);
+                    tab.setContent(settingView.getScene().getRoot());
                     break;
                 case DICTIONARIES:
                     initDictionariesTabPane(tab);

@@ -5,7 +5,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.PrintWriter;
@@ -14,12 +13,12 @@ import java.util.Optional;
 
 public class AlertsUtil {
 
-    public static void showErrorAlert(String headerText, String contentText, Throwable t, Stage ownerStage) {
+    public static void showErrorAlert(String headerText, String contentText, Throwable t) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Ошибка");
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
-        alert.initOwner(ownerStage);
+        alert.initStyle(StageStyle.UTILITY);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

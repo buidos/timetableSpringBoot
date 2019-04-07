@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.database.dictionary.SettingController">
+   <children>
+      <HBox layoutX="25.0" layoutY="47.0" prefHeight="278.0" prefWidth="614.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="47.0">
+         <children>
+            <VBox prefHeight="278.0" prefWidth="395.0" spacing="21.0">
+               <children>
+                  <Label prefHeight="21.0" text="Длительность половины пары в минутах (учебный час):">
+                     <padding>
+                        <Insets top="4.0" />
+                     </padding>
+                  </Label>
+                  <Label prefHeight="21.0" text="Максимальный курс:">
+                     <VBox.margin>
+                        <Insets left="239.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label prefHeight="21.0" text="Количество пар в день:">
+                     <padding>
+                        <Insets left="224.0" />
+                     </padding>
+                  </Label>
+                  <Label prefHeight="21.0" text="Предпочтительный тип дисциплины в субботу:">
+                     <padding>
+                        <Insets left="62.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox prefHeight="278.0" prefWidth="166.0" spacing="10.0">
+               <children>
+                  <TextField fx:id="hourTimeField" />
+                  <TextField fx:id="maxCourseField" />
+                  <TextField fx:id="pairsPerDayField" />
+                  <ComboBox fx:id="subjectTypeComboBox" prefHeight="31.0" prefWidth="166.0" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox prefHeight="52.0" prefWidth="344.0" spacing="20.0" AnchorPane.leftAnchor="275.0" AnchorPane.topAnchor="246.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#save" text="Сохранить" />
+            <Button mnemonicParsing="false" onAction="#setToDefault" text="Установить по умолчанию" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

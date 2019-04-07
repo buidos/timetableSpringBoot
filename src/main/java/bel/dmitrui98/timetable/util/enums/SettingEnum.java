@@ -1,32 +1,25 @@
 package bel.dmitrui98.timetable.util.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /**
  * коды настроек, соответствуют кодам настроек в базе
  */
-@Getter
-@AllArgsConstructor
-public enum SettingCodeEnum {
+public enum SettingEnum {
 
     /**
      * учебный час
      */
-    HOUR_TIME(10),
+    HOUR_TIME,
     /**
      * максимальный курс
      */
-    MAX_COURSE(20),
+    MAX_COURSE,
     /**
      * количество пар в день
      */
-    PAIRS_PER_DAY(30),
+    PAIRS_PER_DAY,
     /**
      * предпочтительный тип дисциплины в субботу
      */
-    SATURDAY_SUBJECT_ID(40)
-    ;
+    SATURDAY_SUBJECT_ID
 
-    private Integer code;
 }

@@ -35,9 +35,9 @@ public class AppsExceptionHandler implements Thread.UncaughtExceptionHandler {
                     AppsException ex = (AppsException) invocationTargetEx.getTargetException();
 
                     if (ex.getExceptionType().equals(REC_NOT_SAVED)) {
-                        AlertsUtil.showErrorAlert(headerText, "Не удалось сохранить или изменить запись", ex, ownerStage);
+                        AlertsUtil.showErrorAlert(headerText, "Не удалось сохранить или изменить запись", ex);
                     } else if (ex.getExceptionType().equals(REC_NOT_DELETED)) {
-                        AlertsUtil.showErrorAlert(headerText, "Не удалось удалить запись", ex, ownerStage);
+                        AlertsUtil.showErrorAlert(headerText, "Не удалось удалить запись", ex);
                     } else {
                         // показываем общую ошибку
                         isAppsException = false;
@@ -48,7 +48,7 @@ public class AppsExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 
         if (!isAppsException) {
-            AlertsUtil.showErrorAlert(headerText,"Неожиданная ошибка", throwable, ownerStage);
+            AlertsUtil.showErrorAlert(headerText,"Неожиданная ошибка", throwable);
         }
     }
 
