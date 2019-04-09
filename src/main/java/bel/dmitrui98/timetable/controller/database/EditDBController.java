@@ -32,6 +32,10 @@ public class EditDBController {
     @Qualifier("studyGroupView")
     private AppsView studyGroupView;
 
+    @Autowired
+    @Qualifier("pairView")
+    private AppsView pairView;
+
     /**
      * Обновляет вкладку отделений
      */
@@ -111,7 +115,7 @@ public class EditDBController {
      */
     @FXML
     private void studyGroupTabSelectionChange(Event event) {
-        if (teacherView == null) {
+        if (studyGroupView == null) {
             return;
         }
         Tab tab = (Tab) event.getSource();
@@ -119,6 +123,23 @@ public class EditDBController {
         if (tab.isSelected()) {
             controller.getDefaultButton().setDefaultButton(true);
             controller.refresh();
+        } else {
+            controller.getDefaultButton().setDefaultButton(false);
+        }
+    }
+
+    /**
+     * Обновляет вкладку пар
+     */
+    @FXML
+    private void pairTabSelectionChange(Event event) {
+        if (pairView == null) {
+            return;
+        }
+        Tab tab = (Tab) event.getSource();
+        StudyPairController controller = (StudyPairController) pairView.getController();
+        if (tab.isSelected()) {
+            controller.getDefaultButton().setDefaultButton(true);
         } else {
             controller.getDefaultButton().setDefaultButton(false);
         }

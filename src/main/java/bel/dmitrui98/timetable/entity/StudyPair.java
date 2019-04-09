@@ -17,14 +17,14 @@ import java.time.LocalTime;
 @Entity
 public class StudyPair {
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StudyShiftEnum studyShift;
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pair_gen")
     @SequenceGenerator(name="pair_gen", sequenceName = "pair_seq", allocationSize=1)
-    private Long studyPairId;
+    private Integer studyPairId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StudyShiftEnum studyShift;
 
     /**
      * Номер пары

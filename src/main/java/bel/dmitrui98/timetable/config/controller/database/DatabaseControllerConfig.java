@@ -1,9 +1,6 @@
 package bel.dmitrui98.timetable.config.controller.database;
 
-import bel.dmitrui98.timetable.controller.database.EditDBController;
-import bel.dmitrui98.timetable.controller.database.SettingController;
-import bel.dmitrui98.timetable.controller.database.StudyGroupController;
-import bel.dmitrui98.timetable.controller.database.TeacherController;
+import bel.dmitrui98.timetable.controller.database.*;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewUtil;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +25,7 @@ public class DatabaseControllerConfig {
         return (EditDBController) editDatabaseView().getController();
     }
 
+    // настройки
     @Bean
     public AppsView settingView() throws IOException {
         return loadView(ViewUtil.getModifyName(PREFIX + "setting"));
@@ -38,6 +36,7 @@ public class DatabaseControllerConfig {
         return (SettingController) settingView().getController();
     }
 
+    // учителя
     @Bean
     public AppsView teacherView() throws IOException {
         return loadView(ViewUtil.getModifyName(PREFIX + "teacher"));
@@ -48,6 +47,7 @@ public class DatabaseControllerConfig {
         return (TeacherController) teacherView().getController();
     }
 
+    // группы
     @Bean
     public AppsView studyGroupView() throws IOException {
         return loadView(ViewUtil.getModifyName(PREFIX + "studyGroup"));
@@ -56,5 +56,16 @@ public class DatabaseControllerConfig {
     @Bean
     public StudyGroupController studyGroupController() throws IOException {
         return (StudyGroupController) studyGroupView().getController();
+    }
+
+    // пары
+    @Bean
+    public AppsView pairView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "pair"));
+    }
+
+    @Bean
+    public StudyPairController pairController() throws IOException {
+        return (StudyPairController) pairView().getController();
     }
 }

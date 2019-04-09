@@ -71,6 +71,10 @@ public class MainController {
     @Qualifier("studyGroupView")
     private AppsView studyGroupView;
 
+    @Autowired
+    @Qualifier("pairView")
+    private AppsView pairView;
+
 
     @FXML
     private void showEditDatabase() {
@@ -98,7 +102,7 @@ public class MainController {
                     tab.setContent(studyGroupView.getScene().getRoot());
                     break;
                 case PAIRS:
-                    System.out.println(PAIRS);
+                    tab.setContent(pairView.getScene().getRoot());
                     break;
                 case LOAD:
                     System.out.println(LOAD);

@@ -307,6 +307,8 @@ public class StudyGroupController {
 
         tuningComboBoxes();
 
+        setNumberFormatter(courseField);
+
         refresh();
     }
 
@@ -439,6 +441,22 @@ public class StudyGroupController {
 
         studyTypeComboBox.setItems(FXCollections.observableArrayList(Arrays.asList(StudyTypeEnum.values())));
         studyTypeComboBox.getSelectionModel().selectFirst();
+    }
+
+    private void setNumberFormatter(TextField numberField){
+        TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
+            if (!change.isContentChange()) {
+                return change;
+            }
+            String newValue = change.getControlNewText();
+
+            // если не цифра, пропускаем
+            if (!newValue.matches("\\d+") && !newValue.equals("")) {
+                return null;
+            }
+            return change;
+        });
+        numberField.setTextFormatter(numberFormatter);
     }
 
     public void refresh() {
