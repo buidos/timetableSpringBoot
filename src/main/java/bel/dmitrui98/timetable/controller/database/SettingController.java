@@ -54,7 +54,7 @@ public class SettingController {
 
         try {
             saveSettingsToDB();
-            AlertsUtil.showInfoAlert("Успех", "Настройки сохранены");
+            AlertsUtil.showInfoAlert("Операция прошла успешно", "Настройки сохранены");
         } catch (Exception ex) {
             refresh();
             throw ex;
@@ -69,7 +69,7 @@ public class SettingController {
             AppsSettingsHolder.setSettingsToDefault();
             try {
                 saveSettingsToDB();
-                AlertsUtil.showInfoAlert("Успех", "Значения настроек установлены по умолчанию");
+                AlertsUtil.showInfoAlert("Операция прошла успешно", "Значения настроек установлены по умолчанию");
             } finally {
                 refresh();
             }

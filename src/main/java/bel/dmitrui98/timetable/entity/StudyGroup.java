@@ -4,9 +4,8 @@ import bel.dmitrui98.timetable.entity.dictionary.Specialty;
 import bel.dmitrui98.timetable.util.enums.StudyFormEnum;
 import bel.dmitrui98.timetable.util.enums.StudyShiftEnum;
 import bel.dmitrui98.timetable.util.enums.StudyTypeEnum;
-import lombok.Getter;
+import javafx.beans.property.*;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -15,42 +14,134 @@ import java.util.Set;
 /**
  * учебная группа
  */
-@Getter
-@Setter
 @NoArgsConstructor
 @Entity
 public class StudyGroup {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_gen")
-    @SequenceGenerator(name="group_gen", sequenceName = "group_seq", allocationSize=1)
+
+    private StringProperty name = new SimpleStringProperty();
+    private IntegerProperty course = new SimpleIntegerProperty();
+    private ObjectProperty<StudyShiftEnum> studyShift = new SimpleObjectProperty<>();
+    private ObjectProperty<StudyTypeEnum> studyType = new SimpleObjectProperty<>();
+    private ObjectProperty<StudyFormEnum> studyForm = new SimpleObjectProperty<>();
+    private ObjectProperty<Specialty> specialty = new SimpleObjectProperty<>();
+
+    public StudyGroup(String name, Integer course, StudyShiftEnum studyShift, StudyTypeEnum studyType,
+                      StudyFormEnum studyForm, Specialty specialty) {
+        this.name.setValue(name);
+        this.course.setValue(course);
+        this.studyShift.setValue(studyShift);
+        this.studyType.setValue(studyType);
+        this.studyForm.setValue(studyForm);
+        this.specialty.setValue(specialty);
+    }
+
     private Long studyGroupId;
 
-    @Column(nullable = false)
-    private String name;
+    private Set<TeachersBranch> teachersBranchSet = new HashSet<>();
 
     @Column(nullable = false)
-    private Integer course;
+    public String getName() {
+        return name.get();
+    }
+
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    @Column(nullable = false)
+    public int getCourse() {
+        return course.get();
+    }
+
+    public IntegerProperty courseProperty() {
+        return course;
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StudyShiftEnum studyShift;
+    public StudyShiftEnum getStudyShift() {
+        return studyShift.get();
+    }
+
+    public ObjectProperty<StudyShiftEnum> studyShiftProperty() {
+        return studyShift;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public StudyTypeEnum getStudyType() {
+        return studyType.get();
+    }
+
+    public ObjectProperty<StudyTypeEnum> studyTypeProperty() {
+        return studyType;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public StudyFormEnum getStudyForm() {
+        return studyForm.get();
+    }
+
+    public ObjectProperty<StudyFormEnum> studyFormProperty() {
+        return studyForm;
+    }
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "specialtyId")
-    private Specialty specialty;
+    public Specialty getSpecialty() {
+        return specialty.get();
+    }
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StudyTypeEnum studyType;
+    public ObjectProperty<Specialty> specialtyProperty() {
+        return specialty;
+    }
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StudyFormEnum studyForm;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_gen")
+    @SequenceGenerator(name="group_gen", sequenceName = "group_seq", allocationSize=1)
+    public Long getStudyGroupId() {
+        return studyGroupId;
+    }
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "studyGroup_teachersBranch", joinColumns = {
             @JoinColumn(name = "studyGroupId", nullable = false)},
-        inverseJoinColumns = {@JoinColumn(name = "teachersBranchId", nullable = false)}
+            inverseJoinColumns = {@JoinColumn(name = "teachersBranchId", nullable = false)}
     )
-    private Set<TeachersBranch> teachersBranchSet = new HashSet<>();
+    public Set<TeachersBranch> getTeachersBranchSet() {
+        return teachersBranchSet;
+    }
+
+    public void setName(String name) {
+        this.name.set(name);
+    }
+
+    public void setCourse(int course) {
+        this.course.set(course);
+    }
+
+    public void setStudyShift(StudyShiftEnum studyShift) {
+        this.studyShift.set(studyShift);
+    }
+
+    public void setStudyType(StudyTypeEnum studyType) {
+        this.studyType.set(studyType);
+    }
+
+    public void setStudyForm(StudyFormEnum studyForm) {
+        this.studyForm.set(studyForm);
+    }
+
+    public void setSpecialty(Specialty specialty) {
+        this.specialty.set(specialty);
+    }
+
+    public void setStudyGroupId(Long studyGroupId) {
+        this.studyGroupId = studyGroupId;
+    }
+
+    public void setTeachersBranchSet(Set<TeachersBranch> teachersBranchSet) {
+        this.teachersBranchSet = teachersBranchSet;
+    }
 }

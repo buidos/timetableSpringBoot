@@ -129,7 +129,8 @@ public class TeacherController {
             try {
                 teacherService.deleteAll(selectedItems);
             } catch (Exception ex) {
-                AlertsUtil.showErrorAlert("Ошибка удаления", "Преподаватели не удалены", ex);
+                AlertsUtil.showErrorAlert("Ошибка удаления", "Преподаватели не удалены. Возможно, " +
+                        "выделенные преподаватели учавствуют в нагрузке. Сначала необходимо удалить нагрузку данных преподавателей", ex);
                 return;
             }
 

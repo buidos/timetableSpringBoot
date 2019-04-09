@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable.config.controller.database;
 
 import bel.dmitrui98.timetable.controller.database.EditDBController;
 import bel.dmitrui98.timetable.controller.database.SettingController;
+import bel.dmitrui98.timetable.controller.database.StudyGroupController;
 import bel.dmitrui98.timetable.controller.database.TeacherController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewUtil;
@@ -45,5 +46,15 @@ public class DatabaseControllerConfig {
     @Bean
     public TeacherController teacherController() throws IOException {
         return (TeacherController) teacherView().getController();
+    }
+
+    @Bean
+    public AppsView studyGroupView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "studyGroup"));
+    }
+
+    @Bean
+    public StudyGroupController studyGroupController() throws IOException {
+        return (StudyGroupController) studyGroupView().getController();
     }
 }

@@ -12,7 +12,7 @@ public enum StudyShiftEnum {
 
     FIRST("первая"),
     SECOND("вторая"),
-    THIRD("третия"),
+    THIRD("третья"),
     ;
 
     private String name;
