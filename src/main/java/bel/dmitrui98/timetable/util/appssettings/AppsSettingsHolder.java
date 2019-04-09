@@ -14,6 +14,10 @@ public class AppsSettingsHolder {
     private static final int MAX_COURSE = 4;
     private static final int PAIRS_PER_DAY = 7;
 
+    static {
+        setSettingsToDefault();
+    }
+
 
     /**
      * Длительность половины пары в минутах

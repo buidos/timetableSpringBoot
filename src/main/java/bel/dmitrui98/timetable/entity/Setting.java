@@ -19,6 +19,10 @@ public class Setting {
     private ObjectProperty<SettingEnum> settingType = new SimpleObjectProperty<>();
     private StringProperty value = new SimpleStringProperty();
 
+    public Setting(SettingEnum settingType, String value) {
+        this.settingType.setValue(settingType);
+        this.value.setValue(value);
+    }
 
     @Id
     @Enumerated(EnumType.STRING)

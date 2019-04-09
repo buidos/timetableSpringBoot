@@ -20,6 +20,6 @@ public enum SettingEnum {
     /**
      * предпочтительный тип дисциплины в субботу
      */
-    SATURDAY_SUBJECT_ID
+    SATURDAY_SUBJECT_TYPE_ID
 
 }
