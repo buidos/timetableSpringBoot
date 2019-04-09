@@ -24,6 +24,10 @@ public class EditDBController {
     @Qualifier("subjectView")
     private AppsView subjectView;
 
+    @Autowired
+    @Qualifier("teacherView")
+    private AppsView teacherView;
+
     /**
      * Обновляет вкладку отделений
      */
@@ -74,6 +78,23 @@ public class EditDBController {
         }
         Tab tab = (Tab) event.getSource();
         SubjectController controller = (SubjectController) subjectView.getController();
+        if (tab.isSelected()) {
+            controller.getDefaultButton().setDefaultButton(true);
+        } else {
+            controller.getDefaultButton().setDefaultButton(false);
+        }
+    }
+
+    /**
+     * Обновляет вкладку учителей
+     */
+    @FXML
+    private void teacherTabSelectionChange(Event event) {
+        if (teacherView == null) {
+            return;
+        }
+        Tab tab = (Tab) event.getSource();
+        TeacherController controller = (TeacherController) teacherView.getController();
         if (tab.isSelected()) {
             controller.getDefaultButton().setDefaultButton(true);
         } else {

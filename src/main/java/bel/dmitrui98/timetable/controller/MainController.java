@@ -63,6 +63,10 @@ public class MainController {
     @Qualifier("settingView")
     private AppsView settingView;
 
+    @Autowired
+    @Qualifier("teacherView")
+    private AppsView teacherView;
+
 
     @FXML
     private void showEditDatabase() {
@@ -84,7 +88,7 @@ public class MainController {
                     initDictionariesTabPane(tab);
                     break;
                 case TEACHERS:
-                    System.out.println(TEACHERS);
+                    tab.setContent(teacherView.getScene().getRoot());
                     break;
                 case GROUPS:
                     System.out.println(GROUPS);

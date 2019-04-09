@@ -22,6 +22,10 @@ public class AppsValidation {
         validate(s, conds, strings, -1);
     }
 
+    public static void validate(String s, ValidConditions conds) throws AppsException {
+        validate(s, conds, null, -1);
+    }
+
     public static void validate(String s, ValidConditions conds, List<String> strings, int ignoreIntex) throws AppsException {
         if (s == null || (!conds.isAllowEmpty() && s.isEmpty())) {
             throw new AppsException(ExceptionType.VALID_EMPTY_VALUE);

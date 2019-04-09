@@ -1,4 +1,4 @@
-package bel.dmitrui98.timetable.controller.database.dictionary;
+package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.entity.Setting;
 import bel.dmitrui98.timetable.repository.SettingRepository;

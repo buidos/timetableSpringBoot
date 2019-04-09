@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="678.0" prefWidth="1155.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.database.TeacherController">
+   <children>
+      <VBox spacing="10.0">
+         <children>
+            <HBox alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Фамилия:">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="surnameField" prefHeight="31.0" prefWidth="168.0" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Имя:">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="nameField" prefHeight="31.0" prefWidth="168.0" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Отчество:">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="patronymicField" prefHeight="31.0" prefWidth="168.0" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Телефон:">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="telephoneField" prefHeight="31.0" prefWidth="168.0" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Email:">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="emailField" prefHeight="31.0" prefWidth="168.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="defaultButton" mnemonicParsing="false" onAction="#add" text="Добавить" />
+                  <Button mnemonicParsing="false" onAction="#edit" text="Редактировать" />
+                  <Button mnemonicParsing="false" onAction="#delete" text="Удалить" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <HBox maxWidth="-Infinity" prefWidth="876.0">
+         <children>
+            <Label fx:id="editIndexLabel" text="Номер для редактирования:" />
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <HBox layoutX="139.0" layoutY="51.0" maxWidth="-Infinity" prefWidth="876.0">
+         <children>
+            <Label fx:id="deleteIndexesLabel" text="Номера для удаления:" />
+         </children>
+      </HBox>
+      <TableView fx:id="tableView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="350.0" prefWidth="1164.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+         <columns>
+            <TableColumn fx:id="indexCol" maxWidth="600.0" prefWidth="97.0" text="№" />
+            <TableColumn fx:id="surnameCol" prefWidth="241.0" text="Фамилия" />
+            <TableColumn fx:id="nameCol" prefWidth="238.0" text="Имя" />
+            <TableColumn fx:id="patronymicCol" prefWidth="238.0" text="Отчество" />
+            <TableColumn fx:id="telephoneCol" prefWidth="196.0" text="Телефон" />
+            <TableColumn fx:id="emailCol" prefWidth="715.0" text="Email" />
+         </columns>
+      </TableView>
+   </children>
+   <padding>
+      <Insets left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

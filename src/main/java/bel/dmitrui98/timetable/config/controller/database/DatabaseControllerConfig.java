@@ -1,7 +1,8 @@
 package bel.dmitrui98.timetable.config.controller.database;
 
 import bel.dmitrui98.timetable.controller.database.EditDBController;
-import bel.dmitrui98.timetable.controller.database.dictionary.SettingController;
+import bel.dmitrui98.timetable.controller.database.SettingController;
+import bel.dmitrui98.timetable.controller.database.TeacherController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import bel.dmitrui98.timetable.util.view.ViewUtil;
 import org.springframework.context.annotation.Bean;
@@ -34,5 +35,15 @@ public class DatabaseControllerConfig {
     @Bean
     public SettingController settingController() throws IOException {
         return (SettingController) settingView().getController();
+    }
+
+    @Bean
+    public AppsView teacherView() throws IOException {
+        return loadView(ViewUtil.getModifyName(PREFIX + "teacher"));
+    }
+
+    @Bean
+    public TeacherController teacherController() throws IOException {
+        return (TeacherController) teacherView().getController();
     }
 }
