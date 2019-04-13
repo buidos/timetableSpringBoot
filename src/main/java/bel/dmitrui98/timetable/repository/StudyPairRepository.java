@@ -12,4 +12,7 @@ public interface StudyPairRepository extends JpaRepository<StudyPair, Integer> {
     @Modifying
     @Query("delete from StudyPair p where p.studyPairId in (:ids)")
     void deleteAllByIds(@Param("ids") List<Integer> ids);
+
+    @Query("FROM StudyPair sp ORDER BY sp.pairNumber")
+    List<StudyPair> findAllOrderByPairNumber();
 }

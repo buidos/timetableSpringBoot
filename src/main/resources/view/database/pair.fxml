@@ -18,7 +18,7 @@
                                     <Insets top="4.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="surnameField" prefHeight="31.0" prefWidth="168.0" />
+                              <TextField fx:id="pairNumberField" disable="true" prefHeight="31.0" prefWidth="168.0" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
@@ -28,7 +28,7 @@
                                     <Insets top="4.0" />
                                  </HBox.margin>
                               </Label>
-                              <ComboBox prefHeight="31.0" prefWidth="167.0">
+                              <ComboBox fx:id="studyShiftComboBox" prefHeight="31.0" prefWidth="167.0">
                                  <HBox.margin>
                                     <Insets left="41.0" />
                                  </HBox.margin>
@@ -49,7 +49,7 @@
                                     <Insets right="27.0" />
                                  </padding>
                               </Label>
-                              <TextField fx:id="surnameField1" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
+                              <TextField fx:id="timeBeginOneField" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
@@ -59,7 +59,7 @@
                                     <Insets top="4.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="surnameField11" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
+                              <TextField fx:id="timeEndOneField" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
                            </children>
                         </HBox>
                      </children>
@@ -76,7 +76,7 @@
                                     <Insets top="4.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="surnameField11" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
+                              <TextField fx:id="timeBeginTwoField" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
@@ -86,7 +86,7 @@
                                     <Insets top="4.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="surnameField111" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
+                              <TextField fx:id="timeEndTwoField" prefHeight="31.0" prefWidth="168.0" promptText="hh:mm" />
                            </children>
                         </HBox>
                      </children>
@@ -120,12 +120,12 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
          <columns>
-            <TableColumn fx:id="indexCol" maxWidth="600.0" prefWidth="97.0" text="№" />
-            <TableColumn fx:id="surnameCol" prefWidth="241.0" text="Фамилия" />
-            <TableColumn fx:id="nameCol" prefWidth="238.0" text="Имя" />
-            <TableColumn fx:id="patronymicCol" prefWidth="238.0" text="Отчество" />
-            <TableColumn fx:id="telephoneCol" prefWidth="196.0" text="Телефон" />
-            <TableColumn fx:id="emailCol" prefWidth="715.0" text="Email" />
+            <TableColumn fx:id="indexCol" maxWidth="600.0" prefWidth="59.0" text="№" />
+            <TableColumn fx:id="studyShiftCol" prefWidth="201.0" text="Смена" />
+            <TableColumn fx:id="timeBeginOneCol" prefWidth="238.0" text="начало 1-й половины пары" />
+            <TableColumn fx:id="timeEndOneCol" minWidth="37.0" prefWidth="253.0" text="окончание 1-й половины пары" />
+            <TableColumn fx:id="timeBeginTwoCol" prefWidth="198.0" text="начало 2-й половины пары" />
+            <TableColumn fx:id="timeEndTwoCol" minWidth="39.0" prefWidth="715.0" text="окончание 2-й половины пары" />
          </columns>
       </TableView>
    </children>

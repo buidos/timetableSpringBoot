@@ -51,4 +51,13 @@ public class StudyPair {
      * Время окончания второй половины пары
      */
     private LocalTime endTimeSecondHalf;
+
+    public StudyPair(StudyShiftEnum studyShift, Integer pairNumber, LocalTime beginTimeFirstHalf, LocalTime endTimeFirstHalf, LocalTime beginTimeSecondHalf, LocalTime endTimeSecondHalf) {
+        this.studyShift = studyShift;
+        this.pairNumber = pairNumber;
+        this.beginTimeFirstHalf = beginTimeFirstHalf;
+        this.endTimeFirstHalf = endTimeFirstHalf;
+        this.beginTimeSecondHalf = beginTimeSecondHalf;
+        this.endTimeSecondHalf = endTimeSecondHalf;
+    }
 }
