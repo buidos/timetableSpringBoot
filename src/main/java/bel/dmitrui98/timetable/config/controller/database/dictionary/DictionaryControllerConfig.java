@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-import static bel.dmitrui98.timetable.util.view.ViewUtil.loadView;
+import static bel.dmitrui98.timetable.util.view.ViewUtil.getView;
 
 @Configuration
 public class DictionaryControllerConfig {
@@ -18,7 +18,7 @@ public class DictionaryControllerConfig {
     // DEPARTMENT
     @Bean
     public AppsView departmentView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "department"));
+        return getView(ViewUtil.getModifyName(PREFIX + "department"));
     }
 
     @Bean
@@ -29,7 +29,7 @@ public class DictionaryControllerConfig {
     // SPECIALTY
     @Bean
     public AppsView specialtyView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "specialty"));
+        return getView(ViewUtil.getModifyName(PREFIX + "specialty"));
     }
 
     @Bean
@@ -40,7 +40,7 @@ public class DictionaryControllerConfig {
     // SUBJECT_TYPE
     @Bean
     public AppsView subjectTypeView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "supject_type_enum"));
+        return getView(ViewUtil.getModifyName(PREFIX + "supject_type_enum"));
     }
 
     @Bean
@@ -51,7 +51,7 @@ public class DictionaryControllerConfig {
     // SUBJECT
     @Bean
     public AppsView subjectView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "subject"));
+        return getView(ViewUtil.getModifyName(PREFIX + "subject"));
     }
 
     @Bean
@@ -62,7 +62,7 @@ public class DictionaryControllerConfig {
     // STUDY FORM
     @Bean
     public AppsView studyFormView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "study_form_enum"));
+        return getView(ViewUtil.getModifyName(PREFIX + "study_form_enum"));
     }
 
     @Bean
@@ -73,7 +73,7 @@ public class DictionaryControllerConfig {
     // STUDY TYPE
     @Bean
     public AppsView studyTypeView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "study_type_enum"));
+        return getView(ViewUtil.getModifyName(PREFIX + "study_type_enum"));
     }
 
     @Bean
@@ -84,7 +84,7 @@ public class DictionaryControllerConfig {
     // STUDY SHIFT
     @Bean
     public AppsView studyShiftView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "study_shift_enum"));
+        return getView(ViewUtil.getModifyName(PREFIX + "study_shift_enum"));
     }
 
     @Bean

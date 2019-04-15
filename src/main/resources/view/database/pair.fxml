@@ -18,7 +18,7 @@
                                     <Insets top="4.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="pairNumberField" disable="true" prefHeight="31.0" prefWidth="168.0" />
+                              <TextField fx:id="pairNumberField" editable="false" prefHeight="31.0" prefWidth="168.0" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">

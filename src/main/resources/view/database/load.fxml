@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="678.0" prefWidth="1383.0" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.database.LoadController">
+   <children>
+      <VBox spacing="10.0">
+         <children>
+            <HBox alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <VBox alignment="TOP_CENTER">
+                     <children>
+                        <Label text="Группа" />
+                        <TextField fx:id="filterGroupField" prefHeight="31.0" prefWidth="168.0" promptText="поиск" />
+                        <ListView fx:id="groupListView" prefHeight="200.0" prefWidth="200.0" />
+                        <Button fx:id="selectGroupButton" mnemonicParsing="false" onAction="#selectGroup" prefHeight="31.0" prefWidth="209.0" text="Выбрать группу" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="285.0" prefWidth="223.0">
+                     <children>
+                        <Label text="Преподаватель" />
+                        <TextField fx:id="pairNumberField1" prefHeight="31.0" prefWidth="168.0" promptText="поиск" />
+                        <ListView prefHeight="231.0" prefWidth="290.0" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" prefHeight="285.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Button mnemonicParsing="false" text="Добавить в связку" />
+                        <Button mnemonicParsing="false" text="Удалить из связки" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER">
+                     <children>
+                        <Label text="Связка преподавателей" />
+                        <TableView fx:id="tableView1" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="264.0" prefWidth="650.0">
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                           <columns>
+                              <TableColumn fx:id="indexCol1" maxWidth="600.0" prefWidth="59.0" text="№" />
+                              <TableColumn fx:id="studyShiftCol1" prefWidth="201.0" text="Связка" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER">
+                     <children>
+                        <Label text="Дисциплина" />
+                        <ComboBox prefHeight="31.0" prefWidth="176.0" />
+                        <Label text="Часы в две недели" />
+                        <TextField />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <HBox alignment="TOP_CENTER" maxWidth="-Infinity" prefWidth="876.0" spacing="5.0">
+         <children>
+            <Button fx:id="defaultButton" mnemonicParsing="false" text="Добавить в нагрузку" />
+            <Button mnemonicParsing="false" text="Удалить из нагрузки" />
+            <Label fx:id="deleteIndexesLabel" text="Номера для удаления:">
+               <padding>
+                  <Insets top="5.0" />
+               </padding></Label>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="139.0" layoutY="51.0" maxWidth="-Infinity" prefWidth="876.0">
+         <children>
+            <Label fx:id="loadLabel" text="Нагрузка для группы" />
+         </children></HBox>
+      <TableView fx:id="tableView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="350.0" prefWidth="1164.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+         <columns>
+            <TableColumn fx:id="indexCol" maxWidth="600.0" prefWidth="59.0" text="№" />
+            <TableColumn fx:id="studyShiftCol" minWidth="200.0" prefWidth="509.0" text="Связка" />
+            <TableColumn fx:id="timeBeginOneCol" prefWidth="214.0" text="Дисциплина" />
+            <TableColumn fx:id="timeEndOneCol" minWidth="37.0" prefWidth="253.0" text="часы в 2 недели" />
+         </columns>
+      </TableView>
+   </children>
+   <padding>
+      <Insets left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

@@ -8,14 +8,14 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-import static bel.dmitrui98.timetable.util.view.ViewUtil.loadView;
+import static bel.dmitrui98.timetable.util.view.ViewUtil.getView;
 
 @Configuration
 public class ControllerConfig {
 
     @Bean
     public AppsView mainView() throws IOException {
-        return loadView(ViewUtil.getModifyName("main"));
+        return getView(ViewUtil.getModifyName("main"));
     }
 
     @Bean

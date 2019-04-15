@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-import static bel.dmitrui98.timetable.util.view.ViewUtil.loadView;
+import static bel.dmitrui98.timetable.util.view.ViewUtil.getView;
 
 @Configuration
 public class DatabaseControllerConfig {
@@ -17,7 +17,7 @@ public class DatabaseControllerConfig {
 
     @Bean
     public AppsView editDatabaseView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "editDatabase"));
+        return getView(ViewUtil.getModifyName(PREFIX + "editDatabase"));
     }
 
     @Bean
@@ -28,7 +28,7 @@ public class DatabaseControllerConfig {
     // настройки
     @Bean
     public AppsView settingView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "setting"));
+        return getView(ViewUtil.getModifyName(PREFIX + "setting"));
     }
 
     @Bean
@@ -39,7 +39,7 @@ public class DatabaseControllerConfig {
     // учителя
     @Bean
     public AppsView teacherView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "teacher"));
+        return getView(ViewUtil.getModifyName(PREFIX + "teacher"));
     }
 
     @Bean
@@ -50,7 +50,7 @@ public class DatabaseControllerConfig {
     // группы
     @Bean
     public AppsView studyGroupView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "studyGroup"));
+        return getView(ViewUtil.getModifyName(PREFIX + "studyGroup"));
     }
 
     @Bean
@@ -61,11 +61,22 @@ public class DatabaseControllerConfig {
     // пары
     @Bean
     public AppsView pairView() throws IOException {
-        return loadView(ViewUtil.getModifyName(PREFIX + "pair"));
+        return getView(ViewUtil.getModifyName(PREFIX + "pair"));
     }
 
     @Bean
     public StudyPairController pairController() throws IOException {
         return (StudyPairController) pairView().getController();
+    }
+
+    // нагрузка
+    @Bean
+    public AppsView loadView() throws IOException {
+        return getView(ViewUtil.getModifyName(PREFIX + "load"));
+    }
+
+    @Bean
+    public LoadController loadController() throws IOException {
+        return (LoadController) loadView().getController();
     }
 }

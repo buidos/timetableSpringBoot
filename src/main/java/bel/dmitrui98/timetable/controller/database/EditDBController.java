@@ -6,23 +6,64 @@ import bel.dmitrui98.timetable.controller.database.dictionary.SubjectController;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 public class EditDBController {
 
+    private static final String SETTINGS = "Настройки";
+    private static final String DICTIONARIES = "Словари";
+    private static final String TEACHERS = "Преподаватели";
+    private static final String GROUPS = "Группы";
+    private static final String PAIRS = "Пары";
+    private static final String LOAD = "Нагрузка";
+    private static final String DEPARTMENT = "Отделение";
+    private static final String SPECIALTY = "Специальность";
+    private static final String SUBJECT_TYPE = "Тип дисциплины";
+    private static final String SUBJECT = "Дисциплина";
+    private static final String STUDY_FORM = "Форма обучения";
+    private static final String STUDY_TYPE = "Тип обучения";
+    private static final String STUDY_SHIFT = "Смена";
+
     @Autowired
-    @Qualifier("specialtyView")
-    private AppsView specialtyView;
+    @Qualifier("editDatabaseView")
+    private AppsView editDatabaseView;
 
     @Autowired
     @Qualifier("departmentView")
     private AppsView departmentView;
 
     @Autowired
+    @Qualifier("specialtyView")
+    private AppsView specialtyView;
+
+    @Autowired
+    @Qualifier("subjectTypeView")
+    private AppsView subjectTypeView;
+
+    @Autowired
     @Qualifier("subjectView")
     private AppsView subjectView;
+
+    @Autowired
+    @Qualifier("studyTypeView")
+    private AppsView studyTypeView;
+
+    @Autowired
+    @Qualifier("studyFormView")
+    private AppsView studyFormView;
+
+    @Autowired
+    @Qualifier("studyShiftView")
+    private AppsView studyShiftView;
+
+    @Autowired
+    @Qualifier("settingView")
+    private AppsView settingView;
 
     @Autowired
     @Qualifier("teacherView")
@@ -35,6 +76,10 @@ public class EditDBController {
     @Autowired
     @Qualifier("pairView")
     private AppsView pairView;
+
+    @Autowired
+    @Qualifier("loadView")
+    private AppsView loadView;
 
     /**
      * Обновляет вкладку отделений
@@ -142,6 +187,83 @@ public class EditDBController {
             controller.getDefaultButton().setDefaultButton(true);
         } else {
             controller.getDefaultButton().setDefaultButton(false);
+        }
+    }
+
+    /**
+     * Обновляет вкладку нагрузки
+     */
+    @FXML
+    private void loadTabSelectionChange(Event event) {
+        if (loadView == null) {
+            return;
+        }
+        Tab tab = (Tab) event.getSource();
+        LoadController controller = (LoadController) loadView.getController();
+        if (tab.isSelected()) {
+            controller.getDefaultButton().setDefaultButton(true);
+            controller.refresh();
+        } else {
+            controller.getDefaultButton().setDefaultButton(false);
+        }
+    }
+
+    public Scene initTabs() {
+        Scene editDatabaseScene = editDatabaseView.getScene();
+
+        BorderPane borderPane = (BorderPane) editDatabaseScene.getRoot();
+        TabPane rootTabPane = (TabPane) borderPane.getCenter();
+        for (Tab tab : rootTabPane.getTabs()) {
+            switch (tab.getText()) {
+                case SETTINGS:
+                    tab.setContent(settingView.getScene().getRoot());
+                    break;
+                case DICTIONARIES:
+                    initDictionariesTabPane(tab);
+                    break;
+                case TEACHERS:
+                    tab.setContent(teacherView.getScene().getRoot());
+                    break;
+                case GROUPS:
+                    tab.setContent(studyGroupView.getScene().getRoot());
+                    break;
+                case PAIRS:
+                    tab.setContent(pairView.getScene().getRoot());
+                    break;
+                case LOAD:
+                    tab.setContent(loadView.getScene().getRoot());
+                    break;
+            }
+        }
+        return editDatabaseScene;
+    }
+
+    private void initDictionariesTabPane(Tab rootTab) {
+        TabPane dictionariesTabPane = (TabPane) rootTab.getContent();
+        for (Tab tab : dictionariesTabPane.getTabs()) {
+            switch (tab.getText()) {
+                case DEPARTMENT:
+                    tab.setContent(departmentView.getScene().getRoot());
+                    break;
+                case SPECIALTY:
+                    tab.setContent(specialtyView.getScene().getRoot());
+                    break;
+                case SUBJECT_TYPE:
+                    tab.setContent(subjectTypeView.getScene().getRoot());
+                    break;
+                case SUBJECT:
+                    tab.setContent(subjectView.getScene().getRoot());
+                    break;
+                case STUDY_FORM:
+                    tab.setContent(studyFormView.getScene().getRoot());
+                    break;
+                case STUDY_TYPE:
+                    tab.setContent(studyTypeView.getScene().getRoot());
+                    break;
+                case STUDY_SHIFT:
+                    tab.setContent(studyShiftView.getScene().getRoot());
+                    break;
+            }
         }
     }
 }

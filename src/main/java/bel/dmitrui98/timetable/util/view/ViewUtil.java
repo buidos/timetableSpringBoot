@@ -27,7 +27,7 @@ public class ViewUtil {
      * @return {@link AppsView}
      * @throws IOException
      */
-    public static AppsView loadView(String url) throws IOException {
+    public static AppsView getView(String url) throws IOException {
         InputStream fxmlStream = null;
         try {
             fxmlStream = ViewUtil.class.getClassLoader().getResourceAsStream(url);

@@ -102,4 +102,22 @@ public class Teacher {
     public void setEmail(String email) {
         this.email.set(email);
     }
+
+    @Override
+    public String toString() {
+        // отображаем Иванов Иван в виде И.Иванов
+        String name, surname;
+        if (getName().isEmpty()) {
+            name = getName();
+        } else {
+            name = getName().substring(0, 1).toUpperCase() + ".";
+        }
+        if (getSurname().isEmpty()) {
+            surname = getSurname();
+        } else {
+            String firstSurnameLetter = getSurname().substring(0, 1).toUpperCase();
+            surname = firstSurnameLetter + getSurname().substring(1);
+        }
+        return name + surname;
+    }
 }
