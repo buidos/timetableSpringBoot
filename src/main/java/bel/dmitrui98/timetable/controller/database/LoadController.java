@@ -32,7 +32,6 @@ public class LoadController {
 
     @FXML
     private ListView<StudyGroup> groupListView;
-
     @FXML
     private TextField filterGroupField;
 
@@ -41,9 +40,15 @@ public class LoadController {
     private ObservableList<StudyGroup> groups;
     private FilteredList<StudyGroup> filteredGroups;
 
+    @FXML
+    private ListView<Teacher> teacherListView;
+    @FXML
+    private TextField filterTeacherField;
+
     @Autowired
     private BaseService<Teacher, Long> teacherService;
     private ObservableList<Teacher> teachers;
+    private FilteredList<Teacher> filteredTeachers;
 
     @FXML
     private TableView<Teacher> tableView;
@@ -226,6 +231,11 @@ public class LoadController {
 //        VBox.setVgrow(tableView, Priority.ALWAYS);
 //
 //        refreshLabels();
+        tuningListViews();
+    }
+
+    private void tuningListViews() {
+        // группы
         groupListView.setCellFactory((list) -> {
             return new ListCell<StudyGroup>() {
                 @Override
@@ -258,6 +268,51 @@ public class LoadController {
                 return group.getName().toLowerCase().startsWith(lowerCase);
             });
         }));
+
+        // учителя
+        teacherListView.setCellFactory((list) -> {
+            return new ListCell<Teacher>() {
+                @Override
+                protected void updateItem(Teacher item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        String surname;
+                        if (item.getSurname().isEmpty()) {
+                            surname = "None";
+                        } else {
+                            String firstSurnameLetter = item.getSurname().substring(0, 1).toUpperCase();
+                            surname = firstSurnameLetter + item.getSurname().substring(1);
+                        }
+                        String name, patronymic;
+                        try {
+                            name = item.getName().substring(0, 1).toUpperCase() + ".";
+                            patronymic = item.getPatronymic().substring(0, 1).toUpperCase() + ".";
+                        } catch (IndexOutOfBoundsException ex) {
+                            if (item.getName().isEmpty()) {
+                                name = "";
+                            } else {
+                                name = item.getName().substring(0, 1).toUpperCase() + ".";
+                            }
+                            patronymic = "";
+                        }
+                        setText(surname + " " + name + patronymic);
+                    }
+                }
+            };
+        });
+
+        filterTeacherField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredTeachers.setPredicate(teacher -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String lowerCase = newValue.toLowerCase();
+                return teacher.getSurname().toLowerCase().startsWith(lowerCase);
+            });
+        }));
     }
 
     public void refresh() {
@@ -268,6 +323,12 @@ public class LoadController {
         // оборачиваем observableList в FilteredList (по умолчанию отображаем все значения)
         filteredGroups = new FilteredList<>(groups, g -> true);
         groupListView.setItems(filteredGroups);
+
+        // обновляем учителей
+        teachers = FXCollections.observableArrayList(teacherService.findAll());
+        // оборачиваем observableList в FilteredList (по умолчанию отображаем все значения)
+        filteredTeachers = new FilteredList<>(teachers, t -> true);
+        teacherListView.setItems(filteredTeachers);
     }
 
     private void refreshLabels() {
