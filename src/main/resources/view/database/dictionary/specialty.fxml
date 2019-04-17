@@ -55,6 +55,9 @@
             <TableColumn fx:id="specialtyNameCol" prefWidth="375.0" text="Название" />
             <TableColumn fx:id="departmentNameCol" prefWidth="715.0" text="Отделение" />
          </columns>
+         <padding>
+            <Insets bottom="10.0" />
+         </padding>
       </TableView>
    </children>
    <padding>

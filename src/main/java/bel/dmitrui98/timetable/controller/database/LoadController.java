@@ -1,17 +1,23 @@
 package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.entity.StudyGroup;
+import bel.dmitrui98.timetable.entity.Subject;
 import bel.dmitrui98.timetable.entity.Teacher;
 import bel.dmitrui98.timetable.service.BaseService;
 import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
+import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.exception.AppsException;
 import bel.dmitrui98.timetable.util.validation.AppsValidation;
 import bel.dmitrui98.timetable.util.validation.ValidConditions;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.util.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -26,6 +32,8 @@ public class LoadController {
     private static final String DELETE_LABEL_INIT = "не установлены";
     private static final String LOAD_FOR_GROUP_LABEL = "Нагрузка для группы";
     private static final String BUTTON_GROUP_TEXT = "Выбрать группу";
+
+    private static final String VALIDATION_ERROR = "Ошибка валидации";
 
     @FXML
     private Button defaultButton;
@@ -49,6 +57,24 @@ public class LoadController {
     private BaseService<Teacher, Long> teacherService;
     private ObservableList<Teacher> teachers;
     private FilteredList<Teacher> filteredTeachers;
+
+    @FXML
+    private TableView<Teacher> branchTableView;
+    @FXML
+    private TableColumn<Teacher, Void> teacherIndexCol;
+    @FXML
+    private TableColumn<Teacher, String> teacherCol;
+
+    @FXML
+    private ComboBox<Subject> subjectComboBox;
+
+    @Autowired
+    private BaseService<Subject, Long> subjectService;
+    private ObservableList<Subject> subjects;
+    private FilteredList<Subject> filteredSubjects;
+
+    @FXML
+    private TextField hourField;
 
     @FXML
     private TableView<Teacher> tableView;
@@ -83,6 +109,41 @@ public class LoadController {
     @FXML
     private Button selectGroupButton;
     private StudyGroup selectedGroup;
+
+    @FXML
+    private void addTeacherToBranch() {
+        List<Teacher> selectedItems = teacherListView.getSelectionModel().getSelectedItems();
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            AlertsUtil.showInfoAlert("Не выбран преподаватель", "Выберите хотя бы одного преподавателя для добавления в связку");
+            return;
+        }
+        int size = branchTableView.getItems().size() + selectedItems.size();
+        if (size > AppsSettingsHolder.getMaxTeachersInBranch()) {
+            AlertsUtil.showInfoAlert(String.format("Связка преподавателей достигла максимального значения (%d). Текущее значение: %d",
+                    AppsSettingsHolder.getMaxTeachersInBranch(), branchTableView.getItems().size()),
+                    "Если вам нужно добавить преподавателей в связку, увеличьте максимальное значение в настройках приложения до "
+                            + size);
+            return;
+        }
+        List<Teacher> branchTeachers = branchTableView.getItems();
+        for (Teacher t : selectedItems) {
+            if (branchTeachers.contains(t)) {
+                AlertsUtil.showInfoAlert("Преподаватель " + Teacher.getTeacherName(t) + " уже есть в связке", null);
+                return;
+            }
+        }
+        branchTableView.getItems().addAll(selectedItems);
+    }
+
+    @FXML
+    private void deleteTeacherFromBranch() {
+        List<Teacher> selectedItems = branchTableView.getSelectionModel().getSelectedItems();
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            AlertsUtil.showInfoAlert("Не выбран преподаватель", "Выберите хотя бы одного преподавателя для удаления из связки");
+            return;
+        }
+        branchTableView.getItems().removeAll(selectedItems);
+    }
 
     @FXML
     private void add() throws AppsException {
@@ -232,6 +293,78 @@ public class LoadController {
 //
 //        refreshLabels();
         tuningListViews();
+        tuningTableViews();
+
+        // дисциплыны
+        tuningComboBoxes();
+
+        setNumberFormatter(hourField);
+    }
+
+    private void tuningComboBoxes() {
+        subjectComboBox.setCellFactory((listView) -> {
+            return new ListCell<Subject>() {
+                @Override
+                protected void updateItem(Subject item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item != null && !empty) {
+                        setText(item.getName());
+                    } else {
+                        setText(null);
+                    }
+                }
+            };
+        });
+
+        subjectComboBox.setConverter(new StringConverter<Subject>() {
+            @Override
+            public String toString(Subject object) {
+                if (object == null) {
+                    return null;
+                } else {
+                    return object.getName();
+                }
+            }
+
+            @Override
+            public Subject fromString(String string) {
+                return null;
+            }
+        });
+
+        subjectComboBox.getEditor().textProperty().addListener((o, oldValue, newValue) -> {
+            TextField editor = subjectComboBox.getEditor();
+            Subject selected = subjectComboBox.getSelectionModel().getSelectedItem();
+
+            // Platform нужен из-за бага в textField listener
+            Platform.runLater(() -> {
+                // если выделенный элемент не равен введенному или выделенного элемента нет, то фильтруем список
+                if (selected == null || !selected.getName().equals(editor.getText())) {
+                    filteredSubjects.setPredicate(item ->
+                            item.getName().toLowerCase().startsWith(newValue.toLowerCase())
+                    );
+                }
+            });
+
+        });
+    }
+
+    private void tuningTableViews() {
+        teacherIndexCol.setCellFactory(col -> {
+            TableCell<Teacher, Void> cell = new TableCell<>();
+            cell.textProperty().bind(Bindings.createStringBinding(() -> {
+                if (cell.isEmpty()) {
+                    return null ;
+                } else {
+                    return Integer.toString(cell.getIndex() + 1);
+                }
+            }, cell.emptyProperty(), cell.indexProperty()));
+
+            return cell ;
+        });
+        teacherCol.setCellValueFactory(cellData -> new SimpleStringProperty(Teacher.getTeacherName(cellData.getValue())));
+        branchTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
     }
 
     private void tuningListViews() {
@@ -279,30 +412,13 @@ public class LoadController {
                     if (item == null || empty) {
                         setText(null);
                     } else {
-                        String surname;
-                        if (item.getSurname().isEmpty()) {
-                            surname = "None";
-                        } else {
-                            String firstSurnameLetter = item.getSurname().substring(0, 1).toUpperCase();
-                            surname = firstSurnameLetter + item.getSurname().substring(1);
-                        }
-                        String name, patronymic;
-                        try {
-                            name = item.getName().substring(0, 1).toUpperCase() + ".";
-                            patronymic = item.getPatronymic().substring(0, 1).toUpperCase() + ".";
-                        } catch (IndexOutOfBoundsException ex) {
-                            if (item.getName().isEmpty()) {
-                                name = "";
-                            } else {
-                                name = item.getName().substring(0, 1).toUpperCase() + ".";
-                            }
-                            patronymic = "";
-                        }
-                        setText(surname + " " + name + patronymic);
+                        setText(Teacher.getTeacherName(item));
                     }
                 }
             };
         });
+
+        teacherListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         filterTeacherField.textProperty().addListener(((observable, oldValue, newValue) -> {
             filteredTeachers.setPredicate(teacher -> {
@@ -326,9 +442,14 @@ public class LoadController {
 
         // обновляем учителей
         teachers = FXCollections.observableArrayList(teacherService.findAll());
-        // оборачиваем observableList в FilteredList (по умолчанию отображаем все значения)
         filteredTeachers = new FilteredList<>(teachers, t -> true);
         teacherListView.setItems(filteredTeachers);
+
+        // дисциплины
+        subjects = FXCollections.observableArrayList(subjectService.findAll());
+        filteredSubjects = new FilteredList<>(subjects, s -> true);
+        subjectComboBox.setItems(filteredSubjects);
+        subjectComboBox.getSelectionModel().selectFirst();
     }
 
     private void refreshLabels() {
@@ -349,5 +470,21 @@ public class LoadController {
 
     public Button getDefaultButton() {
         return defaultButton;
+    }
+
+    private void setNumberFormatter(TextField numberField){
+        TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
+            if (!change.isContentChange()) {
+                return change;
+            }
+            String newValue = change.getControlNewText();
+
+            // если не цифра, пропускаем
+            if (!newValue.matches("\\d+") && !newValue.equals("")) {
+                return null;
+            }
+            return change;
+        });
+        numberField.setTextFormatter(numberFormatter);
     }
 }

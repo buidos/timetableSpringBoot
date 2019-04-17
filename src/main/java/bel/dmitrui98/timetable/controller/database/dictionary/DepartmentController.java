@@ -57,6 +57,7 @@ public class DepartmentController {
             Department department = new Department(name);
             departmentService.save(department);
             departments.add(department);
+            depNameTextField.setText("");
         }
     }
 

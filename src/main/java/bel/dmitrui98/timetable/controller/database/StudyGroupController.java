@@ -132,6 +132,7 @@ public class StudyGroupController {
             StudyGroup studyGroup = new StudyGroup(name, course, studyShift, studyType, studyForm, specialty);
             studyGroupService.save(studyGroup);
             groups.add(studyGroup);
+            nameField.setText("");
         }
     }
 

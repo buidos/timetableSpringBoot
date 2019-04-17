@@ -13,6 +13,11 @@ public enum SettingEnum {
      * максимальный курс
      */
     MAX_COURSE,
+
+    /**
+     * максимальное количество учителей в связке
+     */
+    MAX_TEACHERS_IN_BRANCH,
     /**
      * количество пар в день
      */

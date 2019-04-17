@@ -39,6 +39,9 @@
             <TableColumn fx:id="departmentIndexCol" maxWidth="600.0" prefWidth="97.0" text="№" />
             <TableColumn fx:id="departmentNameCol" prefWidth="715.0" text="Название" />
          </columns>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
       </TableView>
    </children>
    <padding>

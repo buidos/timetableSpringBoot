@@ -77,6 +77,12 @@ public class TeacherController {
             Teacher teacher = new Teacher(surname, name, patronymic, telephone, email);
             teacherService.save(teacher);
             teachers.add(teacher);
+
+            surnameField.setText("");
+            nameField.setText("");
+            patronymicField.setText("");
+            telephoneField.setText("");
+            emailField.setText("");
         }
     }
 

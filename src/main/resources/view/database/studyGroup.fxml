@@ -26,7 +26,7 @@
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <TextField fx:id="courseField" prefHeight="31.0" prefWidth="168.0" />
+                        <TextField fx:id="courseField" prefHeight="31.0" prefWidth="168.0" text="1" />
                      </children>
                   </VBox>
                   <VBox prefHeight="52.0" prefWidth="162.0">

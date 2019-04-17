@@ -72,6 +72,7 @@ public class SpecialtyController {
             Specialty specialty = new Specialty(name, department);
             specialtyService.save(specialty);
             specialties.add(specialty);
+            specialtyNameTextField.setText("");
         }
     }
 

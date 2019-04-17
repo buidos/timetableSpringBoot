@@ -31,6 +31,9 @@ public class SettingController {
     private TextField maxCourseField;
 
     @FXML
+    private TextField maxTeachersInBranchField;
+
+    @FXML
     private TextField pairsPerDayField;
 
     @FXML
@@ -38,10 +41,11 @@ public class SettingController {
 
     @FXML
     private void save() {
-        int hourTime, maxCourse, pairsPerDay;
+        int hourTime, maxCourse, pairsPerDay, maxTeachersInBranch;
         try {
             hourTime = Integer.parseInt(hourTimeField.getText());
             maxCourse = Integer.parseInt(maxCourseField.getText());
+            maxTeachersInBranch = Integer.parseInt(maxTeachersInBranchField.getText());
             pairsPerDay = Integer.parseInt(pairsPerDayField.getText());
         } catch (NumberFormatException ex) {
             AlertsUtil.showErrorAlert("Ошибка валидации", "Неправильный ввод числовых данных", ex);
@@ -49,6 +53,7 @@ public class SettingController {
         }
         AppsSettingsHolder.setHourTime(hourTime);
         AppsSettingsHolder.setMaxCourse(maxCourse);
+        AppsSettingsHolder.setMaxTeachersInBranch(maxTeachersInBranch);
         AppsSettingsHolder.setPairsPerDay(pairsPerDay);
         AppsSettingsHolder.setSubjectType(subjectTypeComboBox.getValue());
 
@@ -100,6 +105,16 @@ public class SettingController {
             settingRepository.save(setting);
         }
 
+        // максимальное количество учителей в связке
+        setting = settingRepository.findBySettingType(SettingEnum.MAX_TEACHERS_IN_BRANCH);
+        if (setting == null) {
+            setting = new Setting(SettingEnum.MAX_TEACHERS_IN_BRANCH, String.valueOf(AppsSettingsHolder.getMaxTeachersInBranch()));
+            settingRepository.save(setting);
+        } else {
+            setting.setValue(String.valueOf(AppsSettingsHolder.getMaxTeachersInBranch()));
+            settingRepository.save(setting);
+        }
+
         // количество пар в день
         setting = settingRepository.findBySettingType(SettingEnum.PAIRS_PER_DAY);
         if (setting == null) {
@@ -133,6 +148,7 @@ public class SettingController {
         if (settings.isEmpty()) {
             hourTimeField.setText(String.valueOf(AppsSettingsHolder.getHourTime()));
             maxCourseField.setText(String.valueOf(AppsSettingsHolder.getMaxCourse()));
+            maxTeachersInBranchField.setText(String.valueOf(AppsSettingsHolder.getMaxTeachersInBranch()));
             pairsPerDayField.setText(String.valueOf(AppsSettingsHolder.getPairsPerDay()));
             subjectTypeComboBox.getSelectionModel().select(AppsSettingsHolder.getSubjectType());
         }
@@ -145,6 +161,9 @@ public class SettingController {
             } else if (s.getSettingType().equals(SettingEnum.MAX_COURSE)) {
                 AppsSettingsHolder.setMaxCourse(Integer.parseInt(s.getValue()));
                 maxCourseField.setText(s.getValue());
+            } else if (s.getSettingType().equals(SettingEnum.MAX_TEACHERS_IN_BRANCH)) {
+                AppsSettingsHolder.setMaxTeachersInBranch(Integer.parseInt(s.getValue()));
+                maxTeachersInBranchField.setText(s.getValue());
             } else if (s.getSettingType().equals(SettingEnum.PAIRS_PER_DAY)) {
                 AppsSettingsHolder.setPairsPerDay(Integer.parseInt(s.getValue()));
                 pairsPerDayField.setText(s.getValue());
@@ -197,6 +216,7 @@ public class SettingController {
 
         setNumberFormatter(hourTimeField);
         setNumberFormatter(maxCourseField);
+        setNumberFormatter(maxTeachersInBranchField);
         setNumberFormatter(pairsPerDayField);
 
         refresh();

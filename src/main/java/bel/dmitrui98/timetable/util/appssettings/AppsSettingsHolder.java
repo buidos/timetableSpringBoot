@@ -13,6 +13,7 @@ public class AppsSettingsHolder {
     private static final int HOUR_TIME = 90;
     private static final int MAX_COURSE = 4;
     private static final int PAIRS_PER_DAY = 7;
+    private static final int MAX_TEACHERS_IN_BRANCH = 3;
 
     static {
         setSettingsToDefault();
@@ -28,6 +29,11 @@ public class AppsSettingsHolder {
      * Максимальный курс
      */
     private static int maxCourse;
+
+    /**
+     * Максимальное количество учителей в связке
+     */
+    private static int maxTeachersInBranch;
 
     /**
      * Количество пар в день
@@ -71,9 +77,18 @@ public class AppsSettingsHolder {
         AppsSettingsHolder.subjectType = subjectType;
     }
 
+    public static int getMaxTeachersInBranch() {
+        return maxTeachersInBranch;
+    }
+
+    public static void setMaxTeachersInBranch(int maxTeachersInBranch) {
+        AppsSettingsHolder.maxTeachersInBranch = maxTeachersInBranch;
+    }
+
     public static void setSettingsToDefault() {
         hourTime = HOUR_TIME;
         maxCourse = MAX_COURSE;
+        maxTeachersInBranch = MAX_TEACHERS_IN_BRANCH;
         pairsPerDay = PAIRS_PER_DAY;
         subjectType = null;
     }

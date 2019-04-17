@@ -19,6 +19,11 @@
                         <Insets left="239.0" />
                      </VBox.margin>
                   </Label>
+                  <Label prefHeight="21.0" text="Максимальное количество преподавателей в связке:">
+                     <VBox.margin>
+                        <Insets left="16.0" />
+                     </VBox.margin>
+                  </Label>
                   <Label prefHeight="21.0" text="Количество пар в день:">
                      <padding>
                         <Insets left="224.0" />
@@ -35,6 +40,7 @@
                <children>
                   <TextField fx:id="hourTimeField" />
                   <TextField fx:id="maxCourseField" />
+                  <TextField fx:id="maxTeachersInBranchField" />
                   <TextField fx:id="pairsPerDayField" />
                   <ComboBox fx:id="subjectTypeComboBox" prefHeight="31.0" prefWidth="166.0" />
                </children>

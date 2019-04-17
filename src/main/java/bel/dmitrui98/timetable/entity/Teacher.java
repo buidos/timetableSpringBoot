@@ -120,4 +120,27 @@ public class Teacher {
         }
         return name + surname;
     }
+
+    public static String getTeacherName(Teacher teacher) {
+        String surname;
+        if (teacher.getSurname().isEmpty()) {
+            surname = "no surname";
+        } else {
+            String firstSurnameLetter = teacher.getSurname().substring(0, 1).toUpperCase();
+            surname = firstSurnameLetter + teacher.getSurname().substring(1);
+        }
+        String name, patronymic;
+        try {
+            name = teacher.getName().substring(0, 1).toUpperCase() + ".";
+            patronymic = teacher.getPatronymic().substring(0, 1).toUpperCase() + ".";
+        } catch (IndexOutOfBoundsException ex) {
+            if (teacher.getName().isEmpty()) {
+                name = "";
+            } else {
+                name = teacher.getName().substring(0, 1).toUpperCase() + ".";
+            }
+            patronymic = "";
+        }
+        return surname + " " + name + patronymic;
+    }
 }

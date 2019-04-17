@@ -55,6 +55,9 @@
             <TableColumn fx:id="subjectNameCol" prefWidth="375.0" text="Название" />
             <TableColumn fx:id="subjectTypeNameCol" prefWidth="715.0" text="Тип дисциплины" />
          </columns>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
       </TableView>
    </children>
    <padding>

@@ -72,6 +72,7 @@ public class SubjectController {
             Subject subject = new Subject(name, subjectTypeEnum);
             subjectService.save(subject);
             subjects.add(subject);
+            subjectNameTextField.setText("");
         }
     }
 
