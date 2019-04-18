@@ -359,21 +359,18 @@ public class LoadController {
             }
         });
         subjectComboBox.getEditor().textProperty().addListener((o, oldValue, newValue) -> {
-            TextField editor = subjectComboBox.getEditor();
             Subject selected = subjectComboBox.getSelectionModel().getSelectedItem();
-
             // Platform нужен из-за бага в textField listener
             Platform.runLater(() -> {
-                // если выделенный элемент не равен введенному или выделенного элемента нет, то фильтруем список
-                if (selected == null || !selected.getName().equals(editor.getText())) {
+                if (selected == null || !selected.getName().equals(newValue)) {
                     filteredSubjects.setPredicate(item ->
                             item.getName().toLowerCase().startsWith(newValue.toLowerCase())
                     );
                 }
             });
-
         });
     }
+
 
     private void tuningTableViews() {
         teacherIndexCol.setCellFactory(col -> {

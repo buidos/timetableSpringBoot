@@ -2,28 +2,35 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.MainController">
    <top>
-      <MenuBar BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="Расписание">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Сохранить" />
-                  <MenuItem mnemonicParsing="false" text="Сохранить как" />
-                  <MenuItem mnemonicParsing="false" text="Очистить" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Редактирование">
-            <items>
-              <MenuItem mnemonicParsing="false" onAction="#showEditDatabase" text="База данных" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Помощь">
-            <items>
-              <MenuItem mnemonicParsing="false" text="О программе" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
+      <VBox>
+         <children>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="Расписание">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Сохранить" />
+                        <MenuItem mnemonicParsing="false" text="Сохранить как" />
+                        <MenuItem mnemonicParsing="false" text="Очистить" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Редактирование">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#showEditDatabase" text="База данных" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Помощь">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="О программе" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <HBox fx:id="criteriaHBox" prefHeight="41.0" prefWidth="600.0" spacing="10.0" />
+         </children>
+      </VBox>
    </top>
 </BorderPane>
