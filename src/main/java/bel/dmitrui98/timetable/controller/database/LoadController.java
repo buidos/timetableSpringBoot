@@ -1,30 +1,36 @@
 package bel.dmitrui98.timetable.controller.database;
 
-import bel.dmitrui98.timetable.entity.StudyGroup;
-import bel.dmitrui98.timetable.entity.Subject;
-import bel.dmitrui98.timetable.entity.Teacher;
+import bel.dmitrui98.timetable.entity.*;
+import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.service.BaseService;
+import bel.dmitrui98.timetable.service.TeachersBranchService;
 import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
+import bel.dmitrui98.timetable.util.dto.TeacherBranchDto;
 import bel.dmitrui98.timetable.util.exception.AppsException;
 import bel.dmitrui98.timetable.util.validation.AppsValidation;
 import bel.dmitrui98.timetable.util.validation.ValidConditions;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static bel.dmitrui98.timetable.util.exception.ExceptionType.*;
+import static bel.dmitrui98.timetable.util.exception.ExceptionType.VALID_EMPTY_VALUE;
+import static bel.dmitrui98.timetable.util.exception.ExceptionType.VALID_LONG_VALUE;
 
 public class LoadController {
 
@@ -32,8 +38,6 @@ public class LoadController {
     private static final String DELETE_LABEL_INIT = "не установлены";
     private static final String LOAD_FOR_GROUP_LABEL = "Нагрузка для группы";
     private static final String BUTTON_GROUP_TEXT = "Выбрать группу";
-
-    private static final String VALIDATION_ERROR = "Ошибка валидации";
 
     @FXML
     private Button defaultButton;
@@ -77,29 +81,21 @@ public class LoadController {
     private TextField hourField;
 
     @FXML
-    private TableView<Teacher> tableView;
+    private TableView<TeacherBranchDto> loadTableView;
     @FXML
-    private TableColumn<Teacher, Void> indexCol;
+    private TableColumn<TeacherBranchDto, Void> indexCol;
     @FXML
-    private TableColumn<Teacher, String> surnameCol;
+    private TableColumn<TeacherBranchDto, String> branchCol;
     @FXML
-    private TableColumn<Teacher, String> nameCol;
+    private TableColumn<TeacherBranchDto, String> subjectCol;
     @FXML
-    private TableColumn<Teacher, String> patronymicCol;
-    @FXML
-    private TableColumn<Teacher, String> telephoneCol;
-    @FXML
-    private TableColumn<Teacher, String> emailCol;
-    @FXML
-    private TextField surnameField;
-    @FXML
-    private TextField nameField;
-    @FXML
-    private TextField patronymicField;
-    @FXML
-    private TextField telephoneField;
-    @FXML
-    private TextField emailField;
+    private TableColumn<TeacherBranchDto, Integer> hourCol;
+
+    @Autowired
+    private TeachersBranchService teachersBranchService;
+    @Autowired
+    private TeachersBranchRepository teachersBranchRepository;
+    private ObservableList<TeacherBranchDto> teachersBranches = FXCollections.observableArrayList();
 
     @FXML
     private Label deleteIndexesLabel;
@@ -146,95 +142,116 @@ public class LoadController {
     }
 
     @FXML
-    private void add() throws AppsException {
-        String surname = surnameField.getText().toLowerCase();
-        String name = nameField.getText().toLowerCase();
-        String patronymic = patronymicField.getText().toLowerCase();
-        String telephone = telephoneField.getText().toLowerCase();
-        String email = emailField.getText().toLowerCase();
-
-        if (isValid(name) && isValid(surname, false) && isValid(patronymic) && isValid(email) && isValid(telephone)) {
-            Teacher teacher = new Teacher(surname, name, patronymic, telephone, email);
-            teacherService.save(teacher);
-            teachers.add(teacher);
-        }
-    }
-
-    @FXML
-    private void edit() throws AppsException {
-        Teacher entityForEdit  = tableView.getSelectionModel().getSelectedItem();
-        if (entityForEdit == null) {
-            AlertsUtil.showInfoAlert("Не выбран преподаватель", "Выберите хотя бы одного преподавателя для редактирования");
-            return;
-        }
-        String surname = surnameField.getText().toLowerCase();
-        String name = nameField.getText().toLowerCase();
-        String patronymic = patronymicField.getText().toLowerCase();
-        String telephone = telephoneField.getText().toLowerCase();
-        String email = emailField.getText().toLowerCase();
-
-        // если изменений не было
-        if (entityForEdit.getSurname().equals(surname) && entityForEdit.getName().equals(name)
-                && entityForEdit.getPatronymic().equals(patronymic) && entityForEdit.getTelephone().equals(telephone)
-                && entityForEdit.getEmail().equals(email)) {
-            AlertsUtil.showInfoAlert("Изменений не зафиксировано",
-                    "Измените хотя бы одно поле");
+    @Transactional
+    public void add() throws AppsException {
+        // проверяем группу
+        if (selectedGroup == null) {
+            AlertsUtil.showInfoAlert("Не выбрана группа", "Выделите группу из списка, затем нажмите на кнопку " +
+                    "\"Выбрать группу\", чтобы редактировать нагрузку этой группы");
             return;
         }
 
-        if (isValid(name) && isValid(surname, false) && isValid(patronymic) && isValid(email) && isValid(telephone)) {
-            entityForEdit.setSurname(surname);
-            entityForEdit.setName(name);
-            entityForEdit.setPatronymic(patronymic);
-            entityForEdit.setTelephone(telephone);
-            entityForEdit.setEmail(email);
-            teacherService.save(entityForEdit);
+        // проверяем связку преподавателей
+        List<Teacher> branchTeachers = branchTableView.getItems();
+        if (branchTeachers.isEmpty()) {
+            AlertsUtil.showInfoAlert("В связке должен быть хотя бы один преподаватель",
+                    "Выделите преподавателя, затем нажмите \"Добавить в связку\"");
+            return;
         }
+        Subject subject = subjectComboBox.getSelectionModel().getSelectedItem();
+        if (subject == null) {
+            AlertsUtil.showInfoAlert("Дисциплина должна быть установлена", null);
+            return;
+        }
+
+        if (!isValid(hourField.getText())) {
+            return;
+        }
+
+        // общее количество часов в две недели не должно превышать максимальное значение, которое возможно установить в нагрузку
+        Integer hours = Integer.valueOf(hourField.getText());
+        Integer minutesInTwoWeeks = hours * (AppsSettingsHolder.getHourTime() * 2);
+        int maxLoadMinutes = AppsSettingsHolder.getPairsPerDay() * (AppsSettingsHolder.getHourTime() * 2) *
+                AppsSettingsHolder.COUNT_WEEK_DAYS * 2;
+        int sum = 0;
+        for (TeacherBranchDto dto : teachersBranches) {
+            Integer countMinutesInTwoWeek = dto.getHour() * (AppsSettingsHolder.getHourTime() * 2);
+            sum += countMinutesInTwoWeek;
+        }
+        sum += minutesInTwoWeeks;
+        if (sum > maxLoadMinutes) {
+            AlertsUtil.showInfoAlert("Слишком много часов для нагрузки. Максимальное количество часов для двух недель: " +
+                    (maxLoadMinutes / (AppsSettingsHolder.getHourTime() * 2) + ". Текущее значение: " + (sum / (AppsSettingsHolder.getHourTime() * 2))), "Формула вычисления: pairsPerDay * (hourTime * 2) *" +
+                    " COUNT_WEEK_DAYS * 2");
+            return;
+        }
+
+        List<TeachersBranch> groupTeachersBranches = teachersBranchService.getTeachersBranches(branchTeachers, selectedGroup);
+        if (groupTeachersBranches.isEmpty()) {
+            // связка не найдена, создаем новую
+            Long maxId = teachersBranchRepository.getMaxId();
+            long nextId;
+            if (maxId == null) {
+                nextId = 1;
+            } else {
+                nextId = maxId + 1;
+            }
+            for (Teacher t : branchTeachers) {
+                StudyLoad load = new StudyLoad(minutesInTwoWeeks, subject);
+                TeachersBranch teachersBranch = new TeachersBranch(nextId, t, load, selectedGroup);
+                teachersBranchService.save(teachersBranch);
+            }
+            teachersBranches.add(new TeacherBranchDto(nextId, branchTeachers, subject, hours, selectedGroup));
+        } else {
+            // связка для данной группы уже существует, предлагаем отредактировать нагрузку
+            boolean isConfirm = AlertsUtil.showConfirmAlert("Данная связка у выделенной группы уже существует",
+                    "Отредактировать данную связку?");
+            if (isConfirm) {
+                for (TeachersBranch tb : groupTeachersBranches) {
+                    tb.getStudyLoad().setCountMinutesInTwoWeek(minutesInTwoWeeks);
+                    tb.getStudyLoad().setSubject(subject);
+                    teachersBranchService.save(tb);
+                    teachersBranches.clear();
+                    teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
+                }
+            }
+        }
+
     }
 
     @FXML
     private void delete() throws AppsException {
-        ObservableList<Teacher> selectedItems = tableView.getSelectionModel().getSelectedItems();
+        List<TeacherBranchDto> selectedItems = loadTableView.getSelectionModel().getSelectedItems();
         if (selectedItems.isEmpty()) {
-            AlertsUtil.showInfoAlert("Не выбран преподаватель", "Выберите хотя бы одного преподавателя для удаления");
+            AlertsUtil.showInfoAlert("Не выбраны часы связки преподавателей", null);
             return;
         }
-        List<Integer> selectedNumbers = tableView.getSelectionModel().getSelectedIndices().stream()
+        List<Integer> selectedNumbers = loadTableView.getSelectionModel().getSelectedIndices().stream()
                 .map(index -> index + 1)
                 .collect(Collectors.toList());
-        boolean isConfirmed = AlertsUtil.showConfirmAlert("Вы точно хотите удалить выделенных преподавателей?",
-                "Преподаватели с номерами " + selectedNumbers + " будут удалены");
+        boolean isConfirmed = AlertsUtil.showConfirmAlert("Вы точно хотите удалить выделенные часы связок преподавателей?",
+                "Часы связок преподавателей с номерами " + selectedNumbers + " будут удалены");
 
         if (isConfirmed) {
-            try {
-                teacherService.deleteAll(selectedItems);
-            } catch (Exception ex) {
-                AlertsUtil.showErrorAlert("Ошибка удаления", "Преподаватели не удалены. Возможно, " +
-                        "выделенные преподаватели учавствуют в нагрузке. Сначала необходимо удалить нагрузку данных преподавателей", ex);
-                return;
-            }
+            teachersBranchService.deleteAllDto(selectedItems);
 
-            teachers.clear();
-            teachers.setAll(teacherService.findAll());
+            teachersBranches.clear();
+            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
             refreshLabels();
         }
     }
 
-    private boolean isValid(String name) {
-        return isValid(name, true);
-    }
-
-    private boolean isValid(String name, boolean allowEmpty) {
+    private boolean isValid(String hour) {
+        ValidConditions cond = new ValidConditions();
+        cond.setMaxStringLength(8);
         try {
-            AppsValidation.validate(name, new ValidConditions(allowEmpty, true));
+            AppsValidation.validate(hour, cond);
         } catch (AppsException ex) {
             String contentText = "";
             if (ex.getExceptionType().equals(VALID_EMPTY_VALUE)) {
-                contentText = "Фамилия не должна быть пустой";
+                contentText = "Часы в две недели должны быть установлены";
             } else if (ex.getExceptionType().equals(VALID_LONG_VALUE)) {
-                contentText = "Строка не должна превышать длину в " + ValidConditions.MAX_STRING_LENGTH + " символов";
-            } else if (ex.getExceptionType().equals(VALID_DUPLICATE_VALUE)) {
-                contentText = "Запись со строкой \"" + name + "\" уже существует";
+                contentText = "Строка не должна превышать длину в " + cond.getMaxStringLength() + " символов";
             }
             AlertsUtil.showErrorAlert(AppsException.VALIDATION_ERROR, contentText);
             return false;
@@ -251,6 +268,10 @@ public class LoadController {
             return;
         }
         selectedGroup = selectedItem;
+
+        teachersBranches.clear();
+        teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
+
         refreshLabels();
     }
 
@@ -276,10 +297,10 @@ public class LoadController {
 //        emailCol.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
 //
 //        teachers = FXCollections.observableArrayList(teacherService.findAll());
-//        tableView.setItems(teachers);
+//        loadTableView.setItems(teachers);
 //
-//        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-//        tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//        loadTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+//        loadTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 //            if (newValue != null) {
 //                surnameField.setText(newValue.getSurname());
 //                nameField.setText(newValue.getName());
@@ -289,7 +310,7 @@ public class LoadController {
 //                refreshLabels();
 //            }
 //        });
-//        VBox.setVgrow(tableView, Priority.ALWAYS);
+//        VBox.setVgrow(loadTableView, Priority.ALWAYS);
 //
 //        refreshLabels();
         tuningListViews();
@@ -332,6 +353,11 @@ public class LoadController {
             }
         });
 
+        subjectComboBox.valueProperty().addListener((o, oldValue, newValue) -> {
+            if (newValue == null) {
+                subjectComboBox.getSelectionModel().select(oldValue);
+            }
+        });
         subjectComboBox.getEditor().textProperty().addListener((o, oldValue, newValue) -> {
             TextField editor = subjectComboBox.getEditor();
             Subject selected = subjectComboBox.getSelectionModel().getSelectedItem();
@@ -364,6 +390,32 @@ public class LoadController {
         });
         teacherCol.setCellValueFactory(cellData -> new SimpleStringProperty(Teacher.getTeacherName(cellData.getValue())));
         branchTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+
+
+        indexCol.setCellFactory(col -> {
+            TableCell<TeacherBranchDto, Void> cell = new TableCell<>();
+            cell.textProperty().bind(Bindings.createStringBinding(() -> {
+                if (cell.isEmpty()) {
+                    return null ;
+                } else {
+                    return Integer.toString(cell.getIndex() + 1);
+                }
+            }, cell.emptyProperty(), cell.indexProperty()));
+
+            return cell ;
+        });
+        branchCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTeacherBranch().toString()));
+        subjectCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSubject().getName()));
+        hourCol.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getHour()).asObject());
+
+        loadTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        loadTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                refreshLabels();
+            }
+        });
+        VBox.setVgrow(loadTableView, Priority.ALWAYS);
 
     }
 
@@ -432,7 +484,11 @@ public class LoadController {
     }
 
     public void refresh() {
-        refreshLabels();
+        if (selectedGroup != null) {
+            teachersBranches.clear();
+            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
+        }
+        loadTableView.setItems(teachersBranches);
 
         // обновляем группы
         groups = FXCollections.observableArrayList(studyGroupService.findAll());
@@ -450,10 +506,12 @@ public class LoadController {
         filteredSubjects = new FilteredList<>(subjects, s -> true);
         subjectComboBox.setItems(filteredSubjects);
         subjectComboBox.getSelectionModel().selectFirst();
+
+        refreshLabels();
     }
 
     private void refreshLabels() {
-        List<Integer> selectedNumbers = tableView.getSelectionModel().getSelectedIndices().stream()
+        List<Integer> selectedNumbers = loadTableView.getSelectionModel().getSelectedIndices().stream()
                 .map(index -> index + 1)
                 .collect(Collectors.toList());
         if (!selectedNumbers.isEmpty()) {
@@ -487,4 +545,5 @@ public class LoadController {
         });
         numberField.setTextFormatter(numberFormatter);
     }
+
 }

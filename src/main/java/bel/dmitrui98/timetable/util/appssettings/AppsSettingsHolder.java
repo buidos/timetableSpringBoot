@@ -7,10 +7,12 @@ import bel.dmitrui98.timetable.util.enums.SubjectTypeEnum;
  */
 public class AppsSettingsHolder {
 
+    public static final int COUNT_WEEK_DAYS = 6;
+
     /**
      * Значения по умолчанию
      */
-    private static final int HOUR_TIME = 90;
+    private static final int HOUR_TIME = 45;
     private static final int MAX_COURSE = 4;
     private static final int PAIRS_PER_DAY = 7;
     private static final int MAX_TEACHERS_IN_BRANCH = 3;

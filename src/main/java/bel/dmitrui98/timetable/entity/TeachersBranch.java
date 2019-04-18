@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * связка учителей, которые будут преподавать в рамках одной нагрузки
@@ -15,23 +13,39 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"teacherId", "studyLoadId"}, name = "t_br_teacher_load_constr")
-})
 public class TeachersBranch {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacher_br_gen")
-    @SequenceGenerator(name="teacher_br_gen", sequenceName = "teacher_br_seq", allocationSize=1)
-    private Long teacherBranchId;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "teacherId")
-    private Teacher teacher;
+    @EmbeddedId
+    private TeacherBranchPK teacherBranchPK;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.ALL})
     @JoinColumn(nullable = false, name = "studyLoadId")
     private StudyLoad studyLoad;
 
-    @ManyToMany(mappedBy = "teachersBranchSet")
-    private Set<StudyGroup> studyGroupSet = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "studyGroupId")
+    private StudyGroup studyGroup;
+
+    public TeachersBranch(Long teacherBranchId, Teacher teacher, StudyLoad studyLoad, StudyGroup studyGroup) {
+        teacherBranchPK = new TeacherBranchPK(teacherBranchId, teacher);
+        this.studyLoad = studyLoad;
+        this.studyGroup = studyGroup;
+    }
+
+    public Teacher getTeacher() {
+        return teacherBranchPK.getTeacher();
+    }
+
+    public Long getTeacherBranchId() {
+        return teacherBranchPK.getTeacherBranchId();
+    }
+
+    public void setTeacher(Teacher teacher) {
+        teacherBranchPK.setTeacher(teacher);
+    }
+
+    public void setTeacherBranchId(Long teacherBranchId) {
+        teacherBranchPK.setTeacherBranchId(teacherBranchId);
+    }
+
 }

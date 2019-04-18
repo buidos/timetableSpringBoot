@@ -24,9 +24,14 @@ public class StudyLoad {
      * Количество минут в часе берется из таблицы StudyPair (endTimeFirstHalf - beginTimeFirstHalf)
      */
     @Column(nullable = false)
-    private Integer countMinutesInWeek;
+    private Integer countMinutesInTwoWeek;
 
     @ManyToOne
     @JoinColumn(name = "subjectId", nullable = false)
     private Subject subject;
+
+    public StudyLoad(Integer countMinutesInTwoWeek, Subject subject) {
+        this.countMinutesInTwoWeek = countMinutesInTwoWeek;
+        this.subject = subject;
+    }
 }

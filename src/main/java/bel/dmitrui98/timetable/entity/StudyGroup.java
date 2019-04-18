@@ -104,15 +104,6 @@ public class StudyGroup {
         return studyGroupId;
     }
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "studyGroup_teachersBranch", joinColumns = {
-            @JoinColumn(name = "studyGroupId", nullable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "teachersBranchId", nullable = false)}
-    )
-    public Set<TeachersBranch> getTeachersBranchSet() {
-        return teachersBranchSet;
-    }
-
     public void setName(String name) {
         this.name.set(name);
     }
