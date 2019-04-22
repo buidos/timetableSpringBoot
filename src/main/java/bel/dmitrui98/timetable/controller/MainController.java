@@ -10,9 +10,12 @@ import bel.dmitrui98.timetable.util.dto.timetable.CriteriaCheckComboBoxesDto;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.CheckComboBox;
@@ -25,6 +28,7 @@ import java.util.Arrays;
 public class MainController {
 
 
+    private static final int SPACING = 5;
 
     @Autowired
     @Qualifier("editDatabaseView")
@@ -62,39 +66,71 @@ public class MainController {
         Scene editDatabaseScene = editDBController.initTabs();
 
         stage.setScene(editDatabaseScene);
-        stage.show();
+        stage.showAndWait();
+        refresh();
     }
 
     @PostConstruct
     public void init() {
-        depCheckComboBox.getItems().add(null);
-        depCheckComboBox.getItems().addAll(departmentService.findAll());
-        criteriaHBox.getChildren().add(depCheckComboBox);
+        VBox vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("Отделение:"));
+        vBox.getChildren().add(depCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
 
-        specialtyCheckComboBox.getItems().add(null);
-        specialtyCheckComboBox.getItems().addAll(specialtyService.findAll());
-        criteriaHBox.getChildren().add(specialtyCheckComboBox);
+        vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("Специальность:"));
+        vBox.getChildren().add(specialtyCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
 
-        groupCheckComboBox.getItems().add(null);
-        groupCheckComboBox.getItems().addAll(studyGroupService.findAll());
-        criteriaHBox.getChildren().add(groupCheckComboBox);
+        vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("Группа:"));
+        vBox.getChildren().add(groupCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
 
-        dayCheckComboBox.getItems().add(null);
-        dayCheckComboBox.getItems().addAll(Arrays.asList(DayEnum.values()));
-        criteriaHBox.getChildren().add(dayCheckComboBox);
+        vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("День:"));
+        vBox.getChildren().add(dayCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
 
         tuningCheckBoxes();
 
         Button showTimeTableButton = new Button("Показать");
+        showTimeTableButton.setMinWidth(100);
+        HBox.setMargin(showTimeTableButton, new Insets(26, 0, 0, 0));
         criteriaHBox.getChildren().add(showTimeTableButton);
         showTimeTableButton.setOnAction((e) -> {
             System.out.println("show");
         });
+        refresh();
     }
 
     private void tuningCheckBoxes() {
         CriteriaCheckComboBoxesDto dto = new CriteriaCheckComboBoxesDto(depCheckComboBox, specialtyCheckComboBox,
                 groupCheckComboBox, dayCheckComboBox);
         criteriaService.enableSelectAll(dto);
+        criteriaService.tuningDataModel(dto);
+        criteriaService.addOnHiddenListener(dto);
+    }
+
+    public void refresh() {
+        depCheckComboBox.getItems().clear();
+        depCheckComboBox.getItems().add(null);
+        depCheckComboBox.getItems().addAll(departmentService.findAll());
+        depCheckComboBox.getCheckModel().checkAll();
+
+        specialtyCheckComboBox.getItems().clear();
+        specialtyCheckComboBox.getItems().add(null);
+        specialtyCheckComboBox.getItems().addAll(specialtyService.findAll());
+        specialtyCheckComboBox.getCheckModel().checkAll();
+
+        groupCheckComboBox.getItems().clear();
+        groupCheckComboBox.getItems().add(null);
+        groupCheckComboBox.getItems().addAll(studyGroupService.findAll());
+        groupCheckComboBox.getCheckModel().checkAll();
+
+        dayCheckComboBox.getItems().clear();
+        dayCheckComboBox.getItems().add(null);
+        dayCheckComboBox.getItems().addAll(Arrays.asList(DayEnum.values()));
+        dayCheckComboBox.getCheckModel().checkAll();
     }
 }

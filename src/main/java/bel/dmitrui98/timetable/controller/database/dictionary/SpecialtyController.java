@@ -176,6 +176,7 @@ public class SpecialtyController {
         specialtyTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 specialtyNameTextField.setText(newValue.getName());
+                departmentComboBox.getSelectionModel().select(newValue.getDepartment());
                 refreshLabels();
             }
         });

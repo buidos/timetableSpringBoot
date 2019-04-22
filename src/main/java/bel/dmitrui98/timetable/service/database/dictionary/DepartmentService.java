@@ -60,7 +60,7 @@ public class DepartmentService implements BaseService<Department, Integer> {
                 .map(Department::getDepartmentId)
                 .collect(Collectors.toList());
 
-        List<Specialty> specialties = specialtyRepository.findByDepartmentDepartmentIdIn(ids);
+        List<Specialty> specialties = specialtyRepository.findByDepartmentIdIn(ids);
         List<String> specialityNames = new ArrayList<>();
 
         for (Specialty specialty : specialties) {

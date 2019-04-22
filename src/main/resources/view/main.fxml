@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.MainController">
+<?import javafx.scene.layout.*?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="474.0" prefWidth="879.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.MainController">
    <top>
       <VBox>
          <children>
@@ -29,7 +28,10 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <HBox fx:id="criteriaHBox" prefHeight="41.0" prefWidth="600.0" spacing="10.0" />
+            <HBox fx:id="criteriaHBox" prefHeight="41.0" prefWidth="600.0" spacing="10.0">
+               <VBox.margin>
+                  <Insets left="10.0" top="10.0" />
+               </VBox.margin></HBox>
          </children>
       </VBox>
    </top>

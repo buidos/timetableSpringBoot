@@ -181,6 +181,7 @@ public class SubjectController {
         subjectTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 subjectNameTextField.setText(newValue.getName());
+                subjectTypeComboBox.getSelectionModel().select(newValue.getSubjectType());
                 refreshLabels();
             }
         });

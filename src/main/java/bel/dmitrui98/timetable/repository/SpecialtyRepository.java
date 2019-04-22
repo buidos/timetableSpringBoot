@@ -1,5 +1,6 @@
 package bel.dmitrui98.timetable.repository;
 
+import bel.dmitrui98.timetable.entity.dictionary.Department;
 import bel.dmitrui98.timetable.entity.dictionary.Specialty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,5 +16,7 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, Integer> {
     void deleteAllByIds(@Param("ids") List<Integer> ids);
 
     @Query("FROM Specialty s WHERE s.department.departmentId IN (:departmentIds)")
-    List<Specialty> findByDepartmentDepartmentIdIn(@Param("departmentIds") List<Integer> departmentIds);
+    List<Specialty> findByDepartmentIdIn(@Param("departmentIds") List<Integer> departmentIds);
+
+    List<Specialty> findByDepartmentIn(List<Department> departments);
 }
