@@ -6,6 +6,8 @@ import bel.dmitrui98.timetable.entity.dictionary.Department;
 import bel.dmitrui98.timetable.entity.dictionary.Specialty;
 import bel.dmitrui98.timetable.service.BaseService;
 import bel.dmitrui98.timetable.service.timetable.CriteriaService;
+import bel.dmitrui98.timetable.service.timetable.TimetableService;
+import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.dto.timetable.CriteriaCheckComboBoxesDto;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import bel.dmitrui98.timetable.util.view.AppsView;
@@ -14,6 +16,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -24,6 +27,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -33,6 +39,9 @@ public class MainController {
     @Autowired
     @Qualifier("editDatabaseView")
     private AppsView editDatabaseView;
+
+    @FXML
+    private BorderPane borderPane;
 
     @FXML
     private HBox criteriaHBox;
@@ -52,6 +61,9 @@ public class MainController {
 
     @Autowired
     private CriteriaService criteriaService;
+
+    @Autowired
+    private TimetableService timetableService;
 
 
     @FXML
@@ -99,9 +111,33 @@ public class MainController {
         HBox.setMargin(showTimeTableButton, new Insets(26, 0, 0, 0));
         criteriaHBox.getChildren().add(showTimeTableButton);
         showTimeTableButton.setOnAction((e) -> {
-            System.out.println("show");
+            showTable();
         });
         refresh();
+    }
+
+    private void showTable() {
+        List<StudyGroup> checkedGroups = groupCheckComboBox.getCheckModel().getCheckedItems().stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (checkedGroups.isEmpty()) {
+            borderPane.setCenter(null);
+            AlertsUtil.showInfoAlert("Не выбрана ни одна группа", "Выберите хотя бы одну группу, чтобы" +
+                    " отобразить расписание");
+            return;
+        }
+
+        List<DayEnum> checkedDays = dayCheckComboBox.getCheckModel().getCheckedItems().stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (checkedDays.isEmpty()) {
+            borderPane.setCenter(null);
+            AlertsUtil.showInfoAlert("Не выбран ни один день", "Выберите хотя бы один день, чтобы" +
+                    " отобразить расписание");
+            return;
+        }
+
+        timetableService.showTable(checkedGroups, checkedDays, borderPane);
     }
 
     private void tuningCheckBoxes() {
