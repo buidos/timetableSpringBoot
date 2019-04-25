@@ -1,51 +1,95 @@
 package bel.dmitrui98.timetable.entity;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * связка учителей, которые будут преподавать в рамках одной нагрузки
  */
-@Getter
-@Setter
 @NoArgsConstructor
 @Entity
 public class TeachersBranch {
 
-    @EmbeddedId
-    private TeacherBranchPK teacherBranchPK;
+    private Long teacherBranchId;
+    private StudyLoad studyLoad;
+    private Set<StudyGroup> studyGroupSet = new HashSet<>();
+    private Set<Teacher> teacherSet = new HashSet<>();
+
+    public TeachersBranch(StudyLoad studyLoad) {
+        this.studyLoad = studyLoad;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacher_br_gen")
+    @SequenceGenerator(name="teacher_br_gen", sequenceName = "teacher_br_seq", allocationSize=1)
+    public Long getTeacherBranchId() {
+        return teacherBranchId;
+    }
 
     @ManyToOne(cascade = {CascadeType.ALL})
     @JoinColumn(nullable = false, name = "studyLoadId")
-    private StudyLoad studyLoad;
-
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "studyGroupId")
-    private StudyGroup studyGroup;
-
-    public TeachersBranch(Long teacherBranchId, Teacher teacher, StudyLoad studyLoad, StudyGroup studyGroup) {
-        teacherBranchPK = new TeacherBranchPK(teacherBranchId, teacher);
-        this.studyLoad = studyLoad;
-        this.studyGroup = studyGroup;
+    public StudyLoad getStudyLoad() {
+        return studyLoad;
     }
 
-    public Teacher getTeacher() {
-        return teacherBranchPK.getTeacher();
+    @ManyToMany(mappedBy = "teachersBranchSet")
+    public Set<StudyGroup> getStudyGroupSet() {
+        return studyGroupSet;
     }
 
-    public Long getTeacherBranchId() {
-        return teacherBranchPK.getTeacherBranchId();
+    @ManyToMany(mappedBy = "teachersBranchSet", fetch = FetchType.EAGER)
+    public Set<Teacher> getTeacherSet() {
+        return teacherSet;
     }
 
-    public void setTeacher(Teacher teacher) {
-        teacherBranchPK.setTeacher(teacher);
+    public void addGroup(StudyGroup group) {
+        if (studyGroupSet.contains(group)) {
+            return;
+        }
+        studyGroupSet.add(group);
+        group.addTeacherBranch(this);
+    }
+
+    public void removeGroup(StudyGroup group) {
+        if (!studyGroupSet.contains(group)) {
+            return;
+        }
+        studyGroupSet.remove(group);
+        group.removeTeacherBranch(this);
+    }
+
+    public void addTeacher(Teacher teacher) {
+        if (teacherSet.contains(teacher)) {
+            return;
+        }
+        teacherSet.add(teacher);
+        teacher.addTeachersBranch(this);
+    }
+
+    public void removeTeacher(Teacher teacher) {
+        if (!teacherSet.contains(teacher)) {
+            return;
+        }
+        teacherSet.remove(teacher);
+        teacher.removeTeachersBranch(this);
     }
 
     public void setTeacherBranchId(Long teacherBranchId) {
-        teacherBranchPK.setTeacherBranchId(teacherBranchId);
+        this.teacherBranchId = teacherBranchId;
     }
 
+    public void setStudyLoad(StudyLoad studyLoad) {
+        this.studyLoad = studyLoad;
+    }
+
+    public void setStudyGroupSet(Set<StudyGroup> studyGroupSet) {
+        this.studyGroupSet = studyGroupSet;
+    }
+
+    public void setTeacherSet(Set<Teacher> teacherSet) {
+        this.teacherSet = teacherSet;
+    }
 }

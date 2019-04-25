@@ -83,6 +83,7 @@ public class TeacherController {
             patronymicField.setText("");
             telephoneField.setText("");
             emailField.setText("");
+            surnameField.requestFocus();
         }
     }
 
@@ -193,6 +194,7 @@ public class TeacherController {
         tableView.setItems(teachers);
 
         tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        tableView.setFocusTraversable(false);
         tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 surnameField.setText(newValue.getSurname());

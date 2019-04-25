@@ -19,11 +19,11 @@ import java.util.List;
 @NoArgsConstructor
 public class TeacherBranchDto {
 
-    private Long teacherBranchId;
+    private TeachersBranch teachersBranch;
     /**
      * Связка учителей
      */
-    private List<Teacher> teacherBranch;
+    private List<Teacher> teachers;
     /**
      * Дисциплина
      */
@@ -32,38 +32,21 @@ public class TeacherBranchDto {
      * Час в две недели
      */
     private Integer hour;
+
     /**
      * Группа
      */
     private StudyGroup studyGroup;
 
     /**
-     * Преобразование {@link TeachersBranch} в {@link TeacherBranchDto}. Входной список должен быть отсортирован по id
+     * Преобразование {@link TeachersBranch} в {@link TeacherBranchDto}
      */
-    public static List<TeacherBranchDto> convert(List<TeachersBranch> teachersBranches) {
+    public static List<TeacherBranchDto> convert(List<TeachersBranch> teachersBranches, StudyGroup group) {
         List<TeacherBranchDto> dtoList = new ArrayList<>();
-        int size = teachersBranches.size();
-        // берем ту связку, где больше всего совпадений
-        for (int i = 0; i < size; i++) {
-            TeachersBranch tb = teachersBranches.get(i);
-            Long teacherBranchId = tb.getTeacherBranchId();
-            List<Teacher> teachers = new ArrayList<>();
-
-            TeachersBranch previous = tb;
-            while (i < size && tb.getTeacherBranchId().equals(teacherBranchId)) {
-                teachers.add(tb.getTeacher());
-                previous = tb;
-
-                i++;
-                if (i < size) {
-                    tb = teachersBranches.get(i);
-                }
-            }
-            i--;
-
-            int hour = previous.getStudyLoad().getCountMinutesInTwoWeek() / (AppsSettingsHolder.getHourTime() * 2);
-            dtoList.add(new TeacherBranchDto(previous.getTeacherBranchId(), teachers, previous.getStudyLoad().getSubject(),
-                    hour, previous.getStudyGroup()));
+        for (TeachersBranch tb : teachersBranches) {
+            int hour = tb.getStudyLoad().getCountMinutesInTwoWeek() / (AppsSettingsHolder.getHourTime() * 2);
+            dtoList.add(new TeacherBranchDto(tb, new ArrayList<>(tb.getTeacherSet()), tb.getStudyLoad().getSubject(),
+                    hour, group));
         }
         return dtoList;
     }

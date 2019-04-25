@@ -12,4 +12,9 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     @Modifying
     @Query("delete from Teacher t where t.teacherId in (:ids)")
     void deleteAllByIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT DISTINCT t FROM Teacher t " +
+            "LEFT JOIN FETCH t.teachersBranchSet " +
+            "WHERE t IN ?1")
+    List<Teacher> branchFetch(List<Teacher> teachers);
 }

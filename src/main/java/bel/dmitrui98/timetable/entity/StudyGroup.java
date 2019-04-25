@@ -132,7 +132,32 @@ public class StudyGroup {
         this.studyGroupId = studyGroupId;
     }
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "studyGroup_teachersBranch", joinColumns = {
+            @JoinColumn(name = "studyGroupId", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "teachersBranchId", nullable = false)}
+    )
+    public Set<TeachersBranch> getTeachersBranchSet() {
+        return teachersBranchSet;
+    }
+
     public void setTeachersBranchSet(Set<TeachersBranch> teachersBranchSet) {
         this.teachersBranchSet = teachersBranchSet;
+    }
+
+    public void addTeacherBranch(TeachersBranch tb) {
+        if (teachersBranchSet.contains(tb)) {
+            return;
+        }
+        teachersBranchSet.add(tb);
+        tb.addGroup(this);
+    }
+
+    public void removeTeacherBranch(TeachersBranch tb) {
+        if (!teachersBranchSet.contains(tb)) {
+            return;
+        }
+        teachersBranchSet.remove(tb);
+        tb.removeGroup(this);
     }
 }

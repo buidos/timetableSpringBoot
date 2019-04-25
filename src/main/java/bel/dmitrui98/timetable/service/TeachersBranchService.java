@@ -2,16 +2,17 @@ package bel.dmitrui98.timetable.service;
 
 import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.entity.Teacher;
-import bel.dmitrui98.timetable.entity.TeacherBranchPK;
 import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.util.dto.TeacherBranchDto;
 import bel.dmitrui98.timetable.util.exception.AppsException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static bel.dmitrui98.timetable.util.exception.ExceptionType.REC_NOT_DELETED;
@@ -46,11 +47,24 @@ public class TeachersBranchService implements BaseService<TeachersBranch, Long> 
         }
     }
 
-    public void deleteAllDto(List<TeacherBranchDto> dtoList) throws AppsException {
-        for (TeacherBranchDto dto : dtoList) {
-            for (Teacher t : dto.getTeacherBranch()) {
-                teachersBranchRepository.deleteById(new TeacherBranchPK(dto.getTeacherBranchId(), t));
+    @Transactional(rollbackFor = AppsException.class)
+    public void deleteAllByDto(List<TeacherBranchDto> dtoList) throws AppsException {
+        List<TeachersBranch> branchList = dtoList.stream()
+                .map(TeacherBranchDto::getTeachersBranch)
+                .collect(Collectors.toList());
+        branchList = teachersBranchRepository.groupsAndTeacherFetch(branchList);
+        for (TeachersBranch tb : branchList) {
+            for (StudyGroup g : tb.getStudyGroupSet()) {
+                g.getTeachersBranchSet().remove(tb);
             }
+            for (Teacher t : tb.getTeacherSet()) {
+                t.getTeachersBranchSet().remove(tb);
+            }
+        }
+        try {
+            teachersBranchRepository.deleteAll(branchList);
+        } catch (Exception ex) {
+            throw new AppsException(REC_NOT_DELETED, ex);
         }
     }
 
@@ -70,50 +84,22 @@ public class TeachersBranchService implements BaseService<TeachersBranch, Long> 
     }
 
     /**
-     * Получает существующую связку для группы по переданным учителям
-     * @param teachers учителя, по которым ищется связка
-     * @param group группа, для которой ищутся связки
+     * Находит связку в базе для данной группы по учителям
+     * @param teachers учителя из связки
+     * @param group группа
+     * @return связка для группы
      */
-    public List<TeachersBranch> getTeachersBranches(List<Teacher> teachers, StudyGroup group) {
-        List<TeachersBranch> allTeachersBranches = teachersBranchRepository.findByGroup(group);
-        List<TeachersBranch> resultTeachersBranches = new ArrayList<>();
+    public TeachersBranch findByTeachersAndGroup(List<Teacher> teachers, StudyGroup group) {
+        List<TeachersBranch> teachersBranches = teachersBranchRepository.findByTeachersInAndGroup(teachers, group);
 
-        List<Long> teacherIds = teachers.stream()
-                .map(Teacher::getTeacherId)
-                .collect(Collectors.toList());
-
-        int size = allTeachersBranches.size();
-        // берем ту связку, где больше всего совпадений
-        for (int i = 0; i < size; i++) {
-            TeachersBranch tb = allTeachersBranches.get(i);
-            Long teacherBranchId = tb.getTeacherBranchId();
-            boolean correctBranch = true;
-            while (i < size && tb.getTeacherBranchId().equals(teacherBranchId)) {
-
-                // если связка неправильная, пропускаем
-                if (correctBranch) {
-                    if (teacherIds.contains(tb.getTeacher().getTeacherId())) {
-                        resultTeachersBranches.add(tb);
-                    } else {
-                        // не та связка
-                        resultTeachersBranches.clear();
-                        correctBranch = false;
-                    }
-                }
-
-                i++;
-                if (i < size) {
-                    tb = allTeachersBranches.get(i);
-                }
-            }
-
-            if (correctBranch && teachers.size() == resultTeachersBranches.size()) {
-                // связка найдена, выходим
+        TeachersBranch resultTeacherBranch = null;
+        for (TeachersBranch tb : teachersBranches) {
+            Set<Teacher> branchTeachers = tb.getTeacherSet();
+            if (CollectionUtils.isEqualCollection(branchTeachers, teachers)) {
+                resultTeacherBranch = tb;
                 break;
             }
-            resultTeachersBranches.clear();
-            i--;
         }
-        return resultTeachersBranches;
+        return resultTeacherBranch;
     }
 }

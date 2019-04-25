@@ -7,6 +7,9 @@ import javafx.beans.property.StringProperty;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -26,6 +29,8 @@ public class Teacher {
         this.telephone.setValue(telephone);
         this.email.setValue(email);
     }
+
+    private Set<TeachersBranch> teachersBranchSet = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "teacher_gen")
@@ -103,6 +108,15 @@ public class Teacher {
         this.email.set(email);
     }
 
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "teacher_teachersBranch", joinColumns = {
+            @JoinColumn(name = "teacherId", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "teachersBranchId", nullable = false)}
+    )
+    public Set<TeachersBranch> getTeachersBranchSet() {
+        return teachersBranchSet;
+    }
+
     @Override
     public String toString() {
         // отображаем Иванов Иван в виде И.Иванов
@@ -142,5 +156,38 @@ public class Teacher {
             patronymic = "";
         }
         return surname + " " + name + patronymic;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Teacher teacher = (Teacher) o;
+        return getTeacherId() == teacher.getTeacherId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teacherId.get());
+    }
+
+    public void setTeachersBranchSet(Set<TeachersBranch> teachersBranchSet) {
+        this.teachersBranchSet = teachersBranchSet;
+    }
+
+    public void addTeachersBranch(TeachersBranch tb) {
+        if (teachersBranchSet.contains(tb)) {
+            return;
+        }
+        teachersBranchSet.add(tb);
+        tb.addTeacher(this);
+    }
+
+    public void removeTeachersBranch(TeachersBranch tb) {
+        if (!teachersBranchSet.contains(tb)) {
+            return;
+        }
+        teachersBranchSet.remove(tb);
+        tb.removeTeacher(this);
     }
 }

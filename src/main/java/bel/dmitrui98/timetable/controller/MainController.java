@@ -121,9 +121,12 @@ public class MainController {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         if (checkedGroups.isEmpty()) {
-            borderPane.setCenter(null);
-            AlertsUtil.showInfoAlert("Не выбрана ни одна группа", "Выберите хотя бы одну группу, чтобы" +
-                    " отобразить расписание");
+            if (borderPane.getCenter() == null) {
+                AlertsUtil.showInfoAlert("Не выбрана ни одна группа", "Выберите хотя бы одну группу, чтобы" +
+                        " отобразить расписание");
+            } else {
+                borderPane.setCenter(null);
+            }
             return;
         }
 
@@ -131,9 +134,12 @@ public class MainController {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         if (checkedDays.isEmpty()) {
-            borderPane.setCenter(null);
-            AlertsUtil.showInfoAlert("Не выбран ни один день", "Выберите хотя бы один день, чтобы" +
-                    " отобразить расписание");
+            if (borderPane.getCenter() == null) {
+                AlertsUtil.showInfoAlert("Не выбран ни один день", "Выберите хотя бы один день, чтобы" +
+                        " отобразить расписание");
+            } else {
+                borderPane.setCenter(null);
+            }
             return;
         }
 
@@ -168,5 +174,7 @@ public class MainController {
         dayCheckComboBox.getItems().add(null);
         dayCheckComboBox.getItems().addAll(Arrays.asList(DayEnum.values()));
         dayCheckComboBox.getCheckModel().checkAll();
+
+        borderPane.setCenter(null);
     }
 }

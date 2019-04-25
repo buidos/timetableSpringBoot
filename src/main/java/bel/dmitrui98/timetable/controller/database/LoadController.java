@@ -1,6 +1,8 @@
 package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.entity.*;
+import bel.dmitrui98.timetable.repository.StudyGroupRepository;
+import bel.dmitrui98.timetable.repository.TeacherRepository;
 import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.service.BaseService;
 import bel.dmitrui98.timetable.service.TeachersBranchService;
@@ -48,6 +50,9 @@ public class LoadController {
     private TextField filterGroupField;
 
     @Autowired
+    private StudyGroupRepository studyGroupRepository;
+
+    @Autowired
     private BaseService<StudyGroup, Long> studyGroupService;
     private ObservableList<StudyGroup> groups;
     private FilteredList<StudyGroup> filteredGroups;
@@ -56,6 +61,9 @@ public class LoadController {
     private ListView<Teacher> teacherListView;
     @FXML
     private TextField filterTeacherField;
+
+    @Autowired
+    private TeacherRepository teacherRepository;
 
     @Autowired
     private BaseService<Teacher, Long> teacherService;
@@ -79,6 +87,9 @@ public class LoadController {
 
     @FXML
     private TextField hourField;
+
+    @FXML
+    private TextField minuteField;
 
     @FXML
     private TableView<TeacherBranchDto> loadTableView;
@@ -142,85 +153,72 @@ public class LoadController {
     }
 
     @FXML
-    @Transactional
+    @Transactional(rollbackFor = AppsException.class)
     public void add() throws AppsException {
-        // проверяем группу
-        if (selectedGroup == null) {
-            AlertsUtil.showInfoAlert("Не выбрана группа", "Выделите группу из списка, затем нажмите на кнопку " +
-                    "\"Выбрать группу\", чтобы редактировать нагрузку этой группы");
-            return;
-        }
+        ValidationInnerClass innerClass = new ValidationInnerClass().validate(false);
+        if (innerClass.isNotValid()) return;
+        List<Teacher> branchTeachers = innerClass.getBranchTeachers();
+        Subject subject = innerClass.getSubject();
+        Integer hours = innerClass.getHours();
+        Integer minutesInTwoWeeks = innerClass.getMinutesInTwoWeeks();
 
-        // проверяем связку преподавателей
-        List<Teacher> branchTeachers = branchTableView.getItems();
-        if (branchTeachers.isEmpty()) {
-            AlertsUtil.showInfoAlert("В связке должен быть хотя бы один преподаватель",
-                    "Выделите преподавателя, затем нажмите \"Добавить в связку\"");
-            return;
-        }
-        Subject subject = subjectComboBox.getSelectionModel().getSelectedItem();
-        if (subject == null) {
-            AlertsUtil.showInfoAlert("Дисциплина должна быть установлена", null);
-            return;
-        }
+        TeachersBranch tb = teachersBranchService.findByTeachersAndGroup(branchTeachers, selectedGroup);
+        if (tb == null) {
+            StudyLoad load = new StudyLoad(minutesInTwoWeeks, subject);
+            tb = new TeachersBranch(load);
+            tb.addGroup(selectedGroup);
 
-        if (!isValid(hourField.getText())) {
-            return;
-        }
+            studyGroupRepository.saveAndFlush(selectedGroup);
+            TeachersBranch last = teachersBranchRepository.findTopByOrderByTeacherBranchIdDesc();
 
-        // общее количество часов в две недели не должно превышать максимальное значение, которое возможно установить в нагрузку
-        Integer hours = Integer.valueOf(hourField.getText());
-        Integer minutesInTwoWeeks = hours * (AppsSettingsHolder.getHourTime() * 2);
-        int maxLoadMinutes = AppsSettingsHolder.getPairsPerDay() * (AppsSettingsHolder.getHourTime() * 2) *
-                AppsSettingsHolder.COUNT_WEEK_DAYS * 2;
-        int sum = 0;
-        for (TeacherBranchDto dto : teachersBranches) {
-            Integer countMinutesInTwoWeek = dto.getHour() * (AppsSettingsHolder.getHourTime() * 2);
-            sum += countMinutesInTwoWeek;
-        }
-        sum += minutesInTwoWeeks;
-        if (sum > maxLoadMinutes) {
-            AlertsUtil.showInfoAlert("Слишком много часов для нагрузки. Максимальное количество часов для двух недель: " +
-                    (maxLoadMinutes / (AppsSettingsHolder.getHourTime() * 2) + ". Текущее значение: " + (sum / (AppsSettingsHolder.getHourTime() * 2))), "Формула вычисления: pairsPerDay * (hourTime * 2) *" +
-                    " COUNT_WEEK_DAYS * 2");
-            return;
-        }
+            branchTeachers = teacherRepository.branchFetch(branchTeachers);
 
-        List<TeachersBranch> groupTeachersBranches = teachersBranchService.getTeachersBranches(branchTeachers, selectedGroup);
-        if (groupTeachersBranches.isEmpty()) {
-            // связка не найдена, создаем новую
-            Long maxId = teachersBranchRepository.getMaxId();
-            long nextId;
-            if (maxId == null) {
-                nextId = 1;
-            } else {
-                nextId = maxId + 1;
-            }
             for (Teacher t : branchTeachers) {
-                StudyLoad load = new StudyLoad(minutesInTwoWeeks, subject);
-                TeachersBranch teachersBranch = new TeachersBranch(nextId, t, load, selectedGroup);
-                teachersBranchService.save(teachersBranch);
+                t.addTeachersBranch(last);
+                teacherService.save(t);
             }
-            teachersBranches.add(new TeacherBranchDto(nextId, branchTeachers, subject, hours, selectedGroup));
+            teachersBranches.add(new TeacherBranchDto(last, branchTeachers, subject, hours, selectedGroup));
+            branchTableView.getItems().clear();
         } else {
             // связка для данной группы уже существует, предлагаем отредактировать нагрузку
             boolean isConfirm = AlertsUtil.showConfirmAlert("Данная связка у выделенной группы уже существует",
                     "Отредактировать данную связку?");
             if (isConfirm) {
-                for (TeachersBranch tb : groupTeachersBranches) {
-                    tb.getStudyLoad().setCountMinutesInTwoWeek(minutesInTwoWeeks);
-                    tb.getStudyLoad().setSubject(subject);
-                    teachersBranchService.save(tb);
-                    teachersBranches.clear();
-                    teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
-                }
+                tb.getStudyLoad().setCountMinutesInTwoWeek(minutesInTwoWeeks);
+                tb.getStudyLoad().setSubject(subject);
+                teachersBranchService.save(tb);
+                teachersBranches.clear();
+                teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup), selectedGroup));
             }
         }
 
     }
 
     @FXML
-    private void delete() throws AppsException {
+    private void edit() throws AppsException {
+        ValidationInnerClass innerClass = new ValidationInnerClass().validate(true);
+        if (innerClass.isNotValid()) return;
+        List<Teacher> branchTeachers = innerClass.getBranchTeachers();
+        Subject subject = innerClass.getSubject();
+        Integer minutesInTwoWeeks = innerClass.getMinutesInTwoWeeks();
+
+        TeachersBranch tb = teachersBranchService.findByTeachersAndGroup(branchTeachers, selectedGroup);
+        if (tb == null) {
+            AlertsUtil.showInfoAlert("Связка для данной группы не найдена",
+                    "Выберите существующую связку из списка для редактирования");
+        } else {
+            tb.getStudyLoad().setCountMinutesInTwoWeek(minutesInTwoWeeks);
+            tb.getStudyLoad().setSubject(subject);
+            teachersBranchService.save(tb);
+            teachersBranches.clear();
+            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup), selectedGroup));
+
+        }
+    }
+
+    @FXML
+    @Transactional(rollbackFor = AppsException.class)
+    public void delete() throws AppsException {
         List<TeacherBranchDto> selectedItems = loadTableView.getSelectionModel().getSelectedItems();
         if (selectedItems.isEmpty()) {
             AlertsUtil.showInfoAlert("Не выбраны часы связки преподавателей", null);
@@ -233,10 +231,10 @@ public class LoadController {
                 "Часы связок преподавателей с номерами " + selectedNumbers + " будут удалены");
 
         if (isConfirmed) {
-            teachersBranchService.deleteAllDto(selectedItems);
+            teachersBranchService.deleteAllByDto(selectedItems);
 
             teachersBranches.clear();
-            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
+            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup), selectedGroup));
             refreshLabels();
         }
     }
@@ -249,7 +247,7 @@ public class LoadController {
         } catch (AppsException ex) {
             String contentText = "";
             if (ex.getExceptionType().equals(VALID_EMPTY_VALUE)) {
-                contentText = "Часы в две недели должны быть установлены";
+                contentText = "Часы (минуты) в две недели должны быть установлены";
             } else if (ex.getExceptionType().equals(VALID_LONG_VALUE)) {
                 contentText = "Строка не должна превышать длину в " + cond.getMaxStringLength() + " символов";
             }
@@ -267,52 +265,16 @@ public class LoadController {
                     " её нагрузки");
             return;
         }
-        selectedGroup = selectedItem;
+        selectedGroup = studyGroupRepository.branchFetch(selectedItem);
 
         teachersBranches.clear();
-        teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
+        teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup), selectedGroup));
 
         refreshLabels();
     }
 
     @PostConstruct
     public void init() {
-
-//        indexCol.setCellFactory(col -> {
-//            TableCell<Teacher, Void> cell = new TableCell<>();
-//            cell.textProperty().bind(Bindings.createStringBinding(() -> {
-//                if (cell.isEmpty()) {
-//                    return null ;
-//                } else {
-//                    return Integer.toString(cell.getIndex() + 1);
-//                }
-//            }, cell.emptyProperty(), cell.indexProperty()));
-//
-//            return cell ;
-//        });
-//        surnameCol.setCellValueFactory(cellData -> cellData.getValue().surnameProperty());
-//        nameCol.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-//        patronymicCol.setCellValueFactory(cellData -> cellData.getValue().patronymicProperty());
-//        telephoneCol.setCellValueFactory(cellData -> cellData.getValue().telephoneProperty());
-//        emailCol.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
-//
-//        teachers = FXCollections.observableArrayList(teacherService.findAll());
-//        loadTableView.setItems(teachers);
-//
-//        loadTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-//        loadTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            if (newValue != null) {
-//                surnameField.setText(newValue.getSurname());
-//                nameField.setText(newValue.getName());
-//                patronymicField.setText(newValue.getPatronymic());
-//                telephoneField.setText(newValue.getTelephone());
-//                emailField.setText(newValue.getEmail());
-//                refreshLabels();
-//            }
-//        });
-//        VBox.setVgrow(loadTableView, Priority.ALWAYS);
-//
-//        refreshLabels();
         tuningListViews();
         tuningTableViews();
 
@@ -320,6 +282,7 @@ public class LoadController {
         tuningComboBoxes();
 
         setNumberFormatter(hourField);
+        setNumberFormatter(minuteField);
     }
 
     private void tuningComboBoxes() {
@@ -402,7 +365,7 @@ public class LoadController {
 
             return cell ;
         });
-        branchCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTeacherBranch().toString()));
+        branchCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTeachers().toString()));
         subjectCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSubject().getName()));
         hourCol.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getHour()).asObject());
 
@@ -410,6 +373,9 @@ public class LoadController {
         loadTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 refreshLabels();
+                branchTableView.setItems(FXCollections.observableArrayList(newValue.getTeachers()));
+                subjectComboBox.getSelectionModel().select(newValue.getSubject());
+                hourField.setText(String.valueOf(newValue.getHour()));
             }
         });
         VBox.setVgrow(loadTableView, Priority.ALWAYS);
@@ -483,7 +449,7 @@ public class LoadController {
     public void refresh() {
         if (selectedGroup != null) {
             teachersBranches.clear();
-            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup)));
+            teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup), selectedGroup));
         }
         loadTableView.setItems(teachersBranches);
 
@@ -521,6 +487,7 @@ public class LoadController {
         } else {
             loadLabel.setText(LOAD_FOR_GROUP_LABEL + " " + selectedGroup.getName());
         }
+        branchTableView.getItems().clear();
     }
 
     public Button getDefaultButton() {
@@ -543,4 +510,97 @@ public class LoadController {
         numberField.setTextFormatter(numberFormatter);
     }
 
+    private class ValidationInnerClass {
+        private boolean isNotValid;
+        private List<Teacher> branchTeachers;
+        private Subject subject;
+        private Integer hours;
+        private Integer minutesInTwoWeeks;
+
+        boolean isNotValid() {
+            return isNotValid;
+        }
+
+        public List<Teacher> getBranchTeachers() {
+            return branchTeachers;
+        }
+
+        public Subject getSubject() {
+            return subject;
+        }
+
+        public Integer getHours() {
+            return hours;
+        }
+
+        public Integer getMinutesInTwoWeeks() {
+            return minutesInTwoWeeks;
+        }
+
+        public ValidationInnerClass validate(boolean isEdit) {
+            // проверяем группу
+            if (selectedGroup == null) {
+                AlertsUtil.showInfoAlert("Не выбрана группа", "Выделите группу из списка, затем нажмите на кнопку " +
+                        "\"Выбрать группу\", чтобы редактировать нагрузку этой группы");
+                isNotValid = true;
+                return this;
+            }
+
+            // проверяем связку преподавателей
+            branchTeachers = branchTableView.getItems();
+            if (branchTeachers.isEmpty()) {
+                AlertsUtil.showInfoAlert("В связке должен быть хотя бы один преподаватель",
+                        "Выделите преподавателя, затем нажмите \"Добавить в связку\"");
+                isNotValid = true;
+                return this;
+            }
+            subject = subjectComboBox.getSelectionModel().getSelectedItem();
+            if (subject == null) {
+                AlertsUtil.showInfoAlert("Дисциплина должна быть установлена", null);
+                isNotValid = true;
+                return this;
+            }
+
+            if (!isValid(hourField.getText())) {
+                isNotValid = true;
+                return this;
+            }
+
+            if (!isValid(minuteField.getText())) {
+                isNotValid = true;
+                return this;
+            }
+
+            // общее количество часов в две недели не должно превышать максимальное значение, которое возможно установить в нагрузку
+            hours = Integer.valueOf(hourField.getText());
+            minutesInTwoWeeks = hours * (AppsSettingsHolder.getHourTime() * 2);
+            int maxLoadMinutes = AppsSettingsHolder.getPairsPerDay() * (AppsSettingsHolder.getHourTime() * 2) *
+                    AppsSettingsHolder.COUNT_WEEK_DAYS * 2;
+            int sum = 0;
+            for (TeacherBranchDto dto : teachersBranches) {
+                Integer countMinutesInTwoWeek = dto.getHour() * (AppsSettingsHolder.getHourTime() * 2);
+                sum += countMinutesInTwoWeek;
+            }
+
+            int editMinutes = 0;
+            if (isEdit) {
+                if (loadTableView.getSelectionModel().getSelectedItem() != null) {
+                    editMinutes = loadTableView.getSelectionModel().getSelectedItem().getHour() * (AppsSettingsHolder.getHourTime() * 2);
+                }
+            }
+
+            sum += minutesInTwoWeeks - editMinutes;
+
+
+            if (sum > maxLoadMinutes) {
+                AlertsUtil.showInfoAlert("Слишком много часов для нагрузки. Максимальное количество часов для двух недель: " +
+                        (maxLoadMinutes / (AppsSettingsHolder.getHourTime() * 2) + ". Текущее значение: " + (sum / (AppsSettingsHolder.getHourTime() * 2))), "Формула вычисления: pairsPerDay * (hourTime * 2) *" +
+                        " COUNT_WEEK_DAYS * 2");
+                isNotValid = true;
+                return this;
+            }
+            isNotValid = false;
+            return this;
+        }
+    }
 }

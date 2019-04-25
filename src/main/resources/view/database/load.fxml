@@ -50,6 +50,8 @@
                         <ComboBox fx:id="subjectComboBox" editable="true" prefHeight="31.0" prefWidth="198.0" />
                         <Label text="Часы в две недели" />
                         <TextField fx:id="hourField" />
+                        <Label text="Минуты в две недели" />
+                        <TextField fx:id="minuteField" />
                      </children>
                   </VBox>
                </children>
@@ -59,6 +61,7 @@
       <HBox alignment="TOP_CENTER" maxWidth="-Infinity" prefWidth="876.0" spacing="5.0">
          <children>
             <Button fx:id="defaultButton" mnemonicParsing="false" onAction="#add" text="Добавить в нагрузку" />
+            <Button mnemonicParsing="false" onAction="#edit" text="Редактировать" />
             <Button mnemonicParsing="false" onAction="#delete" text="Удалить из нагрузки" />
             <Label fx:id="deleteIndexesLabel" text="Номера для удаления:">
                <padding>

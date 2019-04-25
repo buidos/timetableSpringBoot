@@ -15,4 +15,9 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
     void deleteAllByIds(@Param("ids") List<Long> ids);
 
     List<StudyGroup> findBySpecialtyIn(List<Specialty> specialties);
+
+    @Query("SELECT distinct g FROM StudyGroup g " +
+            "LEFT JOIN FETCH g.teachersBranchSet " +
+            "WHERE g = ?1")
+    StudyGroup branchFetch(StudyGroup studyGroup);
 }
