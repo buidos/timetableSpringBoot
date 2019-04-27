@@ -50,8 +50,6 @@
                         <ComboBox fx:id="subjectComboBox" editable="true" prefHeight="31.0" prefWidth="198.0" />
                         <Label text="Часы в две недели" />
                         <TextField fx:id="hourField" />
-                        <Label text="Минуты в две недели" />
-                        <TextField fx:id="minuteField" />
                      </children>
                   </VBox>
                </children>

@@ -1,6 +1,7 @@
 package bel.dmitrui98.timetable.service.timetable;
 
 import bel.dmitrui98.timetable.entity.StudyGroup;
+import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
@@ -8,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -22,7 +24,7 @@ public class TimetableService {
 
     private static final double CELL_WIDTH = 100;
     private static final double CELL_WIDTH_CONTENT = 200;
-    private static final double CELL_WIDTH_HOUR = 50;
+    private static final double CELL_WIDTH_HOUR = 35;
     private static final double CELL_HEIGHT = 25;
     private static final int DAY_ROTATE = -90;
     /**
@@ -124,27 +126,45 @@ public class TimetableService {
         int groupIndex = 0;
         for (int i = 0; i < groups.size() * 2; i += 2) {
             StudyGroup group = groups.get(groupIndex++);
-            // TODO отсортировать по количеству часов
-//            List<TeachersBranch> branches = teachersBranchRepository.findByGroup(group);
-            // извлечь учителей
-//            for (int j = 0; j < branches.size(); j++) {
-//
-//                // связка
-//                cell = new TextField();
-//                cell.setEditable(false);
-//                cell.setMaxSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
-//                cell.setMinSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
-//                cell.setTranslateX(cell.getTranslateX() - SHIFT);
-//                loadGridPane.add(cell, i, j);
-//
-//                // часы
-//                cell = new TextField();
-//                cell.setEditable(false);
-//                cell.setMaxSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
-//                cell.setMinSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
-//                cell.setTranslateX(cell.getTranslateX() - SHIFT);
-//                loadGridPane.add(cell, i, j);
-//            }
+            List<TeachersBranch> branches = teachersBranchRepository.findByGroupOrderByHour(group);
+            if (branches.isEmpty()) {
+                // связка
+                cell = new TextField("Нет нагрузки");
+                cell.setEditable(false);
+                cell.setMaxSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setMinSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setTranslateX(cell.getTranslateX() - SHIFT);
+                loadGridPane.add(cell, i, 0);
+
+                // часы
+                cell = new TextField("0");
+                cell.setEditable(false);
+                cell.setMaxSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setMinSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setTranslateX(cell.getTranslateX() - SHIFT);
+                loadGridPane.add(cell, i + 1, 0);
+                continue;
+            }
+            for (int j = 0; j < branches.size(); j++) {
+                TeachersBranch tb = branches.get(j);
+
+                // связка
+                cell = new TextField(tb.getTeacherSet().toString());
+                cell.setTooltip(new Tooltip(tb.getTeacherSet().toString()));
+                cell.setEditable(false);
+                cell.setMaxSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setMinSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setTranslateX(cell.getTranslateX() - SHIFT);
+                loadGridPane.add(cell, i, j);
+
+                // часы
+                cell = new TextField(String.valueOf(tb.getStudyLoad().getCountMinutesInTwoWeek() / (AppsSettingsHolder.getHourTime() * 2)));
+                cell.setEditable(false);
+                cell.setMaxSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setMinSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell.setTranslateX(cell.getTranslateX() - SHIFT);
+                loadGridPane.add(cell, i + 1, j);
+            }
         }
         contentVBox.getChildren().add(loadGridPane);
 

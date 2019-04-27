@@ -89,9 +89,6 @@ public class LoadController {
     private TextField hourField;
 
     @FXML
-    private TextField minuteField;
-
-    @FXML
     private TableView<TeacherBranchDto> loadTableView;
     @FXML
     private TableColumn<TeacherBranchDto, Void> indexCol;
@@ -282,7 +279,6 @@ public class LoadController {
         tuningComboBoxes();
 
         setNumberFormatter(hourField);
-        setNumberFormatter(minuteField);
     }
 
     private void tuningComboBoxes() {
@@ -562,11 +558,6 @@ public class LoadController {
             }
 
             if (!isValid(hourField.getText())) {
-                isNotValid = true;
-                return this;
-            }
-
-            if (!isValid(minuteField.getText())) {
                 isNotValid = true;
                 return this;
             }

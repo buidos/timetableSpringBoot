@@ -25,6 +25,14 @@ public interface TeachersBranchRepository extends JpaRepository<TeachersBranch, 
             "ORDER BY tb.teacherBranchId, l.countMinutesInTwoWeek DESC")
     List<TeachersBranch> findByGroup(@Param("studyGroup") StudyGroup group);
 
+    @Query("SELECT DISTINCT tb FROM TeachersBranch tb " +
+            "JOIN FETCH tb.studyLoad l " +
+            "JOIN FETCH tb.teacherSet " +
+            "JOIN FETCH l.subject " +
+            "JOIN tb.studyGroupSet g ON g = :studyGroup " +
+            "ORDER BY l.countMinutesInTwoWeek DESC")
+    List<TeachersBranch> findByGroupOrderByHour(@Param("studyGroup") StudyGroup group);
+
     @Query("SELECT tb FROM TeachersBranch tb " +
             "JOIN tb.teacherSet t ON t IN :teachers " +
             "JOIN tb.studyGroupSet g ON g = :group_ " +
