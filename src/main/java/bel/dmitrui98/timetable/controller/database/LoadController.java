@@ -10,6 +10,7 @@ import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.dto.TeacherBranchDto;
 import bel.dmitrui98.timetable.util.exception.AppsException;
+import bel.dmitrui98.timetable.util.time.TimeUtil;
 import bel.dmitrui98.timetable.util.validation.AppsValidation;
 import bel.dmitrui98.timetable.util.validation.ValidConditions;
 import javafx.application.Platform;
@@ -564,7 +565,7 @@ public class LoadController {
 
             // общее количество часов в две недели не должно превышать максимальное значение, которое возможно установить в нагрузку
             hours = Integer.valueOf(hourField.getText());
-            minutesInTwoWeeks = hours * (AppsSettingsHolder.getHourTime() * 2);
+            minutesInTwoWeeks = TimeUtil.convertHourToMinute(hours);
             int maxLoadMinutes = AppsSettingsHolder.getPairsPerDay() * (AppsSettingsHolder.getHourTime() * 2) *
                     AppsSettingsHolder.COUNT_WEEK_DAYS * 2;
             int sum = 0;

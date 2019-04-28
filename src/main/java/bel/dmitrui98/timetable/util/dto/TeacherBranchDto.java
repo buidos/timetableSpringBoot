@@ -4,7 +4,7 @@ import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.entity.Subject;
 import bel.dmitrui98.timetable.entity.Teacher;
 import bel.dmitrui98.timetable.entity.TeachersBranch;
-import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
+import bel.dmitrui98.timetable.util.time.TimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,7 +44,7 @@ public class TeacherBranchDto {
     public static List<TeacherBranchDto> convert(List<TeachersBranch> teachersBranches, StudyGroup group) {
         List<TeacherBranchDto> dtoList = new ArrayList<>();
         for (TeachersBranch tb : teachersBranches) {
-            int hour = tb.getStudyLoad().getCountMinutesInTwoWeek() / (AppsSettingsHolder.getHourTime() * 2);
+            int hour = TimeUtil.convertMinuteToHour(tb.getStudyLoad().getCountMinutesInTwoWeek());
             dtoList.add(new TeacherBranchDto(tb, new ArrayList<>(tb.getTeacherSet()), tb.getStudyLoad().getSubject(),
                     hour, group));
         }

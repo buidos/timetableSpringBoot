@@ -11,6 +11,7 @@ import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.dto.timetable.CriteriaCheckComboBoxesDto;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import bel.dmitrui98.timetable.util.view.AppsView;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -35,6 +36,8 @@ public class MainController {
 
 
     private static final int SPACING = 5;
+    private static final String SHOW_INFO_PANEL_TEXT = "Показать инфо-панель";
+    private static final String HIDE_INFO_PANEL_TEXT = "Скрыть инфо-панель";
 
     @Autowired
     @Qualifier("editDatabaseView")
@@ -106,14 +109,37 @@ public class MainController {
 
         tuningCheckBoxes();
 
-        Button showTimeTableButton = new Button("Показать");
-        showTimeTableButton.setMinWidth(100);
-        HBox.setMargin(showTimeTableButton, new Insets(26, 0, 0, 0));
+        final double marginTop = 26;
+        final double minWidth = 180;
+        Button showTimeTableButton = new Button("Показать расписание");
+        showTimeTableButton.setMinWidth(minWidth);
+        HBox.setMargin(showTimeTableButton, new Insets(marginTop, 0, 0, 0));
         criteriaHBox.getChildren().add(showTimeTableButton);
-        showTimeTableButton.setOnAction((e) -> {
+        showTimeTableButton.setOnAction(e -> {
             showTable();
         });
+
+        showInfoPanelButton = new Button(SHOW_INFO_PANEL_TEXT);
+        showInfoPanelButton.setMinWidth(minWidth);
+        HBox.setMargin(showInfoPanelButton, new Insets(marginTop, 0, 0, 0));
+        criteriaHBox.getChildren().add(showInfoPanelButton);
+        showInfoPanelButton.setOnAction(this::showInfoPanel);
+
         refresh();
+    }
+
+    private Button showInfoPanelButton;
+    private boolean isInfoPanelShown = true;
+    private void showInfoPanel(ActionEvent e) {
+        Button button = (Button) e.getSource();
+        if (timetableService.changeVisibleInfoPanel()) {
+            if (isInfoPanelShown) {
+                button.setText(SHOW_INFO_PANEL_TEXT);
+            } else {
+                button.setText(HIDE_INFO_PANEL_TEXT);
+            }
+            isInfoPanelShown = !isInfoPanelShown;
+        }
     }
 
     private void showTable() {
@@ -125,7 +151,7 @@ public class MainController {
                 AlertsUtil.showInfoAlert("Не выбрана ни одна группа", "Выберите хотя бы одну группу, чтобы" +
                         " отобразить расписание");
             } else {
-                borderPane.setCenter(null);
+                hideTimetable();
             }
             return;
         }
@@ -138,13 +164,20 @@ public class MainController {
                 AlertsUtil.showInfoAlert("Не выбран ни один день", "Выберите хотя бы один день, чтобы" +
                         " отобразить расписание");
             } else {
-                borderPane.setCenter(null);
+                hideTimetable();
             }
             return;
         }
 
         timetableService.showTable(checkedGroups, checkedDays, borderPane);
         timetableService.createInfoPanel(borderPane);
+        showInfoPanelButton.setText(HIDE_INFO_PANEL_TEXT);
+    }
+
+    private void hideTimetable() {
+        borderPane.setCenter(null);
+        borderPane.setRight(null);
+        showInfoPanelButton.setText(SHOW_INFO_PANEL_TEXT);
     }
 
     private void tuningCheckBoxes() {

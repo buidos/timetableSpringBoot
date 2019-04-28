@@ -1,10 +1,13 @@
 package bel.dmitrui98.timetable.service.timetable;
 
+import bel.dmitrui98.timetable.control.LoadLabel;
+import bel.dmitrui98.timetable.control.TimetableLabel;
 import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
+import bel.dmitrui98.timetable.util.time.TimeUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -25,7 +29,7 @@ import java.util.List;
 @Service
 public class TimetableService {
 
-    private static final double CELL_WIDTH = 100;
+    private static final double CELL_WIDTH = 56;
     private static final double CELL_WIDTH_CONTENT = 200;
     private static final double CELL_WIDTH_HOUR = 25;
     private static final double CELL_HEIGHT = 50;
@@ -37,15 +41,18 @@ public class TimetableService {
     private static final double FIRST_MARGIN_TOP_DAY;
     private static final double MARGIN_CONTENT;
     static {
-        SHIFT = (CELL_WIDTH * 2) + CELL_HEIGHT;
-        FIRST_MARGIN_TOP_DAY = SHIFT - CELL_WIDTH - (CELL_HEIGHT /2);
+        SHIFT = Math.abs(CELL_WIDTH - CELL_HEIGHT * AppsSettingsHolder.getPairsPerDay());
+        FIRST_MARGIN_TOP_DAY = CELL_HEIGHT * 3 - 3.5;
         MARGIN_CONTENT = CELL_HEIGHT / 2;
     }
 
     @Autowired
     private TeachersBranchRepository teachersBranchRepository;
 
+    private BorderPane borderPane;
     public void showTable(List<StudyGroup> groups, List<DayEnum> days, BorderPane borderPane) {
+        this.borderPane = borderPane;
+
         // состоит из двух HBox: header и content
         VBox rootVBox = new VBox();
         ScrollPane rootScrollPane = new ScrollPane(rootVBox);
@@ -139,12 +146,10 @@ public class TimetableService {
         // расписание
         GridPane timetableGridPane = new GridPane();
         for (int i = 0; i < groups.size(); i++) {
+            StudyGroup group = groups.get(i);
             for (int j = 0; j < countDays * AppsSettingsHolder.getPairsPerDay(); j++) {
-                cell = new Label();
-                cell.setMaxSize(CELL_WIDTH_CONTENT, CELL_HEIGHT);
-                cell.setMinSize(CELL_WIDTH_CONTENT, CELL_HEIGHT);
+                cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, group);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                cell.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
                 timetableGridPane.add(cell, i, j);
             }
         }
@@ -156,21 +161,16 @@ public class TimetableService {
         for (int i = 0; i < groups.size() * 2; i += 2) {
             StudyGroup group = groups.get(groupIndex++);
             List<TeachersBranch> branches = teachersBranchRepository.findByGroupOrderByHour(group);
+            // если для группы не установлена нагрузка
             if (branches.isEmpty()) {
                 // связка
-                cell = new Label("Нет нагрузки");
-                cell.setMaxSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
-                cell.setMinSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, "Нет нагрузки");
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                cell.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
                 loadGridPane.add(cell, i, 0);
 
                 // часы
-                cell = new Label("0");
-                cell.setMaxSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
-                cell.setMinSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, "0");
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                cell.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
                 loadGridPane.add(cell, i + 1, 0);
                 continue;
             }
@@ -179,31 +179,19 @@ public class TimetableService {
 
                 // связка
                 String text = tb.getTeacherSet().toString() + "\n" + tb.getStudyLoad().getSubject().getName();
-                cell = new Label(text);
-                cell.setTooltip(new Tooltip(tb.getTeacherSet().toString()));
-                cell.setMaxSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
-                cell.setMinSize(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT);
+                cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                cell.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
-                cell.setOnMouseClicked(e -> {
-                    onLoadClicked(tb, group);
-                });
+                cell.setOnMouseClicked(this::onLoadClicked);
                 loadGridPane.add(cell, i, j);
 
                 // часы
-                cell = new Label(String.valueOf(tb.getStudyLoad().getCountMinutesInTwoWeek() / (AppsSettingsHolder.getHourTime() * 2)));
-
+                text = String.valueOf(TimeUtil.convertMinuteToHour(tb.getStudyLoad().getCountMinutesInTwoWeek()));
+                cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
                 if (cell.getText().length() > 2) {
                     cell.setTooltip(new Tooltip(cell.getText()));
                 }
-
-                cell.setMaxSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
-                cell.setMinSize(CELL_WIDTH_HOUR, CELL_HEIGHT);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                cell.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
-                cell.setOnMouseClicked(e -> {
-                    onLoadClicked(tb, group);
-                });
+                cell.setOnMouseClicked(this::onLoadClicked);
                 loadGridPane.add(cell, i + 1, j);
             }
         }
@@ -254,42 +242,48 @@ public class TimetableService {
         return dayVBox;
     }
 
-    private TeachersBranch selectedBranch;
-    private StudyGroup selectedGroup;
-    private void onLoadClicked(TeachersBranch tb, StudyGroup group) {
-        selectedGroup = group;
-        selectedBranch = tb;
+    private LoadLabel selectedLoadLabel;
+    private void onLoadClicked(MouseEvent e) {
+        selectedLoadLabel = (LoadLabel) e.getSource();
 
-        refreshInfoPanel();
+        createInfoPanel(borderPane);
     }
 
     private Object selectedCell;
     private void onTimetableClicked() {
-        refreshInfoPanel();
+        createInfoPanel(borderPane);
     }
 
-    HBox currentLoad;
-    HBox currentCellInfo;
+    VBox infoPanel;
     public void createInfoPanel(BorderPane borderPane) {
-        currentLoad = new HBox();
-        currentCellInfo = new HBox();
-        VBox infoPanel = new VBox(new Label("Статус:"), currentLoad, currentCellInfo);
+        VBox currentLoad = new VBox();
+        VBox currentCellInfo = new VBox();
+        infoPanel = new VBox(new Label("Статус:"), currentLoad, currentCellInfo);
         infoPanel.setMinWidth(100);
+
+//        if (selectedBranch == null || selectedGroup == null) {
+//            currentLoad.getChildren().add(new Label("Нагрузка не выбрана"));
+//        } else {
+//            currentLoad.getChildren().add(new Label(selectedBranch.getTeacherSet().toString()));
+//        }
+//
+//        if (selectedCell == null) {
+//            currentCellInfo.getChildren().add(new Label("Ячейка расписания не выбрана"));
+//        }
 
         borderPane.setRight(infoPanel);
     }
 
-    private void refreshInfoPanel() {
-        currentLoad.getChildren().clear();
-        currentCellInfo.getChildren().clear();
-        if (selectedBranch == null || selectedGroup == null) {
-            currentLoad.getChildren().add(new Label("Нагрузка не выбрана"));
+    public boolean changeVisibleInfoPanel() {
+        if (borderPane != null) {
+            if (borderPane.getRight() == null) {
+                createInfoPanel(borderPane);
+            } else {
+                borderPane.setRight(null);
+            }
+            return true;
         } else {
-            currentLoad.getChildren().add(new Label(selectedBranch.getTeacherSet().toString()));
-        }
-
-        if (selectedCell == null) {
-            currentCellInfo.getChildren().add(new Label("Ячейка расписания не выбрана"));
+            return false;
         }
     }
 }
