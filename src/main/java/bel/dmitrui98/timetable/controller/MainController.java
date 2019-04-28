@@ -144,6 +144,7 @@ public class MainController {
         }
 
         timetableService.showTable(checkedGroups, checkedDays, borderPane);
+        timetableService.createInfoPanel(borderPane);
     }
 
     private void tuningCheckBoxes() {

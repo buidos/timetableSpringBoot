@@ -27,9 +27,9 @@
             <AppenderRef ref="console" />
             <AppenderRef ref="file"/>
         </Logger>
-        <logger name="org.hibernate.type" level="trace" additivity="false" >
-            <AppenderRef ref="console" />
-        </logger>
+        <!--<logger name="org.hibernate.type" level="trace" additivity="false" >-->
+            <!--<AppenderRef ref="console" />-->
+        <!--</logger>-->
         <Root level="info">
             <AppenderRef ref="console"/>
             <AppenderRef ref="file"/>
