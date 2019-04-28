@@ -15,7 +15,19 @@ public class TimeUtil {
     }
 
     public static int convertMinuteToHour(int minute) {
-        return minute / (AppsSettingsHolder.getHourTime() * 2);
+        int hour = minute / (AppsSettingsHolder.getHourTime() * 2);
+        // если есть еще половина пары, то добавляем целый час
+        if (isRemainder(minute)) {
+            hour++;
+        }
+        return hour;
+    }
+
+    /**
+     * Есть ли остаток от деления
+     */
+    public static boolean isRemainder(int minute) {
+        return (minute % (AppsSettingsHolder.getHourTime() * 2)) != 0;
     }
 
     /**

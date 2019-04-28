@@ -50,6 +50,11 @@
                         <ComboBox fx:id="subjectComboBox" editable="true" prefHeight="31.0" prefWidth="198.0" />
                         <Label text="Часы в две недели" />
                         <TextField fx:id="hourField" />
+                        <CheckBox fx:id="halfPairCheckBox" mnemonicParsing="false" text="Добавить половину пары">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
                      </children>
                   </VBox>
                </children>
@@ -80,6 +85,7 @@
             <TableColumn fx:id="branchCol" minWidth="200.0" prefWidth="509.0" text="Связка" />
             <TableColumn fx:id="subjectCol" prefWidth="214.0" text="Дисциплина" />
             <TableColumn fx:id="hourCol" minWidth="37.0" prefWidth="253.0" text="часы в 2 недели" />
+            <TableColumn fx:id="minuteCol" minWidth="37.0" prefWidth="253.0" text="минуты в 2 недели" />
          </columns>
       </TableView>
    </children>

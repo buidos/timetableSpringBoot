@@ -131,6 +131,9 @@ public class MainController {
     private Button showInfoPanelButton;
     private boolean isInfoPanelShown = true;
     private void showInfoPanel(ActionEvent e) {
+        if (borderPane == null || borderPane.getCenter() == null) {
+            return;
+        }
         Button button = (Button) e.getSource();
         if (timetableService.changeVisibleInfoPanel()) {
             if (isInfoPanelShown) {
@@ -209,6 +212,6 @@ public class MainController {
         dayCheckComboBox.getItems().addAll(Arrays.asList(DayEnum.values()));
         dayCheckComboBox.getCheckModel().checkAll();
 
-        borderPane.setCenter(null);
+        hideTimetable();
     }
 }

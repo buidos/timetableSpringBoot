@@ -90,6 +90,9 @@ public class LoadController {
     private TextField hourField;
 
     @FXML
+    private CheckBox halfPairCheckBox;
+
+    @FXML
     private TableView<TeacherBranchDto> loadTableView;
     @FXML
     private TableColumn<TeacherBranchDto, Void> indexCol;
@@ -99,6 +102,8 @@ public class LoadController {
     private TableColumn<TeacherBranchDto, String> subjectCol;
     @FXML
     private TableColumn<TeacherBranchDto, Integer> hourCol;
+    @FXML
+    private TableColumn<TeacherBranchDto, Integer> minuteCol;
 
     @Autowired
     private TeachersBranchService teachersBranchService;
@@ -175,7 +180,8 @@ public class LoadController {
                 t.addTeachersBranch(last);
                 teacherService.save(t);
             }
-            teachersBranches.add(new TeacherBranchDto(last, branchTeachers, subject, hours, selectedGroup));
+            boolean isHalfPair = halfPairCheckBox.isSelected();
+            teachersBranches.add(new TeacherBranchDto(last, branchTeachers, subject, hours, isHalfPair, selectedGroup));
             branchTableView.getItems().clear();
         } else {
             // связка для данной группы уже существует, предлагаем отредактировать нагрузку
@@ -365,6 +371,14 @@ public class LoadController {
         branchCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTeachers().toString()));
         subjectCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getSubject().getName()));
         hourCol.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getHour()).asObject());
+        minuteCol.setCellValueFactory(cellData -> {
+            int minute = TimeUtil.convertHourToMinute(cellData.getValue().getHour());
+            if (cellData.getValue().isHalfPair()) {
+                // вычитаем лишнюю половину пары
+                minute -= AppsSettingsHolder.getHourTime();
+            }
+            return new SimpleIntegerProperty(minute).asObject();
+        });
 
         loadTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         loadTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -566,6 +580,12 @@ public class LoadController {
             // общее количество часов в две недели не должно превышать максимальное значение, которое возможно установить в нагрузку
             hours = Integer.valueOf(hourField.getText());
             minutesInTwoWeeks = TimeUtil.convertHourToMinute(hours);
+            if (halfPairCheckBox.isSelected()) {
+                minutesInTwoWeeks += AppsSettingsHolder.getHourTime();
+
+                // если есть половина пары, то добавляем целый час
+                hours++;
+            }
             int maxLoadMinutes = AppsSettingsHolder.getPairsPerDay() * (AppsSettingsHolder.getHourTime() * 2) *
                     AppsSettingsHolder.COUNT_WEEK_DAYS * 2;
             int sum = 0;
@@ -577,7 +597,12 @@ public class LoadController {
             int editMinutes = 0;
             if (isEdit) {
                 if (loadTableView.getSelectionModel().getSelectedItem() != null) {
-                    editMinutes = loadTableView.getSelectionModel().getSelectedItem().getHour() * (AppsSettingsHolder.getHourTime() * 2);
+                    TeacherBranchDto dto = loadTableView.getSelectionModel().getSelectedItem();
+                    editMinutes = dto.getHour() * (AppsSettingsHolder.getHourTime() * 2);
+                    if (dto.isHalfPair()) {
+                        // отнимаем, потому что в dto для половины пары усатанавливается целый час
+                        editMinutes -= AppsSettingsHolder.getHourTime();
+                    }
                 }
             }
 
