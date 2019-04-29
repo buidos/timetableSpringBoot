@@ -7,6 +7,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import lombok.Getter;
 
+/**
+ * Ячейка нагрузки (связка преподавателей или часы преподавателей)
+ */
 @Getter
 public class LoadLabel extends Label {
 

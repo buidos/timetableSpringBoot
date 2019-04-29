@@ -173,7 +173,6 @@ public class MainController {
         }
 
         timetableService.showTable(checkedGroups, checkedDays, borderPane);
-        timetableService.createInfoPanel(borderPane);
         showInfoPanelButton.setText(HIDE_INFO_PANEL_TEXT);
     }
 

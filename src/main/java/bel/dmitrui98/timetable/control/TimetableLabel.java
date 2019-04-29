@@ -6,6 +6,9 @@ import javafx.scene.control.Label;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Ячейка расписания
+ */
 @Getter
 @Setter
 public class TimetableLabel extends Label {
