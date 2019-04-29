@@ -14,6 +14,9 @@ public class TimeUtil {
         return hour * (AppsSettingsHolder.getHourTime() * 2);
     }
 
+    /**
+     * Если нацело не делится, то добавляется дополнительный час
+     */
     public static int convertMinuteToHour(int minute) {
         int hour = minute / (AppsSettingsHolder.getHourTime() * 2);
         // если есть еще половина пары, то добавляем целый час

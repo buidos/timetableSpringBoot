@@ -147,45 +147,56 @@ class TimetableUtil {
     }
 
     private GridPane getLoadGridPane(List<StudyGroup> groups, BorderPane borderPane) {
-        Label cell;
+        LoadLabel cell;
         GridPane loadGridPane = new GridPane();
         int groupIndex = 0;
         for (int i = 0; i < groups.size() * 2; i += 2) {
             StudyGroup group = groups.get(groupIndex++);
             List<TeachersBranch> branches = teachersBranchRepository.findByGroupOrderByHour(group);
-            // если для группы не установлена нагрузка
-            if (branches.isEmpty()) {
-                // связка
-                cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, "Нет нагрузки");
-                cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                loadGridPane.add(cell, i, 0);
 
-                // часы
-                cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, "0");
-                cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                loadGridPane.add(cell, i + 1, 0);
-                continue;
-            }
-            for (int j = 0; j < branches.size(); j++) {
+            // общее количество часов
+            LoadLabel commonHourCell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, "0");
+            commonHourCell.setHourCell(commonHourCell);
+            commonHourCell.setTranslateX(commonHourCell.getTranslateX() - SHIFT);
+
+            LoadLabel commonCell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, "Количество часов");
+            commonCell.setHourCell(commonHourCell);
+            commonCell.setTranslateX(commonCell.getTranslateX() - SHIFT);
+
+            int j = 0, sumMinute = 0;
+            for (j = 0; j < branches.size(); j++) {
                 TeachersBranch tb = branches.get(j);
 
-                // связка
-                String text = tb.getTeacherSet().toString() + "\n" + tb.getStudyLoad().getSubject().getName();
-                cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
-                cell.setTranslateX(cell.getTranslateX() - SHIFT);
-                cell.setOnMouseClicked(e -> onLoadClicked(e, borderPane));
-                loadGridPane.add(cell, i, j);
-
                 // часы
-                text = String.valueOf(TimeUtil.convertMinuteToHour(tb.getStudyLoad().getCountMinutesInTwoWeek()));
+                int minute = tb.getStudyLoad().getCountMinutesInTwoWeek();
+                int hour = TimeUtil.convertMinuteToHour(minute);
+                sumMinute += minute;
+                String text = String.valueOf(hour);
+
                 cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
+                LoadLabel hourCell = cell;
+                cell.setHourCell(hourCell);
+                cell.setCommonHourCell(commonHourCell);
                 if (cell.getText().length() > 2) {
                     cell.setTooltip(new Tooltip(cell.getText()));
                 }
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
                 cell.setOnMouseClicked(e -> onLoadClicked(e, borderPane));
                 loadGridPane.add(cell, i + 1, j);
+
+                // связка
+                text = tb.getTeacherSet().toString() + "\n" + tb.getStudyLoad().getSubject().getName();
+                cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
+                cell.setHourCell(hourCell);
+                cell.setCommonHourCell(commonHourCell);
+                cell.setTranslateX(cell.getTranslateX() - SHIFT);
+                cell.setOnMouseClicked(e -> onLoadClicked(e, borderPane));
+                loadGridPane.add(cell, i, j);
             }
+
+            commonHourCell.setText(String.valueOf(TimeUtil.convertMinuteToHour(sumMinute)));
+            loadGridPane.add(commonCell, i, j);
+            loadGridPane.add(commonHourCell, i + 1, j);
         }
         return loadGridPane;
     }
@@ -195,7 +206,7 @@ class TimetableUtil {
         TimetableContextMenu contextMenu;
         GridPane timetableGridPane = new GridPane();
         for (int i = 0; i < groups.size(); i++) {
-
+            StudyGroup group = groups.get(i);
             int dayIndex = -1;
             int pairIndex;
             int verticalCellIndex;
@@ -207,7 +218,7 @@ class TimetableUtil {
                 pairIndex = j % AppsSettingsHolder.getPairsPerDay();
                 verticalCellIndex = (days.get(dayIndex).ordinal() * AppsSettingsHolder.getPairsPerDay()) + pairIndex;
 
-                cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, verticalCellIndex);
+                cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, verticalCellIndex, group);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
 
                 // контекстное меню

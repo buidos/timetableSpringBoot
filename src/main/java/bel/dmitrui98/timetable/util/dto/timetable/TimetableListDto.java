@@ -1,11 +1,11 @@
 package bel.dmitrui98.timetable.util.dto.timetable;
 
 import bel.dmitrui98.timetable.entity.StudyGroup;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,13 +14,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class TimetableListDto {
 
     /**
      * Список установленных типов часов со связками преподавателей
      */
-    List<TimetableDto> timetableDtoList;
+    List<TimetableDto> timetableDtoList = new ArrayList<>();
 
     /**
      * Индекс ячейки расписания по вертикали (учитывает день, для которого устанавливалось расписание и пару)
@@ -33,4 +32,13 @@ public class TimetableListDto {
      * (колонка)
      */
     private StudyGroup group;
+
+    public TimetableListDto(int verticalCellIndex, StudyGroup group) {
+        this.verticalCellIndex = verticalCellIndex;
+        this.group = group;
+    }
+
+    public void addDto(TimetableDto dto) {
+        timetableDtoList.add(dto);
+    }
 }

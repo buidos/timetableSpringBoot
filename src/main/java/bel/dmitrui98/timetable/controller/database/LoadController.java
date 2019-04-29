@@ -182,7 +182,7 @@ public class LoadController {
             }
             boolean isHalfPair = halfPairCheckBox.isSelected();
             teachersBranches.add(new TeacherBranchDto(last, branchTeachers, subject, hours, isHalfPair, selectedGroup));
-            branchTableView.getItems().clear();
+            clear();
         } else {
             // связка для данной группы уже существует, предлагаем отредактировать нагрузку
             boolean isConfirm = AlertsUtil.showConfirmAlert("Данная связка у выделенной группы уже существует",
@@ -196,6 +196,12 @@ public class LoadController {
             }
         }
 
+    }
+
+    private void clear() {
+        branchTableView.getItems().clear();
+        hourField.setText("");
+        halfPairCheckBox.setSelected(false);
     }
 
     @FXML
@@ -386,7 +392,14 @@ public class LoadController {
                 refreshLabels();
                 branchTableView.setItems(FXCollections.observableArrayList(newValue.getTeachers()));
                 subjectComboBox.getSelectionModel().select(newValue.getSubject());
-                hourField.setText(String.valueOf(newValue.getHour()));
+                int hour = newValue.getHour();
+                if (newValue.isHalfPair()) {
+                    hour--;
+                    halfPairCheckBox.setSelected(true);
+                } else {
+                    halfPairCheckBox.setSelected(false);
+                }
+                hourField.setText(String.valueOf(hour));
             }
         });
         VBox.setVgrow(loadTableView, Priority.ALWAYS);
