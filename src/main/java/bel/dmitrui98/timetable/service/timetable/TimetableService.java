@@ -2,6 +2,9 @@ package bel.dmitrui98.timetable.service.timetable;
 
 import bel.dmitrui98.timetable.control.LoadLabel;
 import bel.dmitrui98.timetable.entity.StudyGroup;
+import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
+import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
+import bel.dmitrui98.timetable.util.dto.timetable.TimetableListDto;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -14,6 +17,7 @@ import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,9 +29,27 @@ public class TimetableService {
     @Autowired
     private TimetableUtil timetableUtil;
 
+    /**
+     * Непосредственно расписание. Сохраняется в xml файл
+     */
+    private List<TimetableListDto> timetableList = new ArrayList<>();
+
     private BorderPane borderPane;
+
+    /**
+     * Отображение расписания
+     * @param groups группы, для которых будет составлятся расписание
+     * @param days дни, на которые будет составлятся расписание
+     * @param borderPane панель, где будет отображено расписание
+     */
     public void showTable(List<StudyGroup> groups, List<DayEnum> days, BorderPane borderPane) {
         this.borderPane = borderPane;
+
+        if (AppsSettingsHolder.getPairsPerDay() < 1) {
+            AlertsUtil.showInfoAlert("Не установлено количество пар в день", "Установите количество" +
+                    " пар в день, чтобы отобразить расписание. Текущее значение " + AppsSettingsHolder.getPairsPerDay());
+            return;
+        }
 
         // состоит из двух HBox: header и content
         VBox rootVBox = new VBox();
@@ -78,7 +100,7 @@ public class TimetableService {
         VBox pairVBox = timetableUtil.getPairVBox(days.size());
         contentHBox.getChildren().add(pairVBox);
 
-        VBox contentVBox = timetableUtil.getContentVBox(groups, days.size(), borderPane);
+        VBox contentVBox = timetableUtil.getContentVBox(groups, days, borderPane);
         contentHBox.getChildren().add(contentVBox);
         HBox.setMargin(contentVBox, new Insets(0, 0, TimetableUtil.MARGIN_CONTENT, 0));
 
@@ -89,6 +111,8 @@ public class TimetableService {
 
         timetableUtil.createInfoPanel(borderPane);
     }
+
+
 
     public boolean changeVisibleInfoPanel() {
         if (borderPane != null) {
@@ -105,5 +129,9 @@ public class TimetableService {
 
     public LoadLabel getSelectedLoadLabel() {
         return timetableUtil.getSelectedLoadLabel();
+    }
+
+    public List<TimetableListDto> getTimetableList() {
+        return timetableList;
     }
 }

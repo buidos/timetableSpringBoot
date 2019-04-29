@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,6 +50,9 @@ class TimetableUtil {
         FIRST_MARGIN_TOP_DAY = CELL_HEIGHT * 3 - 3.5;
         MARGIN_CONTENT = CELL_HEIGHT / 2;
     }
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private TeachersBranchRepository teachersBranchRepository;
@@ -127,12 +131,12 @@ class TimetableUtil {
         return pairVBox;
     }
 
-    VBox getContentVBox(List<StudyGroup> groups, int countDays, BorderPane borderPane) {
+    VBox getContentVBox(List<StudyGroup> groups, List<DayEnum> days, BorderPane borderPane) {
         VBox contentVBox = new VBox();
         Label cell;
 
         // расписание
-        GridPane timetableGridPane = getTimetableGridPane(groups, countDays);
+        GridPane timetableGridPane = getTimetableGridPane(groups, days);
         contentVBox.getChildren().add(timetableGridPane);
 
         // нагрузка
@@ -186,18 +190,29 @@ class TimetableUtil {
         return loadGridPane;
     }
 
-    private GridPane getTimetableGridPane(List<StudyGroup> groups, int countDays) {
-        Label cell;
+    private GridPane getTimetableGridPane(List<StudyGroup> groups, List<DayEnum> days) {
+        TimetableLabel cell;
         TimetableContextMenu contextMenu;
         GridPane timetableGridPane = new GridPane();
         for (int i = 0; i < groups.size(); i++) {
-            StudyGroup group = groups.get(i);
-            for (int j = 0; j < countDays * AppsSettingsHolder.getPairsPerDay(); j++) {
-                cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, group);
+
+            int dayIndex = -1;
+            int pairIndex;
+            int verticalCellIndex;
+            for (int j = 0; j < days.size() * AppsSettingsHolder.getPairsPerDay(); j++) {
+
+                if (j % AppsSettingsHolder.getPairsPerDay() == 0) {
+                    dayIndex++;
+                }
+                pairIndex = j % AppsSettingsHolder.getPairsPerDay();
+                verticalCellIndex = (days.get(dayIndex).ordinal() * AppsSettingsHolder.getPairsPerDay()) + pairIndex;
+
+                cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, verticalCellIndex);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
 
                 // контекстное меню
-                contextMenu = new TimetableContextMenu(timetableService);
+                contextMenu = applicationContext.getBean(TimetableContextMenu.class);
+                contextMenu.setTimetableLabel(cell);
                 cell.setOnContextMenuRequested(new TimetableContextMenuEvent(contextMenu));
 
                 timetableGridPane.add(cell, i, j);
