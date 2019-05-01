@@ -4,9 +4,11 @@ import bel.dmitrui98.timetable.entity.StudyGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Объект ячейки расписания. Содержит в себе список объектов {@link TimetableDto}
@@ -44,5 +46,24 @@ public class TimetableListDto {
 
     public void removeDto(TimetableDto dto) {
         timetableDtoList.remove(dto);
+    }
+
+    public boolean isEmpty() {
+        return timetableDtoList.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TimetableListDto that = (TimetableListDto) o;
+        return verticalCellIndex == that.verticalCellIndex &&
+                Objects.equals(group, that.group) &&
+                CollectionUtils.isEqualCollection(timetableDtoList, that.timetableDtoList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(verticalCellIndex, group, timetableDtoList);
     }
 }

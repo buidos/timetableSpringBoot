@@ -4,9 +4,12 @@ import bel.dmitrui98.timetable.control.LoadLabel;
 import bel.dmitrui98.timetable.control.TimetableLabel;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.dto.timetable.TimetableDto;
+import bel.dmitrui98.timetable.util.dto.timetable.TimetableListDto;
 import bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Сервис для работы с нагрузкой. Вычитает или прибавляет часы нагрузки связки преподавателей в зависимости от типа часа
@@ -26,6 +29,8 @@ public class LoadService {
      */
     public void setUpLoadToTimetable(TimetableLabel cell, LoadLabel loadCell, HourTypeEnum hourType, boolean isDeleteFromCell) {
         int minutesInTwoWeek = (int) ((AppsSettingsHolder.getHourTime() * 2) * hourType.getHour());
+        List<TimetableListDto> timetableList = timetableService.getTimetableList();
+
         if (!isDeleteFromCell) {
             // если нагрузка добавляется в ячейку расписания, то отнимаем нагрузку из связки учителей
             int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
@@ -35,6 +40,8 @@ public class LoadService {
 
             cell.getTimetableListDto().addDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
+
+            timetableList.add(cell.getTimetableListDto());
         } else {
             // нагрузка удаляется из ячейки расписания. Добавляем нагрузку к связке учителей
             // извлекаем ячейку, из которой бралась нагрузка для данной ячейки расписания
@@ -45,6 +52,10 @@ public class LoadService {
             loadCell.refresh(minutesInTwoWeek);
             cell.getTimetableListDto().removeDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
+
+            if (cell.getTimetableListDto().isEmpty()) {
+                timetableList.remove(cell.getTimetableListDto());
+            }
         }
 
 
