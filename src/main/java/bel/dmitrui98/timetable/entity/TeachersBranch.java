@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -75,6 +76,19 @@ public class TeachersBranch {
         }
         teacherSet.remove(teacher);
         teacher.removeTeachersBranch(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TeachersBranch that = (TeachersBranch) o;
+        return teacherBranchId.equals(that.teacherBranchId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teacherBranchId);
     }
 
     public void setTeacherBranchId(Long teacherBranchId) {

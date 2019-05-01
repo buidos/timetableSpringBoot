@@ -2,16 +2,16 @@ package bel.dmitrui98.timetable.control;
 
 import bel.dmitrui98.timetable.service.timetable.LoadService;
 import bel.dmitrui98.timetable.service.timetable.TimetableService;
+import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import static bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum.*;
 
 
 /**
@@ -30,21 +30,21 @@ public class TimetableContextMenu extends ContextMenu {
     private TimetableLabel timetableLabel;
 
     public TimetableContextMenu() {
-        CheckMenuItem check = new CheckMenuItem("две недели");
+        CheckMenuItem check = new CheckMenuItem(TWO_WEEKS.getName());
         check.setOnAction(this::onTwoWeeksClick);
         this.getItems().add(check);
 
-        check = new CheckMenuItem("числитель");
+        check = new CheckMenuItem(NUMERATOR.getName());
         this.getItems().add(check);
         check.setOnAction(this::onNumClick);
 
-        check = new CheckMenuItem("знаменатель");
+        check = new CheckMenuItem(DENOMINATOR.getName());
         this.getItems().add(check);
         check.setOnAction(this::onDenClick);
 
         this.getItems().add(new SeparatorMenuItem());
 
-        Menu parentMenu = new Menu("2 недели полпары");
+        Menu parentMenu = new Menu(WEEK_HALF_BEGIN.getName());
         check = new CheckMenuItem("начало");
         check.setOnAction(this::onWeekHalfBeginClick);
         parentMenu.getItems().add(check);
@@ -54,7 +54,7 @@ public class TimetableContextMenu extends ContextMenu {
         parentMenu.getItems().add(check);
         this.getItems().add(parentMenu);
 
-        parentMenu = new Menu("числитель полпары");
+        parentMenu = new Menu(NUM_HALF_BEGIN.getName());
         check = new CheckMenuItem("начало");
         check.setOnAction(this::onNumHalfBeginClick);
         parentMenu.getItems().add(check);
@@ -64,7 +64,7 @@ public class TimetableContextMenu extends ContextMenu {
         check.setOnAction(this::onNumHalfEndClick);
         this.getItems().add(parentMenu);
 
-        parentMenu = new Menu("знаменатель полпары");
+        parentMenu = new Menu(DEN_HALF_BEGIN.getName());
         check = new CheckMenuItem("начало");
         check.setOnAction(this::onDenHalfBeginClick);
         parentMenu.getItems().add(check);
@@ -80,7 +80,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) checkMenuItem.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.TWO_WEEKS, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, TWO_WEEKS, isDelete);
     }
 
     private void onNumClick(ActionEvent e) {
@@ -88,7 +88,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) checkMenuItem.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.NUMERATOR, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, NUMERATOR, isDelete);
     }
 
     private void onDenClick(ActionEvent e) {
@@ -96,7 +96,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) checkMenuItem.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.DENOMINATOR, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, DENOMINATOR, isDelete);
     }
 
     private void onWeekHalfBeginClick(ActionEvent e) {
@@ -105,7 +105,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) parentMenu.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.WEEK_HALF_BEGIN, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, WEEK_HALF_BEGIN, isDelete);
     }
 
     private void onWeekHalfEndClick(ActionEvent e) {
@@ -114,7 +114,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) parentMenu.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.WEEK_HALF_END, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, WEEK_HALF_END, isDelete);
     }
 
     private void onNumHalfBeginClick(ActionEvent e) {
@@ -123,7 +123,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) parentMenu.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.NUM_HALF_BEGIN, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, NUM_HALF_BEGIN, isDelete);
     }
 
     private void onNumHalfEndClick(ActionEvent e) {
@@ -132,7 +132,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) parentMenu.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.NUM_HALF_END, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, NUM_HALF_END, isDelete);
     }
 
     private void onDenHalfBeginClick(ActionEvent e) {
@@ -141,7 +141,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) parentMenu.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.DEN_HALF_BEGIN, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, DEN_HALF_BEGIN, isDelete);
     }
 
     private void onDenHalfEndClick(ActionEvent e) {
@@ -150,7 +150,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableContextMenu contextMenu = (TimetableContextMenu) parentMenu.getParentPopup();
         LoadLabel loadLabel = timetableService.getSelectedLoadLabel();
         boolean isDelete = !checkMenuItem.isSelected();
-        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, HourTypeEnum.DEN_HALF_END, isDelete);
+        loadService.setUpLoadToTimetable(contextMenu.getTimetableLabel(), loadLabel, DEN_HALF_END, isDelete);
     }
 
     @Override
@@ -161,13 +161,55 @@ public class TimetableContextMenu extends ContextMenu {
 
     private void disableItems(Node anchor) {
         TimetableLabel cell = (TimetableLabel) anchor;
-//        System.out.println("disabling items for " + cell);
         LoadLabel selectedLoadLabel = timetableService.getSelectedLoadLabel();
-        if (selectedLoadLabel == null) {
-            getItems().forEach(item -> item.setDisable(true));
+        if (selectedLoadLabel == null || !cell.getTimetableListDto().getGroup().getStudyGroupId().equals(
+                selectedLoadLabel.getLoadDto().getGroup().getStudyGroupId())) {
+            // если не выделена ячейка нагрузки или выделена из другой колонки, блокируем все контекстное меню
+            setDisableAll(true);
         } else {
-            getItems().forEach(item -> item.setDisable(false));
+
+            // блокируем в зависимости от количества часов в нагрузке
+            Integer minutes = selectedLoadLabel.getLoadDto().getCountMinutesInTwoWeek();
+            HourTypeEnum[] hourTypes = values();
+            boolean isDisable;
+            CheckMenuItem checkItem;
+            for (int i = 0; i < getItems().size() && i < hourTypes.length; i++) {
+                MenuItem item = getItems().get(i);
+                if (item instanceof SeparatorMenuItem) {
+                    continue;
+                }
+                HourTypeEnum hourType = hourTypes[i];
+
+                int minusMinutes = (int) ((AppsSettingsHolder.getHourTime() * 2) * hourType.getHour());
+                isDisable = minutes < minusMinutes;
+
+                if (item instanceof Menu) {
+                    Menu menu = (Menu) item;
+                    for (MenuItem menuItem : menu.getItems()) {
+                        checkItem = (CheckMenuItem) menuItem;
+                        if (!checkItem.isSelected()) {
+                            menuItem.setDisable(isDisable);
+                        }
+                    }
+                } else {
+                    checkItem = (CheckMenuItem) item;
+                    if (!checkItem.isSelected()) {
+                        item.setDisable(isDisable);
+                    }
+                }
+            }
         }
+    }
+
+    private void setDisableAll(boolean isDisable) {
+        getItems().forEach(item -> {
+            if (item instanceof Menu) {
+                Menu menu = (Menu) item;
+                menu.getItems().forEach(menuItem -> menuItem.setDisable(isDisable));
+            } else {
+                item.setDisable(isDisable);
+            }
+        });
     }
 
     public TimetableLabel getTimetableLabel() {

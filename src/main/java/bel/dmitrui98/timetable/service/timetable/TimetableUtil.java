@@ -195,6 +195,7 @@ class TimetableUtil {
             }
 
             commonHourCell.setText(String.valueOf(TimeUtil.convertMinuteToHour(sumMinute)));
+            commonHourCell.setCommonMinutes(sumMinute);
             loadGridPane.add(commonCell, i, j);
             loadGridPane.add(commonHourCell, i + 1, j);
         }

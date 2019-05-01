@@ -3,6 +3,7 @@ package bel.dmitrui98.timetable.control;
 import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.util.dto.timetable.LoadDto;
+import bel.dmitrui98.timetable.util.time.TimeUtil;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import lombok.Getter;
@@ -29,9 +30,14 @@ public class LoadLabel extends Label {
      */
     private LoadLabel commonHourCell;
 
+    /**
+     * Вычисляется только для commonHourCell, для остальных ячеек 0
+     */
+    private int commonMinutes;
+
     public LoadLabel(double width, double height, TeachersBranch branch, StudyGroup group, String text) {
         this(width, height, text);
-        loadDto = new LoadDto(branch, group);
+        loadDto = new LoadDto(branch, group, branch.getStudyLoad().getCountMinutesInTwoWeek());
         this.setTooltip(new Tooltip(branch.getTeacherSet().toString()));
     }
 
@@ -43,5 +49,12 @@ public class LoadLabel extends Label {
         this.setMaxSize(width, height);
         this.setMinSize(width, height);
         this.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
+    }
+
+    public void refresh(int plusMinutes) {
+        getHourCell().setText(String.valueOf(TimeUtil.convertMinuteToHour(getLoadDto().getCountMinutesInTwoWeek())));
+        int commonMinutes = getCommonHourCell().getCommonMinutes() + plusMinutes;
+        getCommonHourCell().setText(String.valueOf(TimeUtil.convertMinuteToHour(commonMinutes)));
+        getCommonHourCell().setCommonMinutes(commonMinutes);
     }
 }

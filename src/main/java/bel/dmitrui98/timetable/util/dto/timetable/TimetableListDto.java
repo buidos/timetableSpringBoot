@@ -41,4 +41,8 @@ public class TimetableListDto {
     public void addDto(TimetableDto dto) {
         timetableDtoList.add(dto);
     }
+
+    public void removeDto(TimetableDto dto) {
+        timetableDtoList.remove(dto);
+    }
 }
