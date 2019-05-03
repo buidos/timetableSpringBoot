@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum.*;
+
 /**
  * Сервис для определения пересечения преподавателей в расписании
  */
@@ -28,6 +30,7 @@ public class IntersectionService {
      * Есть ли пересечение (один и тот же преподаватель не может вести пару в одно и то же время)
      * @param currentDto ячейка расписания, которую нужно проверить
      * @param loadDto dto выделенной ячейки нагрузки
+     * @param hourType тип часа, который нужно проверить
      * @return есть ли пересечение для переданного dto ячейки расписания
      */
     public boolean isIntersects(TimetableListDto currentDto, LoadDto loadDto, HourTypeEnum hourType) {
@@ -37,34 +40,84 @@ public class IntersectionService {
                 .filter(o -> o.getVerticalCellIndex() == currentIndex)
                 .collect(Collectors.toList());
 
+        boolean isIntersects = false;
         for (TimetableListDto dto : list) {
             Map<HourTypeEnum, List<Teacher>> hourTeachersMap = getHourTeachersMap(dto);
             for (Map.Entry<HourTypeEnum, List<Teacher>> entry : hourTeachersMap.entrySet()) {
                 for (Teacher teacher : entry.getValue()) {
                     for (Teacher t : loadDto.getBranch().getTeacherSet()) {
-                        if (hourType.equals(entry.getKey()) && teacher.equals(t)) {
-                            return true;
+                        if (teacher.equals(t)) {
+                            if (hourType.equals(entry.getKey())) {
+                                return true;
+                            }
+                            isIntersects = checkByHourType(entry.getKey(), hourType);
+                                if (isIntersects) {
+                                return true;
+                            }
                         }
                     }
                 }
             }
         }
-        return false;
+        return isIntersects;
+    }
+
+    private boolean checkByHourType(HourTypeEnum installedHourType, HourTypeEnum hourType) {
+        boolean isIntersects = false;
+        switch (installedHourType) {
+            case TWO_WEEKS:
+                isIntersects = true;
+                break;
+            case NUMERATOR:
+                if (hourType == NUM_HALF_BEGIN || hourType == NUM_HALF_END || hourType == TWO_WEEKS
+                        || hourType == WEEK_HALF_BEGIN || hourType == WEEK_HALF_END) {
+                    isIntersects = true;
+                }
+                break;
+            case DENOMINATOR:
+                if (hourType == DEN_HALF_BEGIN || hourType == DEN_HALF_END || hourType == TWO_WEEKS
+                        || hourType == WEEK_HALF_BEGIN || hourType == WEEK_HALF_END) {
+                    isIntersects = true;
+                }
+                break;
+            case NUM_HALF_BEGIN:
+                if (hourType == NUMERATOR || hourType == TWO_WEEKS || hourType == WEEK_HALF_BEGIN) {
+                    isIntersects = true;
+                }
+                break;
+            case NUM_HALF_END:
+                if (hourType == NUMERATOR || hourType == TWO_WEEKS || hourType == WEEK_HALF_END) {
+                    isIntersects = true;
+                }
+                break;
+            case DEN_HALF_BEGIN:
+                if (hourType == DENOMINATOR || hourType == TWO_WEEKS || hourType == WEEK_HALF_BEGIN) {
+                    isIntersects = true;
+                }
+                break;
+            case DEN_HALF_END:
+                if (hourType == DENOMINATOR || hourType == TWO_WEEKS || hourType == WEEK_HALF_END) {
+                    isIntersects = true;
+                }
+                break;
+        }
+
+        return isIntersects;
     }
 
     private Map<HourTypeEnum, List<Teacher>> getHourTeachersMap(TimetableListDto currentDto) {
         Map<TeachersBranch, HourTypeEnum> branchHourMap = currentDto.getTimetableDtoList().stream()
                 .collect(Collectors.toMap(TimetableDto::getBranch, TimetableDto::getHourType));
-        Map<HourTypeEnum, List<Teacher>> teacherHourMap = new HashMap<>();
+        Map<HourTypeEnum, List<Teacher>> hourTeachersMap = new HashMap<>();
         for (Map.Entry<TeachersBranch, HourTypeEnum> entry : branchHourMap.entrySet()) {
             List<Teacher> list = new ArrayList<>(entry.getKey().getTeacherSet());
-            List<Teacher> resultHourList = teacherHourMap.get(entry.getValue());
+            List<Teacher> resultHourList = hourTeachersMap.get(entry.getValue());
             if (resultHourList == null) {
-                teacherHourMap.put(entry.getValue(), list);
+                hourTeachersMap.put(entry.getValue(), list);
             } else {
                 resultHourList.addAll(list);
             }
         }
-        return teacherHourMap;
+        return hourTeachersMap;
     }
 }

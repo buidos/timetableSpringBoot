@@ -57,8 +57,5 @@ public class LoadService {
                 timetableList.remove(cell.getTimetableListDto());
             }
         }
-
-
-        System.out.println(hourType + " isDelete " + isDeleteFromCell);
     }
 }

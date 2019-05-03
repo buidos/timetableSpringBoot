@@ -168,6 +168,7 @@ public class TimetableContextMenu extends ContextMenu {
         TimetableLabel cell = (TimetableLabel) anchor;
         LoadLabel selectedLoadLabel = timetableService.getSelectedLoadLabel();
 
+        CheckMenuItem checkItem;
         if (selectedLoadLabel == null || !cell.getTimetableListDto().getGroup().getStudyGroupId().equals(
                 selectedLoadLabel.getLoadDto().getGroup().getStudyGroupId())) {
             // если не выделена ячейка нагрузки или выделена из другой колонки, блокируем все контекстное меню
@@ -178,37 +179,62 @@ public class TimetableContextMenu extends ContextMenu {
             Integer minutes = selectedLoadLabel.getLoadDto().getCountMinutesInTwoWeek();
             HourTypeEnum[] hourTypes = values();
             boolean isDisable;
-            CheckMenuItem checkItem;
-            for (int i = 0; i < getItems().size() && i < hourTypes.length; i++) {
+            for (int i = 0, j = 0; i < getItems().size(); i++, j++) {
                 MenuItem item = getItems().get(i);
                 if (item instanceof SeparatorMenuItem) {
+                    j--;
                     continue;
                 }
-                HourTypeEnum hourType = hourTypes[i];
-
-                // блокируем в зависимости от количества часов в нагрузке
-                int minusMinutes = (int) ((AppsSettingsHolder.getHourTime() * 2) * hourType.getHour());
-                isDisable = minutes < minusMinutes;
-
-                if (!isDisable) {
-                    // блокируем, если в одну и ту же группу в одно и то же время пытаются поставить еще одну связку
-                    // (не нужно, так как реализовано через checkMenuItem)
-                    isDisable = cell.getTimetableListDto().getTimetableDtoList().stream()
-                            .map(TimetableDto::getHourType)
-                            .anyMatch(type -> type.equals(hourType));
-
-                    if (!isDisable) {
-                        // блокируем если есть пересечение (один и тот же преподаватель не может вести пару в одно и то же время)
-                        isDisable = intersectionService.isIntersects(cell.getTimetableListDto(), selectedLoadLabel.getLoadDto(), hourType);
+                if (item instanceof Menu) {
+                    Menu menu = (Menu) item;
+                    for (MenuItem menuItem : menu.getItems()) {
+                        checkItem = (CheckMenuItem) menuItem;
+                        if (!checkItem.isSelected()) {
+                            HourTypeEnum hourType = hourTypes[j];
+                            isDisable = isDisable(cell, selectedLoadLabel, minutes, hourType);
+                            checkItem.setDisable(isDisable);
+                        }
+                        j++;
+                    }
+                    if (!menu.getItems().isEmpty()) {
+                       j--;
+                    }
+                } else {
+                    checkItem = (CheckMenuItem) item;
+                    if (!checkItem.isSelected()) {
+                        HourTypeEnum hourType = hourTypes[j];
+                        isDisable = isDisable(cell, selectedLoadLabel, minutes, hourType);
+                        checkItem.setDisable(isDisable);
                     }
                 }
-
-                setIsDisable(isDisable, item);
             }
         }
     }
 
+    private boolean isDisable(TimetableLabel cell, LoadLabel selectedLoadLabel, Integer minutes, HourTypeEnum hourType) {
+        boolean isDisable;// блокируем в зависимости от количества часов в нагрузке
+        int minusMinutes = (int) ((AppsSettingsHolder.getHourTime() * 2) * hourType.getHour());
+        isDisable = minutes < minusMinutes;
+
+        if (!isDisable) {
+            // блокируем, если в одну и ту же группу в одно и то же время пытаются поставить еще одну связку
+            // (не нужно, так как реализовано через checkMenuItem)
+            isDisable = cell.getTimetableListDto().getTimetableDtoList().stream()
+                    .map(TimetableDto::getHourType)
+                    .anyMatch(type -> type.equals(hourType));
+
+            if (!isDisable) {
+                // блокируем если есть пересечение (один и тот же преподаватель не может вести пару в одно и то же время)
+                isDisable = intersectionService.isIntersects(cell.getTimetableListDto(), selectedLoadLabel.getLoadDto(), hourType);
+            }
+        }
+        return isDisable;
+    }
+
     private void setIsDisable(boolean isDisable, MenuItem item) {
+        if (item instanceof SeparatorMenuItem) {
+            return;
+        }
         CheckMenuItem checkItem;
         if (item instanceof Menu) {
             Menu menu = (Menu) item;
@@ -228,9 +254,7 @@ public class TimetableContextMenu extends ContextMenu {
 
     private void setDisableAll(boolean isDisable) {
         getItems().forEach(item -> {
-            if (!(item instanceof SeparatorMenuItem)) {
-                setIsDisable(isDisable, item);
-            }
+            setIsDisable(isDisable, item);
         });
     }
 
