@@ -50,6 +50,7 @@ public class LoadService {
             int minutes = currentMinutes + minutesInTwoWeek;
             loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
             loadCell.refresh(minutesInTwoWeek);
+//            TimetableListDto dto = (TimetableListDto) cell.getTimetableListDto().clone();
             cell.getTimetableListDto().removeDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
 

@@ -1,5 +1,6 @@
 package bel.dmitrui98.timetable.control;
 
+import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.service.timetable.IntersectionService;
 import bel.dmitrui98.timetable.service.timetable.LoadService;
 import bel.dmitrui98.timetable.service.timetable.TimetableService;
@@ -12,6 +13,9 @@ import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum.*;
 
@@ -224,6 +228,13 @@ public class TimetableContextMenu extends ContextMenu {
                     .anyMatch(type -> type.equals(hourType));
 
             if (!isDisable) {
+                // в одну и ту же ячейку нельзя устанавливать одну и ту же связку учителей два раза
+                List<TeachersBranch> teachersBranches = cell.getTimetableListDto().getTimetableDtoList().stream()
+                        .map(TimetableDto::getBranch)
+                        .collect(Collectors.toList());
+                if (teachersBranches.contains(selectedLoadLabel.getLoadDto().getBranch())) {
+                    return true;
+                }
                 // блокируем если есть пересечение (один и тот же преподаватель не может вести пару в одно и то же время)
                 isDisable = intersectionService.isIntersects(cell.getTimetableListDto(), selectedLoadLabel.getLoadDto(), hourType);
             }

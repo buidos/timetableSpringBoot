@@ -4,6 +4,7 @@ import bel.dmitrui98.timetable.entity.StudyGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@Log4j2
 public class TimetableListDto {
 
     /**
