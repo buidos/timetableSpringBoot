@@ -7,6 +7,8 @@ import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
+import bel.dmitrui98.timetable.util.dto.timetable.TimetableDto;
+import bel.dmitrui98.timetable.util.enums.ColorEnum;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import bel.dmitrui98.timetable.util.time.TimeUtil;
 import javafx.event.EventHandler;
@@ -57,10 +59,8 @@ class TimetableUtil {
     @Autowired
     private TeachersBranchRepository teachersBranchRepository;
 
-    @Autowired
-    private TimetableService timetableService;
-
     private LoadLabel selectedLoadLabel;
+    private TimetableLabel selectedTimetableLabel;
 
     HBox getHeaderHBox(List<StudyGroup> groups) {
         HBox headerHBox = new HBox();
@@ -136,7 +136,7 @@ class TimetableUtil {
         Label cell;
 
         // расписание
-        GridPane timetableGridPane = getTimetableGridPane(groups, days);
+        GridPane timetableGridPane = getTimetableGridPane(groups, days, borderPane);
         contentVBox.getChildren().add(timetableGridPane);
 
         // нагрузка
@@ -202,7 +202,7 @@ class TimetableUtil {
         return loadGridPane;
     }
 
-    private GridPane getTimetableGridPane(List<StudyGroup> groups, List<DayEnum> days) {
+    private GridPane getTimetableGridPane(List<StudyGroup> groups, List<DayEnum> days, BorderPane borderPane) {
         TimetableLabel cell;
         TimetableContextMenu contextMenu;
         GridPane timetableGridPane = new GridPane();
@@ -226,6 +226,7 @@ class TimetableUtil {
                 contextMenu = applicationContext.getBean(TimetableContextMenu.class);
                 contextMenu.setTimetableLabel(cell);
                 cell.setOnContextMenuRequested(new TimetableContextMenuEvent(contextMenu));
+                cell.setOnMouseClicked(e -> onTimetableClicked(e, borderPane));
 
                 timetableGridPane.add(cell, i, j);
             }
@@ -234,27 +235,106 @@ class TimetableUtil {
     }
 
     void createInfoPanel(BorderPane borderPane) {
-        VBox currentLoad = new VBox();
+        VBox currentLoadInfo = new VBox();
+        currentLoadInfo.setMinHeight(150);
+        currentLoadInfo.setSpacing(10);
+        currentLoadInfo.setStyle(String.format("-fx-border: solid; -fx-border-width: 2;" +
+                " -fx-border-color: %s;", ColorEnum.CELL_BORDER.getColor()));
+
         VBox currentCellInfo = new VBox();
-        VBox infoPanel = new VBox(new Label("Статус:"), currentLoad, currentCellInfo);
-        infoPanel.setMinWidth(100);
+        currentCellInfo.setSpacing(10);
+        currentCellInfo.setStyle("-fx-border-style: solid none none none; -fx-border-width: 2; -fx-border-color: black;");
+
+        HBox statusHBox = new HBox(new Label("Статус:"));
+        statusHBox.setStyle(String.format("-fx-border-style: solid none none none; -fx-border-width: 2;" +
+                " -fx-border-color: %s;", ColorEnum.CELL_BORDER.getColor()));
+
+        VBox infoPanel = new VBox(statusHBox, currentLoadInfo, currentCellInfo);
+        infoPanel.setMinWidth(60);
         borderPane.setRight(infoPanel);
+        refreshInfoPanel(infoPanel);
     }
 
-    private void refreshInfoPanel(Node node) {
+    /**
+     * Обновляет инфо-панель (подробная информация о текущей ячейке расписания и текущей ячейки нагрузки)
+     * @param node инфо-панель
+     */
+    public void refreshInfoPanel(Node node) {
         if (node == null) {
             return;
         }
         VBox infoPanel = (VBox) node;
-//        if (selectedBranch == null || selectedGroup == null) {
-//            currentLoad.getChildren().add(new Label("Нагрузка не выбрана"));
-//        } else {
-//            currentLoad.getChildren().add(new Label(selectedBranch.getTeacherSet().toString()));
-//        }
-//
-//        if (selectedCell == null) {
-//            currentCellInfo.getChildren().add(new Label("Ячейка расписания не выбрана"));
-//        }
+        VBox currentLoadInfo = (VBox) infoPanel.getChildren().get(1);
+        VBox currentCellInfo = (VBox) infoPanel.getChildren().get(2);
+
+        currentLoadInfo.getChildren().clear();
+        currentCellInfo.getChildren().clear();
+
+        if (selectedLoadLabel == null) {
+            currentLoadInfo.getChildren().add(new Label("Нагрузка не выбрана"));
+        } else {
+            currentLoadInfo.getChildren().add(new Label("Выбранная нагрузка:"));
+
+            // группа
+            String group = "Группа: " + selectedLoadLabel.getLoadDto().getGroup().getName();
+            currentLoadInfo.getChildren().add(new Label(group));
+
+            // преподаватели
+            String teachers = selectedLoadLabel.getLoadDto().getBranch().getTeacherSet().toString();
+            VBox teacherVBox = new VBox(new Label("Преподаватели:"), new Label(teachers));
+            currentLoadInfo.getChildren().add(teacherVBox);
+
+            // часы
+            int minutes = selectedLoadLabel.getLoadDto().getCountMinutesInTwoWeek();
+            int hours = TimeUtil.convertMinuteToHourWithoutHalf(minutes);
+            String sHours = "Часы: " + hours;
+            if (TimeUtil.isRemainder(minutes)) {
+                sHours += " + полпары";
+            }
+            currentLoadInfo.getChildren().add(new Label(sHours));
+
+            // дисциплина
+            String subject = "Дисциплина: " + selectedLoadLabel.getLoadDto().getBranch().getStudyLoad().getSubject().getName();
+            currentLoadInfo.getChildren().add(new Label(subject));
+        }
+
+        if (selectedTimetableLabel == null) {
+            currentCellInfo.getChildren().add(new Label("Ячейка расписания не выбрана"));
+        } else {
+            currentCellInfo.getChildren().add(new Label("Выбранная ячейка расписания:"));
+
+            String group = "Группа: " + selectedTimetableLabel.getTimetableListDto().getGroup().getName();
+            currentCellInfo.getChildren().add(new Label(group));
+
+            String day = "День: " + TimeUtil.defineDay(selectedTimetableLabel.getTimetableListDto().getVerticalCellIndex()).getName();
+            currentCellInfo.getChildren().add(new Label(day));
+
+            String pair = "Пара: " + TimeUtil.definePair(selectedTimetableLabel.getTimetableListDto().getVerticalCellIndex());
+            currentCellInfo.getChildren().add(new Label(pair));
+
+            int i = 1;
+            for (TimetableDto dto : selectedTimetableLabel.getTimetableListDto().getTimetableDtoList()) {
+                VBox content = new VBox();
+                content.setSpacing(5);
+                // преподаватели
+                String teachers = dto.getBranch().getTeacherSet().toString();
+                VBox teacherVBox = new VBox(new Label(i + ". Преподаватели:"), new Label(teachers));
+                content.getChildren().add(teacherVBox);
+
+                // дисциплина
+                String subject = "Дисциплина: " + dto.getBranch().getStudyLoad().getSubject().getName();
+                content.getChildren().add(new Label(subject));
+
+                // тип часа
+                content.getChildren().add(new Label(dto.getHourType().getName()));
+
+                content.setStyle(String.format("-fx-border-style: solid none none none; -fx-border-width: 2;" +
+                        " -fx-border-color: %s;", ColorEnum.CELL_BORDER.getColor()));
+
+                currentCellInfo.getChildren().add(content);
+                i++;
+            }
+        }
     }
 
     @AllArgsConstructor
@@ -274,7 +354,17 @@ class TimetableUtil {
         refreshInfoPanel(borderPane.getRight());
     }
 
+    private void onTimetableClicked(MouseEvent e, BorderPane borderPane) {
+        selectedTimetableLabel = (TimetableLabel) e.getSource();
+        refreshInfoPanel(borderPane.getRight());
+    }
+
     LoadLabel getSelectedLoadLabel() {
         return selectedLoadLabel;
+    }
+
+    public void clearSelection() {
+        selectedLoadLabel = null;
+        selectedTimetableLabel = null;
     }
 }

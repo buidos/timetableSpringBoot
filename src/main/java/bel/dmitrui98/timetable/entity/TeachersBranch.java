@@ -83,7 +83,7 @@ public class TeachersBranch {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TeachersBranch that = (TeachersBranch) o;
-        return teacherBranchId.equals(that.teacherBranchId);
+        return Objects.equals(teacherBranchId, that.teacherBranchId);
     }
 
     @Override

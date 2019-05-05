@@ -1,6 +1,7 @@
 package bel.dmitrui98.timetable.util.time;
 
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
+import bel.dmitrui98.timetable.util.enums.DayEnum;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +28,13 @@ public class TimeUtil {
     }
 
     /**
+     * Если нацело не делится, то добавляется дополнительный час НЕ ДОБАВЛЯЕТСЯ
+     */
+    public static int convertMinuteToHourWithoutHalf(int minute) {
+        return minute / (AppsSettingsHolder.getHourTime() * 2);
+    }
+
+    /**
      * Есть ли остаток от деления
      */
     public static boolean isRemainder(int minute) {
@@ -50,5 +58,14 @@ public class TimeUtil {
      */
     public static LocalTime parseStringToDateTime(String dateTimeString) throws DateTimeParseException {
         return TIME_FORMATTER.parse(dateTimeString, LocalTime::from);
+    }
+
+    public static DayEnum defineDay(int verticalCellIndex) {
+        int index = verticalCellIndex / AppsSettingsHolder.getPairsPerDay();
+        return DayEnum.values()[index];
+    }
+
+    public static int definePair(int verticalCellIndex) {
+        return verticalCellIndex % AppsSettingsHolder.getPairsPerDay() + 1;
     }
 }

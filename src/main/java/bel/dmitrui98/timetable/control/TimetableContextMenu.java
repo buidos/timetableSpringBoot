@@ -39,21 +39,21 @@ public class TimetableContextMenu extends ContextMenu {
     private TimetableLabel timetableLabel;
 
     public TimetableContextMenu() {
-        CheckMenuItem check = new CheckMenuItem(TWO_WEEKS.getName());
+        CheckMenuItem check = new CheckMenuItem(TWO_WEEKS.getContextMenuName());
         check.setOnAction(this::onTwoWeeksClick);
         this.getItems().add(check);
 
-        check = new CheckMenuItem(NUMERATOR.getName());
+        check = new CheckMenuItem(NUMERATOR.getContextMenuName());
         this.getItems().add(check);
         check.setOnAction(this::onNumClick);
 
-        check = new CheckMenuItem(DENOMINATOR.getName());
+        check = new CheckMenuItem(DENOMINATOR.getContextMenuName());
         this.getItems().add(check);
         check.setOnAction(this::onDenClick);
 
         this.getItems().add(new SeparatorMenuItem());
 
-        Menu parentMenu = new Menu(WEEK_HALF_BEGIN.getName());
+        Menu parentMenu = new Menu(WEEK_HALF_BEGIN.getContextMenuName());
         check = new CheckMenuItem("начало");
         check.setOnAction(this::onWeekHalfBeginClick);
         parentMenu.getItems().add(check);
@@ -63,7 +63,7 @@ public class TimetableContextMenu extends ContextMenu {
         parentMenu.getItems().add(check);
         this.getItems().add(parentMenu);
 
-        parentMenu = new Menu(NUM_HALF_BEGIN.getName());
+        parentMenu = new Menu(NUM_HALF_BEGIN.getContextMenuName());
         check = new CheckMenuItem("начало");
         check.setOnAction(this::onNumHalfBeginClick);
         parentMenu.getItems().add(check);
@@ -73,7 +73,7 @@ public class TimetableContextMenu extends ContextMenu {
         check.setOnAction(this::onNumHalfEndClick);
         this.getItems().add(parentMenu);
 
-        parentMenu = new Menu(DEN_HALF_BEGIN.getName());
+        parentMenu = new Menu(DEN_HALF_BEGIN.getContextMenuName());
         check = new CheckMenuItem("начало");
         check.setOnAction(this::onDenHalfBeginClick);
         parentMenu.getItems().add(check);
@@ -221,23 +221,26 @@ public class TimetableContextMenu extends ContextMenu {
         isDisable = minutes < minusMinutes;
 
         if (!isDisable) {
+            // обрабатываем одну и ту же ячейку
             // блокируем, если в одну и ту же группу в одно и то же время пытаются поставить еще одну связку
-            // (не нужно, так как реализовано через checkMenuItem)
-            isDisable = cell.getTimetableListDto().getTimetableDtoList().stream()
+            List<HourTypeEnum> hourTypes = cell.getTimetableListDto().getTimetableDtoList().stream()
                     .map(TimetableDto::getHourType)
-                    .anyMatch(type -> type.equals(hourType));
+                    .collect(Collectors.toList());
+            if (intersectionService.checkByHourTypesSameCell(hourTypes, hourType)) {
+                return true;
+            }
 
-            if (!isDisable) {
-                // в одну и ту же ячейку нельзя устанавливать одну и ту же связку учителей два раза
-                List<TeachersBranch> teachersBranches = cell.getTimetableListDto().getTimetableDtoList().stream()
-                        .map(TimetableDto::getBranch)
-                        .collect(Collectors.toList());
-                if (teachersBranches.contains(selectedLoadLabel.getLoadDto().getBranch())) {
+            // обрабатываем одну и ту же связку в одну и ту же ячейку
+            List<TeachersBranch> teachersBranches = cell.getTimetableListDto().getTimetableDtoList().stream()
+                    .map(TimetableDto::getBranch)
+                    .collect(Collectors.toList());
+            if (teachersBranches.contains(selectedLoadLabel.getLoadDto().getBranch())) {
+                if (intersectionService.checkByHourTypesSameBranch(hourTypes, hourType)){
                     return true;
                 }
-                // блокируем если есть пересечение (один и тот же преподаватель не может вести пару в одно и то же время)
-                isDisable = intersectionService.isIntersects(cell.getTimetableListDto(), selectedLoadLabel.getLoadDto(), hourType);
             }
+            // блокируем если есть пересечение (один и тот же преподаватель не может вести пару в одно и то же время)
+            isDisable = intersectionService.isIntersects(cell.getTimetableListDto(), selectedLoadLabel.getLoadDto(), hourType);
         }
         return isDisable;
     }

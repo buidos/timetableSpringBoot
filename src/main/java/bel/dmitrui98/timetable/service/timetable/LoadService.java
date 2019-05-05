@@ -45,12 +45,16 @@ public class LoadService {
         } else {
             // нагрузка удаляется из ячейки расписания. Добавляем нагрузку к связке учителей
             // извлекаем ячейку, из которой бралась нагрузка для данной ячейки расписания
-            loadCell = cell.getTimetableListDto().getTimetableDtoList().stream().findFirst().get().getLoadCell();
+
+            // берем первый элемент с переданным типом часа
+            loadCell = cell.getTimetableListDto().getTimetableDtoList().stream()
+                    .filter(dto -> dto.getHourType() == hourType)
+                    .findFirst().get().getLoadCell();
+
             int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
             int minutes = currentMinutes + minutesInTwoWeek;
             loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
             loadCell.refresh(minutesInTwoWeek);
-//            TimetableListDto dto = (TimetableListDto) cell.getTimetableListDto().clone();
             cell.getTimetableListDto().removeDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
 
@@ -58,5 +62,8 @@ public class LoadService {
                 timetableList.remove(cell.getTimetableListDto());
             }
         }
+
+        // обновляем инфо-панель
+        timetableService.refreshInfoPanel();
     }
 }

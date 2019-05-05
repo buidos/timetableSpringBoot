@@ -43,6 +43,7 @@ public class TimetableService {
      * @param borderPane панель, где будет отображено расписание
      */
     public void showTable(List<StudyGroup> groups, List<DayEnum> days, BorderPane borderPane) {
+        timetableUtil.clearSelection();
         this.borderPane = borderPane;
 
         if (AppsSettingsHolder.getPairsPerDay() < 1) {
@@ -133,5 +134,9 @@ public class TimetableService {
 
     public List<TimetableListDto> getTimetableList() {
         return timetableList;
+    }
+
+    public void refreshInfoPanel() {
+        timetableUtil.refreshInfoPanel(borderPane.getRight());
     }
 }
