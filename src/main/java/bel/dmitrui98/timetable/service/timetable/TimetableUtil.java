@@ -7,6 +7,7 @@ import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.entity.TeachersBranch;
 import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
+import bel.dmitrui98.timetable.util.color.ColorUtil;
 import bel.dmitrui98.timetable.util.dto.timetable.TimetableDto;
 import bel.dmitrui98.timetable.util.enums.ColorEnum;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
@@ -64,18 +65,23 @@ class TimetableUtil {
 
     HBox getHeaderHBox(List<StudyGroup> groups) {
         HBox headerHBox = new HBox();
+        String c = ColorEnum.CELL_BORDER.getColor();
 
         TextField cell = new TextField("Дни");
         cell.setEditable(false);
         cell.setMaxSize(CELL_WIDTH, CELL_HEIGHT);
         cell.setMinSize(CELL_WIDTH, CELL_HEIGHT);
         headerHBox.getChildren().add(cell);
+        cell.setStyle(String.format("-fx-border-style: none none none solid;" +
+                " -fx-border-color: %s %s black %s;", c, c, c));
 
         cell = new TextField("Пары");
         cell.setEditable(false);
         cell.setMaxSize(CELL_WIDTH, CELL_HEIGHT);
         cell.setMinSize(CELL_WIDTH, CELL_HEIGHT);
         headerHBox.getChildren().add(cell);
+        cell.setStyle(String.format("-fx-border-style: none none none solid;" +
+                " -fx-border-color: %s %s black %s;", c, c, c));
 
         // TODO отсортировать по отделениям, специальностям, именам при загрузке из базы
         for (StudyGroup group : groups) {
@@ -84,6 +90,8 @@ class TimetableUtil {
             cell.setMaxSize(CELL_WIDTH_CONTENT, CELL_HEIGHT);
             cell.setMinSize(CELL_WIDTH_CONTENT, CELL_HEIGHT);
             headerHBox.getChildren().add(cell);
+            cell.setStyle(String.format("-fx-border-style: none none none solid;" +
+                    " -fx-border-color: %s %s black %s;", c, c, c));
         }
 
         return headerHBox;
@@ -95,6 +103,7 @@ class TimetableUtil {
         TextField cell;
         int i = 0;
         double marginTop = FIRST_MARGIN_TOP_DAY;
+        String c = ColorEnum.CELL_BORDER.getColor();
         for (DayEnum day : days) {
             cell = new TextField(day.getName());
             cell.setEditable(false);
@@ -103,7 +112,8 @@ class TimetableUtil {
             cell.setMaxSize(width, height);
             cell.setMinSize(width, height);
             cell.setRotate(DAY_ROTATE);
-            cell.setStyle("-fx-alignment: center");
+            cell.setStyle("-fx-alignment: center; " + String.format("-fx-border-style: none none none solid;" +
+                    " -fx-border-color: %s %s %s black;", c, c, c));
             dayVBox.getChildren().add(cell);
             cell.setTranslateX(cell.getTranslateX() - SHIFT / 2);
 
@@ -117,7 +127,8 @@ class TimetableUtil {
 
     VBox getPairVBox(int countDays) {
         VBox pairVBox = new VBox();
-        TextField cell;
+        TextField cell = null;
+        String c = ColorEnum.CELL_BORDER.getColor();
         for (int i = 0; i < countDays; i++) {
             for (int j = 1; j <= AppsSettingsHolder.getPairsPerDay(); j++) {
                 cell = new TextField(String.valueOf(j));
@@ -126,6 +137,10 @@ class TimetableUtil {
                 cell.setMinSize(CELL_WIDTH, CELL_HEIGHT);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
                 pairVBox.getChildren().add(cell);
+            }
+            if (cell != null) {
+                cell.setStyle(String.format("-fx-border-style: none none none solid;" +
+                        " -fx-border-color: %s %s black %s;", c, c, c));
             }
         }
         return pairVBox;
@@ -163,7 +178,7 @@ class TimetableUtil {
             commonCell.setHourCell(commonHourCell);
             commonCell.setTranslateX(commonCell.getTranslateX() - SHIFT);
 
-            int j = 0, sumMinute = 0;
+            int j, sumMinute = 0;
             for (j = 0; j < branches.size(); j++) {
                 TeachersBranch tb = branches.get(j);
 
@@ -221,6 +236,13 @@ class TimetableUtil {
 
                 cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, verticalCellIndex, group);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
+
+                // нижнее подчеркивание
+                if (pairIndex == (AppsSettingsHolder.getPairsPerDay() -1)) {
+                    String c = ColorEnum.CELL_BORDER.getColor();
+                    cell.setStyle(cell.getStyle() + String.format(";-fx-border-style: none none none solid;" +
+                            " -fx-border-color: %s %s black %s;", c, c, c));
+                }
 
                 // контекстное меню
                 contextMenu = applicationContext.getBean(TimetableContextMenu.class);
@@ -350,7 +372,14 @@ class TimetableUtil {
     }
 
     private void onLoadClicked(MouseEvent e, BorderPane borderPane) {
+        if (selectedLoadLabel != null) {
+            selectedLoadLabel.getStyleClass().remove("selected-load");
+            ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.WHITE.getColor());
+            ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.WHITE.getColor());
+        }
         selectedLoadLabel = (LoadLabel) e.getSource();
+        ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.LOAD_SELECTED.getColor());
+        ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.LOAD_SELECTED.getColor());
         refreshInfoPanel(borderPane.getRight());
     }
 
