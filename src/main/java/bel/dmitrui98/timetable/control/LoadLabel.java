@@ -36,9 +36,11 @@ public class LoadLabel extends Label {
     private int commonMinutes;
 
     /**
-     * Колонка расписания (для выделения цветом)
+     * Колонка расписания
      */
     private int col;
+
+    private int rowIndex = -1;
 
     public LoadLabel(double width, double height, TeachersBranch branch, StudyGroup group, String text) {
         this(width, height, text);
@@ -56,6 +58,10 @@ public class LoadLabel extends Label {
         this.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
     }
 
+    /**
+     * Обновляет ячейку нагрузки
+     * @param plusMinutes количество минут, которое прибавляется к общему количеству минут (если нужно отнять, передаем минус)
+     */
     public void refresh(int plusMinutes) {
         getHourCell().setText(String.valueOf(TimeUtil.convertMinuteToHour(getLoadDto().getCountMinutesInTwoWeek())));
         int commonMinutes = getCommonHourCell().getCommonMinutes() + plusMinutes;

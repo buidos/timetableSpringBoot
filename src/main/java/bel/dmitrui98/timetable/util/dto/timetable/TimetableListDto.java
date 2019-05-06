@@ -1,5 +1,6 @@
 package bel.dmitrui98.timetable.util.dto.timetable;
 
+import bel.dmitrui98.timetable.control.TimetableContextMenu;
 import bel.dmitrui98.timetable.entity.StudyGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,16 @@ public class TimetableListDto {
      * (колонка)
      */
     private StudyGroup group;
+
+    /**
+     * Колонка группы
+     */
+    private int col;
+
+    /**
+     * Контекстное меню
+     */
+    private TimetableContextMenu contextMenu;
 
     public TimetableListDto(int verticalCellIndex, StudyGroup group) {
         this.verticalCellIndex = verticalCellIndex;

@@ -1,6 +1,7 @@
 package bel.dmitrui98.timetable.service.timetable;
 
 import bel.dmitrui98.timetable.control.LoadLabel;
+import bel.dmitrui98.timetable.controller.MainController;
 import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
@@ -29,6 +30,9 @@ public class TimetableService {
 
     @Autowired
     private TimetableUtil timetableUtil;
+
+    @Autowired
+    private MainController mainController;
 
     /**
      * Непосредственно расписание. Сохраняется в xml файл
@@ -112,6 +116,9 @@ public class TimetableService {
         borderPane.setCenter(rootScrollPane);
 
         timetableUtil.createInfoPanel(borderPane);
+
+        // заполняем расписание
+        timetableUtil.fillTimetable(timetableList);
     }
 
 
@@ -143,5 +150,13 @@ public class TimetableService {
 
     public GridPane getTimetableGrid() {
         return timetableUtil.getTimetableGrid();
+    }
+
+    /**
+     * Очистка расписания
+     */
+    public void cleanAll() {
+        timetableList.clear();
+        mainController.showTable();
     }
 }

@@ -9,8 +9,10 @@ import bel.dmitrui98.timetable.repository.TeachersBranchRepository;
 import bel.dmitrui98.timetable.util.appssettings.AppsSettingsHolder;
 import bel.dmitrui98.timetable.util.color.ColorUtil;
 import bel.dmitrui98.timetable.util.dto.timetable.TimetableDto;
+import bel.dmitrui98.timetable.util.dto.timetable.TimetableListDto;
 import bel.dmitrui98.timetable.util.enums.ColorEnum;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
+import bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum;
 import bel.dmitrui98.timetable.util.time.TimeUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -25,6 +27,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -66,6 +70,7 @@ class TimetableUtil {
     private LoadLabel selectedLoadLabel;
     private TimetableLabel selectedTimetableLabel;
     private GridPane timetableGrid;
+    private GridPane loadGrid;
 
     HBox getHeaderHBox(List<StudyGroup> groups) {
         HBox headerHBox = new HBox();
@@ -169,6 +174,7 @@ class TimetableUtil {
     private GridPane getLoadGridPane(List<StudyGroup> groups, BorderPane borderPane) {
         LoadLabel cell;
         GridPane loadGridPane = new GridPane();
+        this.loadGrid = loadGridPane;
         int groupIndex = 0;
         for (int i = 0; i < groups.size() * 2; i += 2) {
             StudyGroup group = groups.get(groupIndex);
@@ -195,6 +201,7 @@ class TimetableUtil {
 
                 cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
                 cell.setCol(groupIndex);
+                cell.setRowIndex(j);
                 LoadLabel hourCell = cell;
                 cell.setHourCell(hourCell);
                 cell.setCommonHourCell(commonHourCell);
@@ -209,6 +216,7 @@ class TimetableUtil {
                 text = tb.getTeacherSet().toString() + "\n" + tb.getStudyLoad().getSubject().getName();
                 cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
                 cell.setCol(groupIndex);
+                cell.setRowIndex(j);
                 cell.setHourCell(hourCell);
                 cell.setCommonHourCell(commonHourCell);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
@@ -243,6 +251,7 @@ class TimetableUtil {
                 verticalCellIndex = (days.get(dayIndex).ordinal() * AppsSettingsHolder.getPairsPerDay()) + pairIndex;
 
                 cell = new TimetableLabel(CELL_WIDTH_CONTENT, CELL_HEIGHT, verticalCellIndex, group);
+                cell.getTimetableListDto().setCol(i);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
 
                 // нижнее подчеркивание
@@ -253,6 +262,7 @@ class TimetableUtil {
 
                 // контекстное меню
                 contextMenu = applicationContext.getBean(TimetableContextMenu.class);
+                cell.getTimetableListDto().setContextMenu(contextMenu);
                 contextMenu.setTimetableLabel(cell);
                 cell.setOnContextMenuRequested(new TimetableContextMenuEvent(contextMenu));
                 cell.setOnMouseClicked(e -> onTimetableClicked(e, borderPane));
@@ -370,7 +380,58 @@ class TimetableUtil {
         return timetableGrid;
     }
 
+    /**
+     * Заполняет расписание данными. Индексы групп совпадают с колонками, строки с verticalCellIndex
+     * @param timetableList - данные расписания
+     */
+    public void fillTimetable(List<TimetableListDto> timetableList) {
+
+        // обновляем грид расписания
+        for (int i = 0; i < timetableGrid.getChildren().size(); i++) {
+            TimetableLabel cell = (TimetableLabel) timetableGrid.getChildren().get(i);
+            for (TimetableListDto listDto : timetableList) {
+                if (cell.getTimetableListDto().getGroup().getStudyGroupId().equals(listDto.getGroup().getStudyGroupId()) &&
+                        cell.getVerticalCellIndex() == listDto.getVerticalCellIndex()) {
+                    cell.setTimetableListDto(listDto);
+                    cell.setVerticalCellIndex(listDto.getVerticalCellIndex());
+                    TimetableContextMenuEvent event = (TimetableContextMenuEvent) cell.getOnContextMenuRequested();
+                    event.setContextMenu(listDto.getContextMenu());
+                    listDto.getContextMenu().setTimetableLabel(cell);
+                    cell.refresh();
+                    break;
+                }
+            }
+        }
+        // обновляем грид нагрузки
+        for (Node timetableNode : timetableGrid.getChildren()) {
+            TimetableLabel cell = (TimetableLabel) timetableNode;
+            TimetableListDto listDto = cell.getTimetableListDto();
+            for (TimetableDto dto : listDto.getTimetableDtoList()) {
+                for (Node loadNode : loadGrid.getChildren()) {
+                    LoadLabel loadCell = (LoadLabel) loadNode;
+                    if (loadCell.getRowIndex() == dto.getLoadCell().getRowIndex() &&
+                        loadCell.getLoadDto().getGroup().getStudyGroupId().equals(
+                                dto.getLoadCell().getLoadDto().getGroup().getStudyGroupId())) {
+                        // отнимаем нагрузку в зависимости от типа часа
+                        minusMinutes(loadCell, dto.getHourType());
+                        dto.setLoadCell(loadCell);
+                    }
+                }
+            }
+        }
+    }
+
+    private void minusMinutes(LoadLabel loadCell, HourTypeEnum hourType) {
+        int minutesInTwoWeek = (int) (AppsSettingsHolder.getHourTime() *  2 * hourType.getHour());
+        int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
+        int minutes = currentMinutes - minutesInTwoWeek;
+        loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
+        loadCell.refresh(-minutesInTwoWeek);
+    }
+
     @AllArgsConstructor
+    @Getter
+    @Setter
     private class TimetableContextMenuEvent implements EventHandler<ContextMenuEvent> {
 
         private TimetableContextMenu contextMenu;

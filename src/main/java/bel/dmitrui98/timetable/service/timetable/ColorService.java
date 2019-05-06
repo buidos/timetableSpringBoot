@@ -41,9 +41,11 @@ public class ColorService {
     }
 
     public void paintCell(LoadLabel loadLabel, TimetableLabel cell) {
+        if (timetableService.getSelectedLoadLabel() == null) {
+            return;
+        }
         if (cell.getTimetableListDto().isEmpty()) {
             ColorUtil.setBackgroundColor(cell, ColorEnum.GREEN.getColor());
-            return;
         }
         // обрабатываем одну и ту же ячейку
         // блокируем, если в одну и ту же группу в одно и то же время пытаются поставить еще одну связку
@@ -75,7 +77,9 @@ public class ColorService {
         if (countDisable == HourTypeEnum.values().length) {
             ColorUtil.setBackgroundColor(cell, ColorEnum.RED.getColor());
         } else {
-            ColorUtil.setBackgroundColor(cell, ColorEnum.YELLOW.getColor());
+            if (countDisable > 0) {
+                ColorUtil.setBackgroundColor(cell, ColorEnum.YELLOW.getColor());
+            }
         }
     }
 }

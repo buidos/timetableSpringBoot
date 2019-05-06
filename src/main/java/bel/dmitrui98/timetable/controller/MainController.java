@@ -145,7 +145,7 @@ public class MainController {
         }
     }
 
-    private void showTable() {
+    public void showTable() {
         List<StudyGroup> checkedGroups = groupCheckComboBox.getCheckModel().getCheckedItems().stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -212,5 +212,13 @@ public class MainController {
         dayCheckComboBox.getCheckModel().checkAll();
 
         hideTimetable();
+    }
+
+    @FXML
+    private void cleanAll() {
+        boolean isConfirm = AlertsUtil.showConfirmAlert("Вы точно хотите очистить расписание?", null);
+        if (isConfirm) {
+            timetableService.cleanAll();
+        }
     }
 }

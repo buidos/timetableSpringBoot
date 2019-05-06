@@ -13,7 +13,7 @@
                   <items>
                     <MenuItem mnemonicParsing="false" text="Сохранить" />
                         <MenuItem mnemonicParsing="false" text="Сохранить как" />
-                        <MenuItem mnemonicParsing="false" text="Очистить" />
+                        <MenuItem mnemonicParsing="false" onAction="#cleanAll" text="Очистить" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Редактирование">

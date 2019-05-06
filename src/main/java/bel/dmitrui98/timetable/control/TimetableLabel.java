@@ -19,12 +19,15 @@ public class TimetableLabel extends Label {
 
     private TimetableListDto timetableListDto;
 
+    private int verticalCellIndex;
+
     public TimetableLabel(double width, double height, int verticalCellIndex, StudyGroup group) {
         this.setMaxSize(width, height);
         this.setMinSize(width, height);
         this.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #BABABA");
 
         timetableListDto = new TimetableListDto(verticalCellIndex, group);
+        this.verticalCellIndex = verticalCellIndex;
     }
 
     public void refresh() {
