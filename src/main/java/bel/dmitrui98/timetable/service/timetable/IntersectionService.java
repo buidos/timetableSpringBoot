@@ -182,7 +182,7 @@ public class IntersectionService {
      * @param hourType тип часа, который пытаются установить
      */
     public boolean checkByHourTypesSameCell(List<HourTypeEnum> installedHourTypes, HourTypeEnum hourType) {
-        if (installedHourTypes.contains(hourType)) {
+        if (installedHourTypes.contains(hourType) || installedHourTypes.contains(TWO_WEEKS)) {
             return true;
         }
         if (!installedHourTypes.isEmpty() && hourType == TWO_WEEKS) {

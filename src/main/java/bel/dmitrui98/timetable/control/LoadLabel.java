@@ -35,6 +35,11 @@ public class LoadLabel extends Label {
      */
     private int commonMinutes;
 
+    /**
+     * Колонка расписания (для выделения цветом)
+     */
+    private int col;
+
     public LoadLabel(double width, double height, TeachersBranch branch, StudyGroup group, String text) {
         this(width, height, text);
         loadDto = new LoadDto(branch, group, branch.getStudyLoad().getCountMinutesInTwoWeek());

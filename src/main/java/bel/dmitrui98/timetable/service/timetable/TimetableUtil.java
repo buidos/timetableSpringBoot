@@ -60,8 +60,12 @@ class TimetableUtil {
     @Autowired
     private TeachersBranchRepository teachersBranchRepository;
 
+    @Autowired
+    private ColorService colorService;
+
     private LoadLabel selectedLoadLabel;
     private TimetableLabel selectedTimetableLabel;
+    private GridPane timetableGrid;
 
     HBox getHeaderHBox(List<StudyGroup> groups) {
         HBox headerHBox = new HBox();
@@ -152,6 +156,7 @@ class TimetableUtil {
 
         // расписание
         GridPane timetableGridPane = getTimetableGridPane(groups, days, borderPane);
+        this.timetableGrid = timetableGridPane;
         contentVBox.getChildren().add(timetableGridPane);
 
         // нагрузка
@@ -166,7 +171,7 @@ class TimetableUtil {
         GridPane loadGridPane = new GridPane();
         int groupIndex = 0;
         for (int i = 0; i < groups.size() * 2; i += 2) {
-            StudyGroup group = groups.get(groupIndex++);
+            StudyGroup group = groups.get(groupIndex);
             List<TeachersBranch> branches = teachersBranchRepository.findByGroupOrderByHour(group);
 
             // общее количество часов
@@ -189,6 +194,7 @@ class TimetableUtil {
                 String text = String.valueOf(hour);
 
                 cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
+                cell.setCol(groupIndex);
                 LoadLabel hourCell = cell;
                 cell.setHourCell(hourCell);
                 cell.setCommonHourCell(commonHourCell);
@@ -202,6 +208,7 @@ class TimetableUtil {
                 // связка
                 text = tb.getTeacherSet().toString() + "\n" + tb.getStudyLoad().getSubject().getName();
                 cell = new LoadLabel(CELL_WIDTH_CONTENT - CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
+                cell.setCol(groupIndex);
                 cell.setHourCell(hourCell);
                 cell.setCommonHourCell(commonHourCell);
                 cell.setTranslateX(cell.getTranslateX() - SHIFT);
@@ -213,6 +220,7 @@ class TimetableUtil {
             commonHourCell.setCommonMinutes(sumMinute);
             loadGridPane.add(commonCell, i, j);
             loadGridPane.add(commonHourCell, i + 1, j);
+            groupIndex++;
         }
         return loadGridPane;
     }
@@ -240,8 +248,7 @@ class TimetableUtil {
                 // нижнее подчеркивание
                 if (pairIndex == (AppsSettingsHolder.getPairsPerDay() -1)) {
                     String c = ColorEnum.CELL_BORDER.getColor();
-                    cell.setStyle(cell.getStyle() + String.format(";-fx-border-style: none none none solid;" +
-                            " -fx-border-color: %s %s black %s;", c, c, c));
+                    cell.setStyle(cell.getStyle() + String.format("; -fx-border-color: %s %s black %s;", c, c, c));
                 }
 
                 // контекстное меню
@@ -359,6 +366,10 @@ class TimetableUtil {
         }
     }
 
+    GridPane getTimetableGrid() {
+        return timetableGrid;
+    }
+
     @AllArgsConstructor
     private class TimetableContextMenuEvent implements EventHandler<ContextMenuEvent> {
 
@@ -372,14 +383,19 @@ class TimetableUtil {
     }
 
     private void onLoadClicked(MouseEvent e, BorderPane borderPane) {
+        int previousCol = -1;
         if (selectedLoadLabel != null) {
             selectedLoadLabel.getStyleClass().remove("selected-load");
             ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.WHITE.getColor());
             ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.WHITE.getColor());
+            previousCol = selectedLoadLabel.getCol();
         }
         selectedLoadLabel = (LoadLabel) e.getSource();
         ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.LOAD_SELECTED.getColor());
         ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.LOAD_SELECTED.getColor());
+
+        colorService.paintTimetableColumn(selectedLoadLabel.getCol(), previousCol, selectedLoadLabel);
+
         refreshInfoPanel(borderPane.getRight());
     }
 

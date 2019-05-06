@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 public enum ColorEnum {
     CELL_BORDER("#BABABA"),
-    GREEN("#2CFF5A"),
+    GREEN("#93FF85"),
     YELLOW("#FFFF00"),
-    RED("#FF1A22"),
+    RED("#FF5C59"),
     LOAD_SELECTED("#9D92FF"),
     WHITE("#FFFFFF")
     ;

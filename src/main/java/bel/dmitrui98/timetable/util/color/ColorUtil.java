@@ -6,7 +6,7 @@ public class ColorUtil {
 
     public static void setBackgroundColor(Node node, String color) {
         String style = node.getStyle();
-        style = style.replaceAll("-fx-background-color: #.+;", String.format("-fx-background-color: %s;", color));
+        style = style.replaceAll("-fx-background-color: #[^;]+;", String.format("-fx-background-color: %s;", color));
         node.setStyle(style);
     }
 }

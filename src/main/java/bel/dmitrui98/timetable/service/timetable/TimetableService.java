@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,5 +139,9 @@ public class TimetableService {
 
     public void refreshInfoPanel() {
         timetableUtil.refreshInfoPanel(borderPane.getRight());
+    }
+
+    public GridPane getTimetableGrid() {
+        return timetableUtil.getTimetableGrid();
     }
 }

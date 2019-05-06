@@ -20,6 +20,9 @@ public class LoadService {
     @Autowired
     private TimetableService timetableService;
 
+    @Autowired
+    private ColorService colorService;
+
     /**
      * Установка нагрузки в расписание
      * @param cell куда устанавливается нагрузка
@@ -65,5 +68,7 @@ public class LoadService {
 
         // обновляем инфо-панель
         timetableService.refreshInfoPanel();
+
+        colorService.paintCell(loadCell, cell);
     }
 }
