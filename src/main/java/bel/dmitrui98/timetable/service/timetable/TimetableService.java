@@ -35,7 +35,7 @@ public class TimetableService {
     private MainController mainController;
 
     /**
-     * Непосредственно расписание. Сохраняется в xml файл
+     * Непосредственно расписание. Сохраняется в файл
      */
     private List<TimetableListDto> timetableList = new ArrayList<>();
 

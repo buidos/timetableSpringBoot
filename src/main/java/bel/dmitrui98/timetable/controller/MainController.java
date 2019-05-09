@@ -7,6 +7,7 @@ import bel.dmitrui98.timetable.entity.dictionary.Specialty;
 import bel.dmitrui98.timetable.service.BaseService;
 import bel.dmitrui98.timetable.service.timetable.CriteriaService;
 import bel.dmitrui98.timetable.service.timetable.TimetableService;
+import bel.dmitrui98.timetable.service.timetable.save.TimetableSaveService;
 import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.dto.timetable.CriteriaCheckComboBoxesDto;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
@@ -20,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.CheckComboBox;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +41,8 @@ public class MainController {
     private static final int SPACING = 5;
     private static final String SHOW_INFO_PANEL_TEXT = "Показать инфо-панель";
     private static final String HIDE_INFO_PANEL_TEXT = "Скрыть инфо-панель";
+
+    private Stage rootStage;
 
     @Autowired
     @Qualifier("editDatabaseView")
@@ -68,6 +73,9 @@ public class MainController {
     @Autowired
     private TimetableService timetableService;
 
+    @Autowired
+    private TimetableSaveService timetableSaveService;
+
 
     @FXML
     private void showEditDatabase() {
@@ -82,49 +90,6 @@ public class MainController {
 
         stage.setScene(editDatabaseScene);
         stage.showAndWait();
-        refresh();
-    }
-
-    @PostConstruct
-    public void init() {
-        VBox vBox = new VBox(SPACING);
-        vBox.getChildren().add(new Label("Отделение:"));
-        vBox.getChildren().add(depCheckComboBox);
-        criteriaHBox.getChildren().add(vBox);
-
-        vBox = new VBox(SPACING);
-        vBox.getChildren().add(new Label("Специальность:"));
-        vBox.getChildren().add(specialtyCheckComboBox);
-        criteriaHBox.getChildren().add(vBox);
-
-        vBox = new VBox(SPACING);
-        vBox.getChildren().add(new Label("Группа:"));
-        vBox.getChildren().add(groupCheckComboBox);
-        criteriaHBox.getChildren().add(vBox);
-
-        vBox = new VBox(SPACING);
-        vBox.getChildren().add(new Label("День:"));
-        vBox.getChildren().add(dayCheckComboBox);
-        criteriaHBox.getChildren().add(vBox);
-
-        tuningCheckBoxes();
-
-        final double marginTop = 26;
-        final double minWidth = 180;
-        Button showTimeTableButton = new Button("Показать расписание");
-        showTimeTableButton.setMinWidth(minWidth);
-        HBox.setMargin(showTimeTableButton, new Insets(marginTop, 0, 0, 0));
-        criteriaHBox.getChildren().add(showTimeTableButton);
-        showTimeTableButton.setOnAction(e -> {
-            showTable();
-        });
-
-        showInfoPanelButton = new Button(SHOW_INFO_PANEL_TEXT);
-        showInfoPanelButton.setMinWidth(minWidth);
-        HBox.setMargin(showInfoPanelButton, new Insets(marginTop, 0, 0, 0));
-        criteriaHBox.getChildren().add(showInfoPanelButton);
-        showInfoPanelButton.setOnAction(this::showInfoPanel);
-
         refresh();
     }
 
@@ -216,9 +181,121 @@ public class MainController {
 
     @FXML
     private void cleanAll() {
-        boolean isConfirm = AlertsUtil.showConfirmAlert("Вы точно хотите очистить расписание?", null);
+        boolean isConfirm = AlertsUtil.showConfirmAlert("Вы точно хотите очистить расписание?",
+                "Текущее расписание удалится и исходная нагрузка загрузится из базы данных");
         if (isConfirm) {
             timetableService.cleanAll();
         }
+    }
+
+    @FXML
+    private void save() {
+        File personFile = timetableSaveService.getTimetableFilePath();
+        if (personFile != null) {
+            if (timetableSaveService.saveTimetableToFile(personFile)) {
+                AlertsUtil.showInfoAlert("Сохранено", null);
+            }
+        } else {
+            saveAs();
+        }
+    }
+
+    @FXML
+    private void saveAs() {
+        FileChooser fileChooser = new FileChooser();
+
+        // Задаём фильтр расширений
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "RASP files (*.rasp)", "*.rasp");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath());
+        fileChooser.setInitialFileName("timetable.rasp");
+
+        // Показываем диалог сохранения файла
+        File file = fileChooser.showSaveDialog(getRootStage());
+
+        if (file != null) {
+            if (!file.getPath().endsWith(".rasp")) {
+                file = new File(file.getPath() + ".rasp");
+            }
+            if (timetableSaveService.saveTimetableToFile(file)) {
+                AlertsUtil.showInfoAlert("Сохранено", null);
+            }
+        }
+    }
+
+    @FXML
+    private void open() {
+        FileChooser fileChooser = new FileChooser();
+        // Задаём фильтр расширений
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "RASP files (*.rasp)", "*.rasp");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath());
+
+        // Показываем диалог загрузки файла
+        File file = fileChooser.showOpenDialog(getRootStage());
+
+        if (file != null) {
+            timetableSaveService.loadTimetableFromFile(file);
+            showTable();
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        VBox vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("Отделение:"));
+        vBox.getChildren().add(depCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
+
+        vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("Специальность:"));
+        vBox.getChildren().add(specialtyCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
+
+        vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("Группа:"));
+        vBox.getChildren().add(groupCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
+
+        vBox = new VBox(SPACING);
+        vBox.getChildren().add(new Label("День:"));
+        vBox.getChildren().add(dayCheckComboBox);
+        criteriaHBox.getChildren().add(vBox);
+
+        tuningCheckBoxes();
+
+        final double marginTop = 26;
+        final double minWidth = 180;
+        Button showTimeTableButton = new Button("Показать расписание");
+        showTimeTableButton.setMinWidth(minWidth);
+        HBox.setMargin(showTimeTableButton, new Insets(marginTop, 0, 0, 0));
+        criteriaHBox.getChildren().add(showTimeTableButton);
+        showTimeTableButton.setOnAction(e -> {
+            showTable();
+        });
+
+        showInfoPanelButton = new Button(SHOW_INFO_PANEL_TEXT);
+        showInfoPanelButton.setMinWidth(minWidth);
+        HBox.setMargin(showInfoPanelButton, new Insets(marginTop, 0, 0, 0));
+        criteriaHBox.getChildren().add(showInfoPanelButton);
+        showInfoPanelButton.setOnAction(this::showInfoPanel);
+
+        // Пытается загрузить последний открытый файл с расписанием
+        File file = timetableSaveService.getTimetableFilePath();
+        if (file != null) {
+            timetableSaveService.loadTimetableFromFile(file);
+        }
+
+        refresh();
+    }
+
+    public Stage getRootStage() {
+        return rootStage;
+    }
+
+    public void setRootStage(Stage rootStage) {
+        this.rootStage = rootStage;
     }
 }

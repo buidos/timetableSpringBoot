@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +20,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @Log4j2
-public class TimetableListDto {
+public class TimetableListDto implements Serializable {
 
     /**
      * Список установленных типов часов со связками преподавателей
@@ -39,14 +40,14 @@ public class TimetableListDto {
     private StudyGroup group;
 
     /**
-     * Колонка группы
-     */
-    private int col;
-
-    /**
      * Контекстное меню
      */
-    private TimetableContextMenu contextMenu;
+    private transient TimetableContextMenu contextMenu;
+
+    /**
+     * Колонка группы (это состояние не нужно сохранять)
+     */
+    private int col;
 
     public TimetableListDto(int verticalCellIndex, StudyGroup group) {
         this.verticalCellIndex = verticalCellIndex;

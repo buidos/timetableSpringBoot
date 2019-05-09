@@ -273,6 +273,66 @@ class TimetableUtil {
         return timetableGridPane;
     }
 
+    /**
+     * Заполняет расписание данными. Индексы групп совпадают с колонками, строки с verticalCellIndex
+     * @param timetableList - данные расписания
+     */
+    public void fillTimetable(List<TimetableListDto> timetableList) {
+
+        // обновляем грид расписания
+        for (int i = 0; i < timetableGrid.getChildren().size(); i++) {
+            TimetableLabel cell = (TimetableLabel) timetableGrid.getChildren().get(i);
+            for (TimetableListDto listDto : timetableList) {
+
+                // находим по группе и по verticalCellIndex(день и пара)
+                if (cell.getTimetableListDto().getGroup().getStudyGroupId().equals(listDto.getGroup().getStudyGroupId()) &&
+                        cell.getVerticalCellIndex() == listDto.getVerticalCellIndex()) {
+
+                    cell.setTimetableListDto(listDto);
+                    cell.setVerticalCellIndex(listDto.getVerticalCellIndex());
+                    TimetableContextMenuEvent event = (TimetableContextMenuEvent) cell.getOnContextMenuRequested();
+                    event.setContextMenu(listDto.getContextMenu());
+                    listDto.getContextMenu().setTimetableLabel(cell);
+                    cell.refresh();
+                    break;
+                }
+            }
+        }
+
+        // обновляем грид нагрузки
+        for (TimetableListDto listDto : timetableList) {
+            StudyGroup group = listDto.getGroup();
+            for (TimetableDto dto : listDto.getTimetableDtoList()) {
+                for (Node loadNode : loadGrid.getChildren()) {
+                    LoadLabel loadCell = (LoadLabel) loadNode;
+
+                    // если нет связки в ячейке
+                    if (loadCell.getLoadDto() == null) {
+                        continue;
+                    }
+
+                    // находим по связке и по группе
+                    if (loadCell.getLoadDto().getBranch().getTeacherBranchId().equals(
+                            dto.getBranch().getTeacherBranchId()) &&
+                            loadCell.getLoadDto().getGroup().getStudyGroupId().equals(group.getStudyGroupId())) {
+
+                        // отнимаем нагрузку в зависимости от типа часа
+                        minusMinutes(loadCell, dto.getHourType());
+                        dto.setLoadCell(loadCell);
+                    }
+                }
+            }
+        }
+    }
+
+    private void minusMinutes(LoadLabel loadCell, HourTypeEnum hourType) {
+        int minutesInTwoWeek = (int) (AppsSettingsHolder.getHourTime() *  2 * hourType.getHour());
+        int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
+        int minutes = currentMinutes - minutesInTwoWeek;
+        loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
+        loadCell.refresh(-minutesInTwoWeek);
+    }
+
     void createInfoPanel(BorderPane borderPane) {
         VBox currentLoadInfo = new VBox();
         currentLoadInfo.setMinHeight(150);
@@ -380,55 +440,6 @@ class TimetableUtil {
         return timetableGrid;
     }
 
-    /**
-     * Заполняет расписание данными. Индексы групп совпадают с колонками, строки с verticalCellIndex
-     * @param timetableList - данные расписания
-     */
-    public void fillTimetable(List<TimetableListDto> timetableList) {
-
-        // обновляем грид расписания
-        for (int i = 0; i < timetableGrid.getChildren().size(); i++) {
-            TimetableLabel cell = (TimetableLabel) timetableGrid.getChildren().get(i);
-            for (TimetableListDto listDto : timetableList) {
-                if (cell.getTimetableListDto().getGroup().getStudyGroupId().equals(listDto.getGroup().getStudyGroupId()) &&
-                        cell.getVerticalCellIndex() == listDto.getVerticalCellIndex()) {
-                    cell.setTimetableListDto(listDto);
-                    cell.setVerticalCellIndex(listDto.getVerticalCellIndex());
-                    TimetableContextMenuEvent event = (TimetableContextMenuEvent) cell.getOnContextMenuRequested();
-                    event.setContextMenu(listDto.getContextMenu());
-                    listDto.getContextMenu().setTimetableLabel(cell);
-                    cell.refresh();
-                    break;
-                }
-            }
-        }
-        // обновляем грид нагрузки
-        for (Node timetableNode : timetableGrid.getChildren()) {
-            TimetableLabel cell = (TimetableLabel) timetableNode;
-            TimetableListDto listDto = cell.getTimetableListDto();
-            for (TimetableDto dto : listDto.getTimetableDtoList()) {
-                for (Node loadNode : loadGrid.getChildren()) {
-                    LoadLabel loadCell = (LoadLabel) loadNode;
-                    if (loadCell.getRowIndex() == dto.getLoadCell().getRowIndex() &&
-                        loadCell.getLoadDto().getGroup().getStudyGroupId().equals(
-                                dto.getLoadCell().getLoadDto().getGroup().getStudyGroupId())) {
-                        // отнимаем нагрузку в зависимости от типа часа
-                        minusMinutes(loadCell, dto.getHourType());
-                        dto.setLoadCell(loadCell);
-                    }
-                }
-            }
-        }
-    }
-
-    private void minusMinutes(LoadLabel loadCell, HourTypeEnum hourType) {
-        int minutesInTwoWeek = (int) (AppsSettingsHolder.getHourTime() *  2 * hourType.getHour());
-        int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
-        int minutes = currentMinutes - minutesInTwoWeek;
-        loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
-        loadCell.refresh(-minutesInTwoWeek);
-    }
-
     @AllArgsConstructor
     @Getter
     @Setter
@@ -446,7 +457,6 @@ class TimetableUtil {
     private void onLoadClicked(MouseEvent e, BorderPane borderPane) {
         int previousCol = -1;
         if (selectedLoadLabel != null) {
-            selectedLoadLabel.getStyleClass().remove("selected-load");
             ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.WHITE.getColor());
             ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.WHITE.getColor());
             previousCol = selectedLoadLabel.getCol();

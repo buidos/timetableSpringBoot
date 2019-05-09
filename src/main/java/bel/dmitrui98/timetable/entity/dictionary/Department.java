@@ -17,7 +17,7 @@ import javax.persistence.*;
 @Table(indexes =
         {@Index(columnList = "name", unique = true, name = "dep_name_ind_unique")})
 @ToString
-public class Department {
+public class Department{
 
     @ToString.Exclude
     private IntegerProperty departmentId = new SimpleIntegerProperty();

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimetableDto {
+public class TimetableDto implements Serializable {
 
     /**
      * Связка учителей
@@ -31,7 +32,12 @@ public class TimetableDto {
     /**
      * Ячейка, от куда бралась нагрузка
      */
-    private LoadLabel loadCell;
+    private transient LoadLabel loadCell;
+
+    public TimetableDto(TeachersBranch branch, HourTypeEnum hourType) {
+        this.branch = branch;
+        this.hourType = hourType;
+    }
 
     @Override
     public boolean equals(Object o) {

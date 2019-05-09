@@ -16,8 +16,15 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
     List<StudyGroup> findBySpecialtyIn(List<Specialty> specialties);
 
+    List<StudyGroup> findByStudyGroupIdIn(List<Long> ids);
+
     @Query("SELECT distinct g FROM StudyGroup g " +
             "LEFT JOIN FETCH g.teachersBranchSet " +
             "WHERE g = ?1")
     StudyGroup branchFetch(StudyGroup studyGroup);
+
+    @Query("SELECT distinct g FROM StudyGroup g " +
+            "LEFT JOIN FETCH g.teachersBranchSet " +
+            "WHERE g IN ?1")
+    List<StudyGroup> branchByGroupInFetch(List<StudyGroup> studyGroups);
 }

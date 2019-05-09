@@ -48,4 +48,7 @@ public interface TeachersBranchRepository extends JpaRepository<TeachersBranch, 
             "LEFT JOIN FETCH t.teachersBranchSet " +
             "WHERE tb IN ?1")
     List<TeachersBranch> groupsAndTeacherFetch(List<TeachersBranch> branches);
+
+    List<TeachersBranch> findByTeacherBranchIdIn(List<Long> ids);
+
 }

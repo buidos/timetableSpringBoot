@@ -21,9 +21,6 @@ public class LoadDto {
     private TeachersBranch branch;
     private StudyGroup group;
 
-    /**
-     * Часы для xml файла
-     */
     private Integer countMinutesInTwoWeek;
 
     @Override

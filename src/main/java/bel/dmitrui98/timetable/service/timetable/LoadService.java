@@ -26,7 +26,6 @@ public class LoadService {
     /**
      * Установка нагрузки в расписание
      * @param cell куда устанавливается нагрузка
-     * @param loadCell выбранная ячейка с нагрузкой
      * @param hourType тип часа
      * @param isDeleteFromCell удаляется ли нагрузка из ячейки расписания
      */
@@ -45,6 +44,7 @@ public class LoadService {
             cell.refresh();
 
             timetableList.add(cell.getTimetableListDto());
+
         } else {
             // нагрузка удаляется из ячейки расписания. Добавляем нагрузку к связке учителей
             // извлекаем ячейку, из которой бралась нагрузка для данной ячейки расписания
@@ -69,6 +69,8 @@ public class LoadService {
         // обновляем инфо-панель
         timetableService.refreshInfoPanel();
 
-        colorService.paintCell(loadCell, cell);
+        // перерисовываем текущую колонку
+        LoadLabel selectedLoadCell = timetableService.getSelectedLoadLabel();
+        colorService.paintTimetableColumn(selectedLoadCell.getCol(), -1, selectedLoadCell);
     }
 }
