@@ -1,9 +1,6 @@
 package bel.dmitrui98.timetable.util.alerts;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.StageStyle;
 
@@ -66,5 +63,35 @@ public class AlertsUtil {
         Optional<ButtonType> result = alert.showAndWait();
 
         return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+
+    /**
+     * confirm dialog да, нет, отмена
+     * @return true - да, false - нет, null - отмена
+     */
+    public static Boolean showCustomConfirmAlert(String headerText, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Подтверждение действия");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        ButtonType buttonTypeOne = new ButtonType("Да");
+        ButtonType buttonTypeTwo = new ButtonType("Нет");
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeOne){
+            // да
+            return true;
+        } else if (result.get() == buttonTypeTwo) {
+            // нет
+            return false;
+        } else {
+            // отмена
+            return null;
+        }
     }
 }

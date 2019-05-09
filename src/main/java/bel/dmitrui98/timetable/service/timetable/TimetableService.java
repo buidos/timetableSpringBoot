@@ -42,6 +42,11 @@ public class TimetableService {
     private BorderPane borderPane;
 
     /**
+     * Было ли редактирование расписания
+     */
+    private boolean isEdit;
+
+    /**
      * Отображение расписания
      * @param groups группы, для которых будет составлятся расписание
      * @param days дни, на которые будет составлятся расписание
@@ -158,5 +163,14 @@ public class TimetableService {
     public void cleanAll() {
         timetableList.clear();
         mainController.showTable();
+        setEdit(true);
+    }
+
+    public boolean isEdit() {
+        return isEdit;
+    }
+
+    public void setEdit(boolean edit) {
+        isEdit = edit;
     }
 }

@@ -10,7 +10,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TimetableDtoInnerWrapper implements Serializable {
+public class BranchHourWrapper implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long branchId;
     private HourTypeEnum hourType;
 }

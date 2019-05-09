@@ -30,6 +30,8 @@ public class LoadService {
      * @param isDeleteFromCell удаляется ли нагрузка из ячейки расписания
      */
     public void setUpLoadToTimetable(TimetableLabel cell, LoadLabel loadCell, HourTypeEnum hourType, boolean isDeleteFromCell) {
+        timetableService.setEdit(true);
+
         int minutesInTwoWeek = (int) ((AppsSettingsHolder.getHourTime() * 2) * hourType.getHour());
         List<TimetableListDto> timetableList = timetableService.getTimetableList();
 
@@ -43,7 +45,9 @@ public class LoadService {
             cell.getTimetableListDto().addDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
 
-            timetableList.add(cell.getTimetableListDto());
+            if (!timetableList.contains(cell.getTimetableListDto())) {
+                timetableList.add(cell.getTimetableListDto());
+            }
 
         } else {
             // нагрузка удаляется из ячейки расписания. Добавляем нагрузку к связке учителей
@@ -71,6 +75,8 @@ public class LoadService {
 
         // перерисовываем текущую колонку
         LoadLabel selectedLoadCell = timetableService.getSelectedLoadLabel();
-        colorService.paintTimetableColumn(selectedLoadCell.getCol(), -1, selectedLoadCell);
+        if (selectedLoadCell != null) {
+            colorService.paintTimetableColumn(selectedLoadCell.getCol(), -1, selectedLoadCell);
+        }
     }
 }

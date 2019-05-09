@@ -4,7 +4,7 @@ import bel.dmitrui98.timetable.control.TimetableContextMenu;
 import bel.dmitrui98.timetable.entity.StudyGroup;
 import bel.dmitrui98.timetable.repository.StudyGroupRepository;
 import bel.dmitrui98.timetable.util.dto.timetable.TimetableListDto;
-import bel.dmitrui98.timetable.util.dto.timetable.wrapper.inner_wrapper.ListDtoInnerWrapper;
+import bel.dmitrui98.timetable.util.dto.timetable.wrapper.inner_wrapper.CellWrapper;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,42 +26,47 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TimetableWrapper implements Serializable {
+public class CellListWrapper implements Serializable {
 
-    private List<ListDtoInnerWrapper> timetableList = new ArrayList<>();
+    private static final long serialVersionUID = 1L;
+
+    private List<CellWrapper> timetableList = new ArrayList<>();
 
     @Autowired
     private StudyGroupRepository studyGroupRepository;
 
-    public TimetableWrapper(List<TimetableListDto> timetableList) {
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    public CellListWrapper(List<TimetableListDto> timetableList) {
         for (TimetableListDto listDto : timetableList) {
             StudyGroup group = listDto.getGroup();
             int verticalCellIndex = listDto.getVerticalCellIndex();
-            TimetableListDtoWrapper listDtoWrapper = new TimetableListDtoWrapper(listDto.getTimetableDtoList());
+            BranchHourListWrapper listDtoWrapper = new BranchHourListWrapper(listDto.getTimetableDtoList());
             ContextMenuWrapper contextMenuWrapper = new ContextMenuWrapper(listDto.getContextMenu());
-            this.timetableList.add(new ListDtoInnerWrapper(group.getStudyGroupId(), verticalCellIndex, listDtoWrapper, contextMenuWrapper));
+            this.timetableList.add(new CellWrapper(group.getStudyGroupId(), verticalCellIndex, listDtoWrapper, contextMenuWrapper));
         }
     }
 
     /**
      * Восстановление расписание
-     * @param contextMenu пустой бин контекстного меню
      * @return восстановленное расписание. Ячейка, от куда бралась нагрузка восстанавливается по связке и группе
      * при отображении расписания
      */
-    public List<TimetableListDto> getTimetableListDto(TimetableContextMenu contextMenu) {
+    public List<TimetableListDto> getTimetableListDto() {
         List<TimetableListDto> list = new ArrayList<>();
 
         List<Long> groupIds = this.timetableList.stream()
-                .map(ListDtoInnerWrapper::getGroupId)
+                .map(CellWrapper::getGroupId)
                 .collect(Collectors.toList());
         List<StudyGroup> groups = studyGroupRepository.findByStudyGroupIdIn(groupIds);
 
-        for (ListDtoInnerWrapper innerWrapper : this.timetableList) {
+        for (CellWrapper innerWrapper : this.timetableList) {
 
             for (StudyGroup group : groups) {
                 if (group.getStudyGroupId().equals(innerWrapper.getGroupId())) {
                     TimetableListDto listDto = new TimetableListDto(innerWrapper.getVerticalCellIndex(), group);
+                    TimetableContextMenu contextMenu = applicationContext.getBean(TimetableContextMenu.class);
                     setIsSelected(contextMenu, innerWrapper);
                     listDto.setContextMenu(contextMenu);
                     listDto.setTimetableDtoList(innerWrapper.getListDtoWrapper().getTimetableDtoList());
@@ -72,7 +78,7 @@ public class TimetableWrapper implements Serializable {
         return list;
     }
 
-    private void setIsSelected(TimetableContextMenu contextMenu, ListDtoInnerWrapper innerClassDto) {
+    private void setIsSelected(TimetableContextMenu contextMenu, CellWrapper innerClassDto) {
         Boolean isSelected;
         List<Boolean> isSelectedList = innerClassDto.getContextMenuWrapper().getIsSelectedList();
         for (int i = 0, j = 0; i < contextMenu.getItems().size() && j < isSelectedList.size(); i++) {

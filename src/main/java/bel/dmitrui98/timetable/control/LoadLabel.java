@@ -42,6 +42,8 @@ public class LoadLabel extends Label {
 
     private int rowIndex = -1;
 
+    private boolean isHourLabel;
+
     public LoadLabel(double width, double height, TeachersBranch branch, StudyGroup group, String text) {
         this(width, height, text);
         loadDto = new LoadDto(branch, group, branch.getStudyLoad().getCountMinutesInTwoWeek());

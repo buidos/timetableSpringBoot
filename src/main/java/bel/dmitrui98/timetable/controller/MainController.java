@@ -189,7 +189,7 @@ public class MainController {
     }
 
     @FXML
-    private void save() {
+    public void save() {
         File personFile = timetableSaveService.getTimetableFilePath();
         if (personFile != null) {
             if (timetableSaveService.saveTimetableToFile(personFile)) {
@@ -208,7 +208,7 @@ public class MainController {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "RASP files (*.rasp)", "*.rasp");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath());
+        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath().getParentFile());
         fileChooser.setInitialFileName("timetable.rasp");
 
         // Показываем диалог сохранения файла
@@ -226,12 +226,19 @@ public class MainController {
 
     @FXML
     private void open() {
+
+        if (!timetableService.getTimetableList().isEmpty()) {
+            AlertsUtil.showInfoAlert("Расписание установлено",
+                    "Сначала очистите текущее расписание, чтобы открыть сохраненное");
+            return;
+        }
+
         FileChooser fileChooser = new FileChooser();
         // Задаём фильтр расширений
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "RASP files (*.rasp)", "*.rasp");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath());
+        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath().getParentFile());
 
         // Показываем диалог загрузки файла
         File file = fileChooser.showOpenDialog(getRootStage());
@@ -281,12 +288,6 @@ public class MainController {
         HBox.setMargin(showInfoPanelButton, new Insets(marginTop, 0, 0, 0));
         criteriaHBox.getChildren().add(showInfoPanelButton);
         showInfoPanelButton.setOnAction(this::showInfoPanel);
-
-        // Пытается загрузить последний открытый файл с расписанием
-        File file = timetableSaveService.getTimetableFilePath();
-        if (file != null) {
-            timetableSaveService.loadTimetableFromFile(file);
-        }
 
         refresh();
     }

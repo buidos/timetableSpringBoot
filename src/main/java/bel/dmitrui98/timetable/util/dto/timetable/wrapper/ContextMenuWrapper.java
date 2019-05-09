@@ -18,6 +18,9 @@ import java.util.List;
 @Getter
 @Setter
 public class ContextMenuWrapper implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private List<Boolean> isSelectedList = new ArrayList<>();
 
     public ContextMenuWrapper(TimetableContextMenu contextMenu) {

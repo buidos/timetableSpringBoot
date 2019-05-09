@@ -13,6 +13,7 @@ import bel.dmitrui98.timetable.util.dto.timetable.TimetableListDto;
 import bel.dmitrui98.timetable.util.enums.ColorEnum;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import bel.dmitrui98.timetable.util.enums.timetable.HourTypeEnum;
+import bel.dmitrui98.timetable.util.gridpane.GridPaneUtil;
 import bel.dmitrui98.timetable.util.time.TimeUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -200,6 +201,7 @@ class TimetableUtil {
                 String text = String.valueOf(hour);
 
                 cell = new LoadLabel(CELL_WIDTH_HOUR, CELL_HEIGHT, tb, group, text);
+                cell.setHourLabel(true);
                 cell.setCol(groupIndex);
                 cell.setRowIndex(j);
                 LoadLabel hourCell = cell;
@@ -458,12 +460,35 @@ class TimetableUtil {
         int previousCol = -1;
         if (selectedLoadLabel != null) {
             ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.WHITE.getColor());
-            ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.WHITE.getColor());
+
+            if (selectedLoadLabel.isHourLabel()) {
+                // снимаем выделение со связки
+                int columnIndex = GridPane.getColumnIndex(selectedLoadLabel) - 1;
+                Node node = GridPaneUtil.getCell(loadGrid, GridPane.getRowIndex(selectedLoadLabel), columnIndex);
+                if (node != null) {
+                    ColorUtil.setBackgroundColor(node,  ColorEnum.WHITE.getColor());
+                }
+            } else {
+                // снимаем выделение с часа
+                ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(),  ColorEnum.WHITE.getColor());
+            }
+
             previousCol = selectedLoadLabel.getCol();
         }
         selectedLoadLabel = (LoadLabel) e.getSource();
         ColorUtil.setBackgroundColor(selectedLoadLabel, ColorEnum.LOAD_SELECTED.getColor());
-        ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.LOAD_SELECTED.getColor());
+
+        if (selectedLoadLabel.isHourLabel()) {
+            // если нажали на час, выделяем связку
+            int columnIndex = GridPane.getColumnIndex(selectedLoadLabel) - 1;
+            Node node = GridPaneUtil.getCell(loadGrid, GridPane.getRowIndex(selectedLoadLabel), columnIndex);
+            if (node != null) {
+                ColorUtil.setBackgroundColor(node, ColorEnum.LOAD_SELECTED.getColor());
+            }
+        } else {
+            // если нажали на связку, выделяем час
+            ColorUtil.setBackgroundColor(selectedLoadLabel.getHourCell(), ColorEnum.LOAD_SELECTED.getColor());
+        }
 
         colorService.paintTimetableColumn(selectedLoadLabel.getCol(), previousCol, selectedLoadLabel);
 
