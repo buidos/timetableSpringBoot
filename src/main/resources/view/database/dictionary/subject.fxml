@@ -5,9 +5,9 @@
 <?import javafx.scene.layout.*?>
 <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="414.0" prefWidth="1126.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.database.dictionary.SubjectController">
    <children>
-      <HBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="843.0" spacing="10.0">
+      <HBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="52.0" prefWidth="961.0" spacing="10.0">
          <children>
-            <VBox prefHeight="52.0" prefWidth="202.0">
+            <VBox prefHeight="52.0" prefWidth="418.0">
                <children>
                   <Label text="Название:" />
                   <TextField fx:id="subjectNameTextField" />

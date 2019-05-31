@@ -206,7 +206,7 @@ public class CriteriaService {
             ObservableList<Integer> currentChecked = dto.getDepCheckComboBox().getCheckModel().getCheckedIndices();
             if (!CollectionUtils.isEqualCollection(checkedIndexes, currentChecked)) {
                 ObservableList<Department> departments = dto.getDepCheckComboBox().getCheckModel().getCheckedItems();
-                List<Specialty> specialties = specialtyRepository.findByDepartmentIn(departments);
+                List<Specialty> specialties = specialtyRepository.findByDepartmentInOrderByName(departments);
 
                 dto.getSpecialtyCheckComboBox().getItems().clear();
                 dto.getGroupCheckComboBox().getItems().clear();
@@ -215,7 +215,7 @@ public class CriteriaService {
                     dto.getSpecialtyCheckComboBox().getItems().addAll(specialties);
                     dto.getSpecialtyCheckComboBox().getCheckModel().checkAll();
 
-                    List<StudyGroup> groups = studyGroupRepository.findBySpecialtyIn(specialties);
+                    List<StudyGroup> groups = studyGroupRepository.findBySpecialtyInOrderByName(specialties);
                     if (!groups.isEmpty()) {
 
                         dto.getGroupCheckComboBox().getItems().add(null);
@@ -235,7 +235,7 @@ public class CriteriaService {
             ObservableList<Integer> currentChecked = dto.getSpecialtyCheckComboBox().getCheckModel().getCheckedIndices();
             if (!CollectionUtils.isEqualCollection(checkedIndexes, currentChecked)) {
                 ObservableList<Specialty> specialties = dto.getSpecialtyCheckComboBox().getCheckModel().getCheckedItems();
-                List<StudyGroup> groups = studyGroupRepository.findBySpecialtyIn(specialties);
+                List<StudyGroup> groups = studyGroupRepository.findBySpecialtyInOrderByName(specialties);
                 dto.getGroupCheckComboBox().getItems().clear();
                 if (!groups.isEmpty()) {
 

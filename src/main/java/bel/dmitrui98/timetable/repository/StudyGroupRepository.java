@@ -14,7 +14,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
     @Query("delete from StudyGroup g where g.studyGroupId in (:ids)")
     void deleteAllByIds(@Param("ids") List<Long> ids);
 
-    List<StudyGroup> findBySpecialtyIn(List<Specialty> specialties);
+    List<StudyGroup> findBySpecialtyInOrderByName(List<Specialty> specialties);
 
     List<StudyGroup> findByStudyGroupIdIn(List<Long> ids);
 

@@ -18,5 +18,5 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, Integer> {
     @Query("FROM Specialty s WHERE s.department.departmentId IN (:departmentIds)")
     List<Specialty> findByDepartmentIdIn(@Param("departmentIds") List<Integer> departmentIds);
 
-    List<Specialty> findByDepartmentIn(List<Department> departments);
+    List<Specialty> findByDepartmentInOrderByName(List<Department> departments);
 }

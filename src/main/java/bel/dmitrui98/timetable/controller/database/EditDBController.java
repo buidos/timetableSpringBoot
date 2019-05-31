@@ -215,6 +215,15 @@ public class EditDBController {
         TabPane rootTabPane = (TabPane) borderPane.getCenter();
         for (Tab tab : rootTabPane.getTabs()) {
             switch (tab.getText()) {
+                case DEPARTMENT:
+                    tab.setContent(departmentView.getScene().getRoot());
+                    break;
+                case SPECIALTY:
+                    tab.setContent(specialtyView.getScene().getRoot());
+                    break;
+                case SUBJECT:
+                    tab.setContent(subjectView.getScene().getRoot());
+                    break;
                 case SETTINGS:
                     tab.setContent(settingView.getScene().getRoot());
                     break;
@@ -242,17 +251,8 @@ public class EditDBController {
         TabPane dictionariesTabPane = (TabPane) rootTab.getContent();
         for (Tab tab : dictionariesTabPane.getTabs()) {
             switch (tab.getText()) {
-                case DEPARTMENT:
-                    tab.setContent(departmentView.getScene().getRoot());
-                    break;
-                case SPECIALTY:
-                    tab.setContent(specialtyView.getScene().getRoot());
-                    break;
                 case SUBJECT_TYPE:
                     tab.setContent(subjectTypeView.getScene().getRoot());
-                    break;
-                case SUBJECT:
-                    tab.setContent(subjectView.getScene().getRoot());
                     break;
                 case STUDY_FORM:
                     tab.setContent(studyFormView.getScene().getRoot());

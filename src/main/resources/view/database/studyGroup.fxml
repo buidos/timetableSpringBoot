@@ -29,14 +29,14 @@
                         <TextField fx:id="courseField" prefHeight="31.0" prefWidth="168.0" text="1" />
                      </children>
                   </VBox>
-                  <VBox prefHeight="52.0" prefWidth="162.0">
+                  <VBox prefHeight="52.0" prefWidth="240.0">
                      <children>
                         <Label text="Специальность:">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </Label>
-                        <ComboBox fx:id="specialtyComboBox" prefHeight="31.0" prefWidth="161.0" />
+                        <ComboBox fx:id="specialtyComboBox" prefHeight="31.0" prefWidth="246.0" />
                      </children>
                   </VBox>
                   <VBox>

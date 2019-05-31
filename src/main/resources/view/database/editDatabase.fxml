@@ -17,7 +17,33 @@
    <center>
       <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
-            <Tab text="Настройки">
+          <Tab onSelectionChanged="#departmentTabSelectionChange" text="Отделение" />
+          <Tab onSelectionChanged="#specialtyTabSelectionChange" text="Специальность">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+            <Tab onSelectionChanged="#subjectTabSelectionChange" text="Дисциплина">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+               </content>
+            </Tab>
+          <Tab onSelectionChanged="#teacherTabSelectionChange" text="Преподаватели">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+            <Tab onSelectionChanged="#studyGroupTabSelectionChange" text="Группы">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+               </content>
+            </Tab>
+            <Tab onSelectionChanged="#loadTabSelectionChange" text="Нагрузка">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+               </content>
+            </Tab>
+            <Tab onSelectionChanged="#pairTabSelectionChange" text="Пары">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                </content>
@@ -26,18 +52,7 @@
                <content>
                   <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" scaleY="1.02" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab onSelectionChanged="#departmentTabSelectionChange" text="Отделение" />
-                      <Tab onSelectionChanged="#specialtyTabSelectionChange" text="Специальность">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
                         <Tab text="Тип дисциплины">
-                           <content>
-                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                           </content>
-                        </Tab>
-                        <Tab onSelectionChanged="#subjectTabSelectionChange" text="Дисциплина">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                            </content>
@@ -61,22 +76,7 @@
                   </TabPane>
                </content>
           </Tab>
-          <Tab onSelectionChanged="#teacherTabSelectionChange" text="Преподаватели">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </Tab>
-            <Tab onSelectionChanged="#studyGroupTabSelectionChange" text="Группы">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-               </content>
-            </Tab>
-            <Tab onSelectionChanged="#pairTabSelectionChange" text="Пары">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-               </content>
-            </Tab>
-            <Tab onSelectionChanged="#loadTabSelectionChange" text="Нагрузка">
+            <Tab text="Настройки">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                </content>

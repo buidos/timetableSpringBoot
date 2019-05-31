@@ -3,16 +3,16 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="414.0" prefWidth="698.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController">
+<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="565.0" prefWidth="1398.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bel.dmitrui98.timetable.controller.database.dictionary.DepartmentController">
    <children>
-      <HBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="678.0" spacing="10.0">
+      <HBox alignment="TOP_CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="830.0" spacing="10.0">
          <children>
             <Label text="Название:">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </Label>
-            <TextField fx:id="depNameTextField" />
+            <TextField fx:id="depNameTextField" prefHeight="31.0" prefWidth="265.0" />
             <Button fx:id="defaultButton" mnemonicParsing="false" onAction="#addDepartment" text="Добавить" />
             <Button mnemonicParsing="false" onAction="#editDepartment" text="Редактировать" />
             <Button mnemonicParsing="false" onAction="#deleteDepartment" text="Удалить" />
