@@ -82,7 +82,9 @@ public class MainController {
         Stage stage = new Stage();
         stage.setTitle("Редактирование базы данных");
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.getIcons().add(editDatabaseView.getIcon());
+        if (editDatabaseView.getIcon() != null) {
+            stage.getIcons().add(editDatabaseView.getIcon());
+        }
 
         EditDBController editDBController = (EditDBController) editDatabaseView.getController();
         // заполняем табы содержимым
@@ -208,7 +210,11 @@ public class MainController {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "RASP files (*.rasp)", "*.rasp");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setInitialDirectory(timetableSaveService.getTimetableFilePath().getParentFile());
+
+        File timetableFilePath = timetableSaveService.getTimetableFilePath();
+        if (timetableFilePath != null) {
+            fileChooser.setInitialDirectory(timetableFilePath.getParentFile());
+        }
         fileChooser.setInitialFileName("timetable.rasp");
 
         // Показываем диалог сохранения файла

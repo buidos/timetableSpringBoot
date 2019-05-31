@@ -8,6 +8,7 @@ import bel.dmitrui98.timetable.util.exception.AppsExceptionHandler;
 import bel.dmitrui98.timetable.util.view.AppsView;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,10 +18,12 @@ import java.io.File;
 
 @Lazy
 @SpringBootApplication
+@Log4j2
 public class TimetableApplication extends AbstractJavaFxApplicationSupport {
 
     private String windowTitle = "Помощник составления расписания";
-    public static final Image APPLICATION_ICON = new Image("images/icon.png");
+    private static final String IMAGE_URL = "images/icon.png";
+    public static Image applicationIcon;
 
 
     @Autowired
@@ -34,14 +37,27 @@ public class TimetableApplication extends AbstractJavaFxApplicationSupport {
     private TimetableSaveService timetableSaveService;
 
     @Override
-    public void start(Stage stage) {
+    public void init() throws Exception {
+        // инициализация иконки приложения
+        try {
+            applicationIcon = new Image(IMAGE_URL);
+        } catch (IllegalArgumentException ex) {
+            log.error("image with url " + IMAGE_URL + " not found");
+            applicationIcon = null;
+        }
+        super.init();
+    }
 
+    @Override
+    public void start(Stage stage) {
         // сквозной перехватчик исключений
         Thread.currentThread().setUncaughtExceptionHandler(new AppsExceptionHandler(stage));
 
         stage.setTitle(windowTitle);
         stage.setScene(mainView.getScene());
-        stage.getIcons().add(mainView.getIcon());
+        if (mainView.getIcon() != null) {
+            stage.getIcons().add(mainView.getIcon());
+        }
         MainController controller = (MainController) mainView.getController();
         controller.setRootStage(stage);
 
@@ -59,7 +75,7 @@ public class TimetableApplication extends AbstractJavaFxApplicationSupport {
         });
 
         // на полный экран
-//        stage.setMaximized(true);
+        stage.setMaximized(true);
 
         stage.show();
 

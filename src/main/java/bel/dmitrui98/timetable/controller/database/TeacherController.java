@@ -2,6 +2,7 @@ package bel.dmitrui98.timetable.controller.database;
 
 import bel.dmitrui98.timetable.entity.Teacher;
 import bel.dmitrui98.timetable.service.BaseService;
+import bel.dmitrui98.timetable.util.StringUtil;
 import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.exception.AppsException;
 import bel.dmitrui98.timetable.util.validation.AppsValidation;
@@ -70,10 +71,11 @@ public class TeacherController {
         String surname = surnameField.getText().toLowerCase();
         String name = nameField.getText().toLowerCase();
         String patronymic = patronymicField.getText().toLowerCase();
-        String telephone = telephoneField.getText().toLowerCase();
-        String email = emailField.getText().toLowerCase();
-
-        if (isValid(name) && isValid(surname, false) && isValid(patronymic) && isValid(email) && isValid(telephone)) {
+        String telephone = telephoneField.getText();
+        String email = emailField.getText();
+        if (isValid(name) && isValid(surname, false)
+                && isValid(patronymic) && isValid(email)
+                && isValid(telephone) && notDuplicate(surname, name, patronymic, telephone, email)) {
             Teacher teacher = new Teacher(surname, name, patronymic, telephone, email);
             teacherService.save(teacher);
             teachers.add(teacher);
@@ -87,6 +89,18 @@ public class TeacherController {
         }
     }
 
+    private boolean notDuplicate(String surname, String name, String patronymic, String telephone, String email, int ignoreIndex) {
+        List<String> strings = teachers.stream()
+                .map(t -> t.getSurname() + t.getName() + t.getPatronymic() + t.getTelephone() + t.getEmail())
+                .collect(Collectors.toList());
+        return isValid(surname + name + patronymic + telephone + email, false, false,
+                strings, ignoreIndex);
+    }
+
+    private boolean notDuplicate(String surname, String name, String patronymic, String telephone, String email) {
+        return notDuplicate(surname, name, patronymic, telephone, email, -1);
+    }
+
     @FXML
     private void edit() throws AppsException {
         Teacher entityForEdit  = tableView.getSelectionModel().getSelectedItem();
@@ -97,8 +111,8 @@ public class TeacherController {
         String surname = surnameField.getText().toLowerCase();
         String name = nameField.getText().toLowerCase();
         String patronymic = patronymicField.getText().toLowerCase();
-        String telephone = telephoneField.getText().toLowerCase();
-        String email = emailField.getText().toLowerCase();
+        String telephone = telephoneField.getText();
+        String email = emailField.getText();
 
         // если изменений не было
         if (entityForEdit.getSurname().equals(surname) && entityForEdit.getName().equals(name)
@@ -109,7 +123,9 @@ public class TeacherController {
             return;
         }
 
-        if (isValid(name) && isValid(surname, false) && isValid(patronymic) && isValid(email) && isValid(telephone)) {
+        int ignoreIndex = tableView.getSelectionModel().getSelectedIndex();
+        if (isValid(name) && isValid(surname, false) && isValid(patronymic) && isValid(email)
+                && isValid(telephone) && notDuplicate(surname, name, patronymic, telephone, email, ignoreIndex)) {
             entityForEdit.setSurname(surname);
             entityForEdit.setName(name);
             entityForEdit.setPatronymic(patronymic);
@@ -120,7 +136,7 @@ public class TeacherController {
     }
 
     @FXML
-    private void delete() throws AppsException {
+    private void delete() {
         ObservableList<Teacher> selectedItems = tableView.getSelectionModel().getSelectedItems();
         if (selectedItems.isEmpty()) {
             AlertsUtil.showInfoAlert("Не выбран преподаватель", "Выберите хотя бы одного преподавателя для удаления");
@@ -152,8 +168,12 @@ public class TeacherController {
     }
 
     private boolean isValid(String name, boolean allowEmpty) {
+        return isValid(name, allowEmpty, true, null, -1);
+    }
+
+    private boolean isValid(String name, boolean allowEmpty, boolean allowDuplicate, List<String> strings, int ignoreIndex) {
         try {
-            AppsValidation.validate(name, new ValidConditions(allowEmpty, true));
+            AppsValidation.validate(name, new ValidConditions(allowEmpty, allowDuplicate), strings, ignoreIndex);
         } catch (AppsException ex) {
             String contentText = "";
             if (ex.getExceptionType().equals(VALID_EMPTY_VALUE)) {
@@ -161,7 +181,7 @@ public class TeacherController {
             } else if (ex.getExceptionType().equals(VALID_LONG_VALUE)) {
                 contentText = "Строка не должна превышать длину в " + ValidConditions.MAX_STRING_LENGTH + " символов";
             } else if (ex.getExceptionType().equals(VALID_DUPLICATE_VALUE)) {
-                contentText = "Запись со строкой \"" + name + "\" уже существует";
+                contentText = "Запись уже существует";
             }
             AlertsUtil.showErrorAlert(AppsException.VALIDATION_ERROR, contentText);
             return false;
@@ -184,9 +204,9 @@ public class TeacherController {
 
             return cell ;
         });
-        surnameCol.setCellValueFactory(cellData -> cellData.getValue().surnameProperty());
-        nameCol.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        patronymicCol.setCellValueFactory(cellData -> cellData.getValue().patronymicProperty());
+        surnameCol.setCellValueFactory(cellData -> StringUtil.upperFirstProperty(cellData.getValue().getSurname()));
+        nameCol.setCellValueFactory(cellData -> StringUtil.upperFirstProperty(cellData.getValue().getName()));
+        patronymicCol.setCellValueFactory(cellData -> StringUtil.upperFirstProperty(cellData.getValue().getPatronymic()));
         telephoneCol.setCellValueFactory(cellData -> cellData.getValue().telephoneProperty());
         emailCol.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
 
@@ -197,9 +217,9 @@ public class TeacherController {
         tableView.setFocusTraversable(false);
         tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                surnameField.setText(newValue.getSurname());
-                nameField.setText(newValue.getName());
-                patronymicField.setText(newValue.getPatronymic());
+                surnameField.setText(StringUtil.upperFirst(newValue.getSurname()));
+                nameField.setText(StringUtil.upperFirst(newValue.getName()));
+                patronymicField.setText(StringUtil.upperFirst(newValue.getPatronymic()));
                 telephoneField.setText(newValue.getTelephone());
                 emailField.setText(newValue.getEmail());
                 refreshLabels();

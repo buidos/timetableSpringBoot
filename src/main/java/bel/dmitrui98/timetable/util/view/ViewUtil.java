@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static bel.dmitrui98.timetable.TimetableApplication.APPLICATION_ICON;
+import static bel.dmitrui98.timetable.TimetableApplication.applicationIcon;
 
 public class ViewUtil {
     private static String prefix = "view/";
@@ -33,7 +33,7 @@ public class ViewUtil {
             fxmlStream = ViewUtil.class.getClassLoader().getResourceAsStream(url);
             FXMLLoader loader = new FXMLLoader();
             loader.load(fxmlStream);
-            return new AppsView(new Scene(loader.getRoot()), loader.getController(), APPLICATION_ICON);
+            return new AppsView(new Scene(loader.getRoot()), loader.getController(), applicationIcon);
         } finally {
             if (fxmlStream != null) {
                 fxmlStream.close();

@@ -20,6 +20,12 @@ public class AppsExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
+
+        // хз как обработать ошибки в критериях (фильтры на главной страницы)
+        if (throwable instanceof IndexOutOfBoundsException || throwable instanceof NullPointerException) {
+            return;
+        }
+
         // логируем все исключения
         log.error("error", throwable);
 

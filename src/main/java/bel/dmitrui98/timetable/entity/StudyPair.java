@@ -23,7 +23,7 @@ public class StudyPair {
     private Integer studyPairId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private StudyShiftEnum studyShift;
 
     /**
