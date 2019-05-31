@@ -13,7 +13,6 @@ import bel.dmitrui98.timetable.util.exception.AppsException;
 import bel.dmitrui98.timetable.util.time.TimeUtil;
 import bel.dmitrui98.timetable.util.validation.AppsValidation;
 import bel.dmitrui98.timetable.util.validation.ValidConditions;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,7 +23,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,10 +38,14 @@ public class LoadController {
     private static final String DELETE_LABEL_NAME = "Номера для удаления: ";
     private static final String DELETE_LABEL_INIT = "не установлены";
     private static final String LOAD_FOR_GROUP_LABEL = "Нагрузка для группы";
+    private static final String GROUP_LABEL = "Группа";
     private static final String BUTTON_GROUP_TEXT = "Выбрать группу";
 
     @FXML
     private Button defaultButton;
+
+    @FXML
+    private Label groupLabel;
 
     @FXML
     private ListView<StudyGroup> groupListView;
@@ -63,6 +65,11 @@ public class LoadController {
     @FXML
     private TextField filterTeacherField;
 
+    @FXML
+    private ListView<Subject> subjectListView;
+    @FXML
+    private TextField filterSubjectField;
+
     @Autowired
     private TeacherRepository teacherRepository;
 
@@ -77,9 +84,6 @@ public class LoadController {
     private TableColumn<Teacher, Void> teacherIndexCol;
     @FXML
     private TableColumn<Teacher, String> teacherCol;
-
-    @FXML
-    private ComboBox<Subject> subjectComboBox;
 
     @Autowired
     private BaseService<Subject, Long> subjectService;
@@ -202,6 +206,7 @@ public class LoadController {
         branchTableView.getItems().clear();
         hourField.setText("");
         halfPairCheckBox.setSelected(false);
+        filterSubjectField.setText("");
     }
 
     @FXML
@@ -249,12 +254,16 @@ public class LoadController {
         }
     }
 
-    private boolean isValid(String hour) {
+    private boolean isValid(String hour, boolean isShowAlert) {
         ValidConditions cond = new ValidConditions();
         cond.setMaxStringLength(8);
         try {
             AppsValidation.validate(hour, cond);
         } catch (AppsException ex) {
+            if (!isShowAlert) {
+                // сообщение не показываем
+                return false;
+            }
             String contentText = "";
             if (ex.getExceptionType().equals(VALID_EMPTY_VALUE)) {
                 contentText = "Часы (минуты) в две недели должны быть установлены";
@@ -279,6 +288,7 @@ public class LoadController {
 
         teachersBranches.clear();
         teachersBranches.addAll(TeacherBranchDto.convert(teachersBranchRepository.findByGroup(selectedGroup), selectedGroup));
+        clear();
 
         refreshLabels();
     }
@@ -286,61 +296,10 @@ public class LoadController {
     @PostConstruct
     public void init() {
         tuningListViews();
+
         tuningTableViews();
 
-        // дисциплыны
-        tuningComboBoxes();
-
         setNumberFormatter(hourField);
-    }
-
-    private void tuningComboBoxes() {
-        subjectComboBox.setCellFactory((listView) -> {
-            return new ListCell<Subject>() {
-                @Override
-                protected void updateItem(Subject item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item != null && !empty) {
-                        setText(item.getName());
-                    } else {
-                        setText(null);
-                    }
-                }
-            };
-        });
-
-        subjectComboBox.setConverter(new StringConverter<Subject>() {
-            @Override
-            public String toString(Subject object) {
-                if (object == null) {
-                    return null;
-                } else {
-                    return object.getName();
-                }
-            }
-
-            @Override
-            public Subject fromString(String string) {
-                return null;
-            }
-        });
-
-        subjectComboBox.valueProperty().addListener((o, oldValue, newValue) -> {
-            if (newValue == null) {
-                subjectComboBox.getSelectionModel().select(oldValue);
-            }
-        });
-        subjectComboBox.getEditor().textProperty().addListener((o, oldValue, newValue) -> {
-            Subject selected = subjectComboBox.getSelectionModel().getSelectedItem();
-            // Platform нужен из-за бага в textField listener
-            Platform.runLater(() -> {
-                if (selected == null || !selected.getName().equals(newValue)) {
-                    filteredSubjects.setPredicate(item ->
-                            item.getName().toLowerCase().startsWith(newValue.toLowerCase())
-                    );
-                }
-            });
-        });
     }
 
 
@@ -391,7 +350,8 @@ public class LoadController {
             if (newValue != null) {
                 refreshLabels();
                 branchTableView.setItems(FXCollections.observableArrayList(newValue.getTeachers()));
-                subjectComboBox.getSelectionModel().select(newValue.getSubject());
+                subjectListView.getSelectionModel().select(newValue.getSubject());
+                filterSubjectField.setText(newValue.getSubject().getName());
                 int hour = newValue.getHour();
                 if (newValue.isHalfPair()) {
                     hour--;
@@ -468,6 +428,32 @@ public class LoadController {
                 return teacher.getSurname().toLowerCase().startsWith(lowerCase);
             });
         }));
+
+        // дисциплины
+        subjectListView.setCellFactory((list) -> {
+            return new ListCell<Subject>() {
+                @Override
+                protected void updateItem(Subject item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
+                    }
+                }
+            };
+        });
+
+        filterSubjectField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredSubjects.setPredicate(teacher -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String lowerCase = newValue.toLowerCase();
+                return teacher.getName().toLowerCase().startsWith(lowerCase);
+            });
+        }));
     }
 
     public void refresh() {
@@ -491,8 +477,7 @@ public class LoadController {
         // дисциплины
         subjects = FXCollections.observableArrayList(subjectService.findAll());
         filteredSubjects = new FilteredList<>(subjects, s -> true);
-        subjectComboBox.setItems(filteredSubjects);
-        subjectComboBox.getSelectionModel().selectFirst();
+        subjectListView.setItems(filteredSubjects);
 
         refreshLabels();
     }
@@ -508,10 +493,11 @@ public class LoadController {
         }
         if (selectedGroup == null) {
             loadLabel.setText(LOAD_FOR_GROUP_LABEL);
+            groupLabel.setText(GROUP_LABEL);
         } else {
             loadLabel.setText(LOAD_FOR_GROUP_LABEL + " " + selectedGroup.getName());
+            groupLabel.setText(GROUP_LABEL + " " + selectedGroup.getName());
         }
-        branchTableView.getItems().clear();
     }
 
     public Button getDefaultButton() {
@@ -578,16 +564,22 @@ public class LoadController {
                 isNotValid = true;
                 return this;
             }
-            subject = subjectComboBox.getSelectionModel().getSelectedItem();
+            subject = subjectListView.getSelectionModel().getSelectedItem();
             if (subject == null) {
                 AlertsUtil.showInfoAlert("Дисциплина должна быть установлена", null);
                 isNotValid = true;
                 return this;
             }
 
-            if (!isValid(hourField.getText())) {
-                isNotValid = true;
-                return this;
+            if (!halfPairCheckBox.isSelected()) {
+                if (!isValid(hourField.getText(), true)) {
+                    isNotValid = true;
+                    return this;
+                }
+            } else {
+                if (!isValid(hourField.getText(), false)) {
+                    hourField.setText("0");
+                }
             }
 
             // общее количество часов в две недели не должно превышать максимальное значение, которое возможно установить в нагрузку
