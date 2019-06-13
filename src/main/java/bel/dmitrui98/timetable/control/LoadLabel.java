@@ -25,6 +25,7 @@ public class LoadLabel extends Label {
      * Ячейка с часами, которые отображаются пользователю. Если была выделена ячейка с часами, то ссылка на саму себя
      */
     private LoadLabel hourCell;
+
     /**
      * Ячейка с общим количеством часов данной группы
      */
@@ -62,12 +63,32 @@ public class LoadLabel extends Label {
 
     /**
      * Обновляет ячейку нагрузки
-     * @param plusMinutes количество минут, которое прибавляется к общему количеству минут (если нужно отнять, передаем минус)
      */
-    public void refresh(int plusMinutes) {
+    public void refresh() {
         getHourCell().setText(String.valueOf(TimeUtil.convertMinuteToHour(getLoadDto().getCountMinutesInTwoWeek())));
-        int commonMinutes = getCommonHourCell().getCommonMinutes() + plusMinutes;
-        getCommonHourCell().setText(String.valueOf(TimeUtil.convertMinuteToHour(commonMinutes)));
+    }
+
+    /**
+     * Обновляет общую ячейку с часами
+     * @param minutes количество минут, которое добавляется/удаляется к общей ячейке расписания
+     * @param isAdd добавляются ли минуты
+     */
+    public void refreshCommonHourCell(int minutes, boolean isAdd) {
+        int commonMinutes = getCommonHourCell().getCommonMinutes();
+        if (isAdd) {
+            commonMinutes += minutes;
+        } else {
+            commonMinutes -= minutes;
+        }
         getCommonHourCell().setCommonMinutes(commonMinutes);
+        refreshCommonHourCell();
+    }
+
+    /**
+     * Обновляет текст общей ячейки с часами
+     */
+    public void refreshCommonHourCell() {
+        int commonMinutes = getCommonHourCell().getCommonMinutes();
+        getCommonHourCell().setText(String.valueOf(TimeUtil.convertMinuteToHour(commonMinutes)));
     }
 }

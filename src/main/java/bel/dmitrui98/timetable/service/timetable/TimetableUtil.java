@@ -319,7 +319,9 @@ class TimetableUtil {
                             loadCell.getLoadDto().getGroup().getStudyGroupId().equals(group.getStudyGroupId())) {
 
                         // отнимаем нагрузку в зависимости от типа часа
-                        minusMinutes(loadCell, dto.getHourType());
+                        if (loadCell.isHourLabel()) {
+                            minusMinutes(loadCell, dto.getHourType());
+                        }
                         dto.setLoadCell(loadCell);
                     }
                 }
@@ -332,7 +334,8 @@ class TimetableUtil {
         int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
         int minutes = currentMinutes - minutesInTwoWeek;
         loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
-        loadCell.refresh(-minutesInTwoWeek);
+        loadCell.refresh();
+        loadCell.refreshCommonHourCell(minutesInTwoWeek, false);
     }
 
     void createInfoPanel(BorderPane borderPane) {

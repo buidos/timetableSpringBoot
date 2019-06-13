@@ -32,15 +32,19 @@ public class LoadService {
     public void setUpLoadToTimetable(TimetableLabel cell, LoadLabel loadCell, HourTypeEnum hourType, boolean isDeleteFromCell) {
         timetableService.setEdit(true);
 
+        // сколько минут отнимается или прибавляется
         int minutesInTwoWeek = (int) ((AppsSettingsHolder.getHourTime() * 2) * hourType.getHour());
         List<TimetableListDto> timetableList = timetableService.getTimetableList();
+
+        // обновляем общую ячейку с часами
+        loadCell.refreshCommonHourCell(minutesInTwoWeek, isDeleteFromCell);
 
         if (!isDeleteFromCell) {
             // если нагрузка добавляется в ячейку расписания, то отнимаем нагрузку из связки учителей
             int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
             int minutes = currentMinutes - minutesInTwoWeek;
             loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
-            loadCell.refresh(-minutesInTwoWeek);
+            loadCell.refresh();
 
             cell.getTimetableListDto().addDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
@@ -61,7 +65,7 @@ public class LoadService {
             int currentMinutes = loadCell.getLoadDto().getCountMinutesInTwoWeek();
             int minutes = currentMinutes + minutesInTwoWeek;
             loadCell.getLoadDto().setCountMinutesInTwoWeek(minutes);
-            loadCell.refresh(minutesInTwoWeek);
+            loadCell.refresh();
             cell.getTimetableListDto().removeDto(new TimetableDto(loadCell.getLoadDto().getBranch(), hourType, loadCell));
             cell.refresh();
 
