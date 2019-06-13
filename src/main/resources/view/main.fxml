@@ -33,9 +33,10 @@
                     <MenuItem mnemonicParsing="false" onAction="#showEditDatabase" text="База данных" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Помощь">
+                <Menu mnemonicParsing="false" text="Справка">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="О программе" />
+                        <MenuItem mnemonicParsing="false" onAction="#aboutAction" text="О программе" />
+                    <MenuItem mnemonicParsing="false" onAction="#helpAction" text="Помощь" />
                   </items>
                 </Menu>
               </menus>

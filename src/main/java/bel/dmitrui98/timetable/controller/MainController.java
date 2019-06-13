@@ -12,6 +12,7 @@ import bel.dmitrui98.timetable.util.alerts.AlertsUtil;
 import bel.dmitrui98.timetable.util.dto.timetable.CriteriaCheckComboBoxesDto;
 import bel.dmitrui98.timetable.util.enums.DayEnum;
 import bel.dmitrui98.timetable.util.view.AppsView;
+import bel.dmitrui98.timetable.util.view.ViewUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -82,6 +84,10 @@ public class MainController {
         Stage stage = new Stage();
         stage.setTitle("Редактирование базы данных");
         stage.initModality(Modality.APPLICATION_MODAL);
+
+        // на полный экран
+        stage.setMaximized(true);
+
         if (editDatabaseView.getIcon() != null) {
             stage.getIcons().add(editDatabaseView.getIcon());
         }
@@ -254,6 +260,38 @@ public class MainController {
             showTable();
         }
     }
+
+    @FXML
+    private void aboutAction() throws IOException {
+        // загружаем без спринга
+        Stage stage = new Stage();
+        stage.setTitle("О программе");
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        AppsView view = ViewUtil.getView(ViewUtil.getModifyName("reference/about"));
+        if (view.getIcon() != null) {
+            stage.getIcons().add(view.getIcon());
+        }
+        stage.setScene(view.getScene());
+        stage.show();
+    }
+
+    @FXML
+    private void helpAction() throws IOException {
+        // загружаем без спринга
+        Stage stage = new Stage();
+        stage.setTitle("Помощь");
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        AppsView view = ViewUtil.getView(ViewUtil.getModifyName("reference/help"));
+        if (view.getIcon() != null) {
+            stage.getIcons().add(view.getIcon());
+        }
+        stage.setScene(view.getScene());
+        stage.show();
+    }
+
+
 
     @PostConstruct
     public void init() {
