@@ -80,6 +80,18 @@ public class IntersectionService {
                     isIntersects = true;
                 }
                 break;
+            case WEEK_HALF_BEGIN:
+                if (hourType == TWO_WEEKS || hourType == NUMERATOR || hourType == DENOMINATOR ||
+                    hourType == NUM_HALF_BEGIN || hourType == DEN_HALF_BEGIN) {
+                    isIntersects = true;
+                }
+                break;
+            case WEEK_HALF_END:
+                if (hourType == TWO_WEEKS || hourType == NUMERATOR || hourType == DENOMINATOR ||
+                        hourType == NUM_HALF_END || hourType == DEN_HALF_END) {
+                    isIntersects = true;
+                }
+                break;
             case NUM_HALF_BEGIN:
                 if (hourType == NUMERATOR || hourType == TWO_WEEKS || hourType == WEEK_HALF_BEGIN) {
                     isIntersects = true;
